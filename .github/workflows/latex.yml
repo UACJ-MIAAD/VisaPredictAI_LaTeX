@@ -77,6 +77,7 @@ jobs:
       # son SIEMPRE bloqueantes.
       - name: Gate de logs (refs, citas, labels, overfull)
         run: |
+          python3 tools/check_no_emdash.py
           bash tools/check_latex_log.sh reports/latex/ProyectoI_VisaPredictAI.log 0 0
           bash tools/check_latex_log.sh reports/latex/AnteproyectoVisaPredictAI.log 0 0
           bash tools/check_latex_log.sh reports/paper_micai/paper.log 3 15

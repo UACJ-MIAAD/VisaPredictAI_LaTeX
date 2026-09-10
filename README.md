@@ -14,7 +14,7 @@ los documentos académicos.
 
 El workflow **LaTeX gate** compila los tres documentos desde un clon limpio,
 comprueba referencias, citas, labels y overfulls, y conserva PDF y logs como
-artefactos de CI.
+artefactos de CI. También ejecuta el guardarraíl tipográfico de Proyecto I.
 
 ## Uso con Overleaf
 
