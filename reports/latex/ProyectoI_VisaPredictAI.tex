@@ -3051,6 +3051,28 @@ cobertura empírica de los intervalos al 95\,\% se reporta junto con el desempe�
 de modo que la incertidumbre declarada sea verificable y no dependa de condiciones
 particulares.
 
+\paragraph{Amenazas a la validez del suministro de datos.} La robustez estadística supone que el
+dato llega. La fuente primaria publica detrás de un cortafuegos de aplicación que rechaza a los
+clientes automatizados, y en el corte que documenta este trabajo ese rechazo está activo. El
+sistema no lo interpreta ni lo disimula: lo registra en su feed canónico de ingesta, que viaja con
+cada corte publicable y declara el estado de la fuente, la fecha desde la que rige y su causa.
+Esta prosa no repite esos valores a propósito, porque un estado que cambia no debe quedar tecleado
+en un documento.
+
+La consecuencia operativa es que la ingesta del mes pasó a ser \textbf{semiautomática}: la página
+se obtiene a mano y entra por la misma orden gobernada que usaba el proceso desatendido, de modo
+que el congelado inmutable de cada página, las sumas de verificación por artefacto y el gate que
+exige que el mes llegue efectivamente al panel siguen rigiendo. Cambia quién trae la página, no
+cómo se valida ni cómo se almacena, y por eso el corte vigente no tiene meses ausentes: la
+cobertura sigue siendo de \factNMonths{} de \factNMonths{} meses.
+
+Lo que sí queda amenazado es la \textbf{frescura} del corte y, con ella, la acumulación de añadas
+prospectivas, que es justamente la evidencia que el gate campeón-retador necesita para decidir a
+horizontes largos. Mientras el bloqueo persista, esa evidencia crece sólo al ritmo de la
+intervención manual, y cualquier afirmación de operación desatendida queda suspendida. El riesgo
+es de disponibilidad, no de integridad: lo ya ingerido está congelado, verificable y respaldado
+página por página tal como se publicó.
+
 % ============================================================
 % 3. CONCLUSIONES
 % ============================================================
@@ -3156,6 +3178,10 @@ de información: reproduce los pronósticos que el sistema habría emitido con l
 disponible en cada origen, pero solo las añadas congeladas desde julio de 2026 constituyen
 evidencia servida en tiempo real. La distinción se reporta de forma explícita y las añadas
 en vivo se acumulan mes con mes.
+\item El acceso automático a la fuente primaria está bloqueado por su cortafuegos de aplicación,
+de modo que la ingesta del mes es hoy semiautomática. El congelado inmutable y las verificaciones
+no cambian, pero la frescura del corte depende de una intervención manual; la Sección~2.3 acota el
+alcance de esta amenaza y el feed canónico de ingesta publica el estado vigente.
 \end{enumerate}
 El trabajo futuro prioriza la evidencia prospectiva multi-horizonte frente al retador
 ingenuo, el tratamiento explícito de los cambios de régimen, la extensión por país de las
@@ -3835,7 +3861,10 @@ horizonte ser\'a la de 2026-08. Cada corte publicable queda adem\'as identificad
 manifiesto de \textit{release} con suma de verificaci\'on SHA-256 por artefacto; las
 cifras de este documento corresponden a la a\~nada \factPanelVintage{} del panel
 (hash \factPanelHashShort). As\'i, el sistema se
-mantiene reproducible, auditado y al d\'ia sin intervenci\'on manual.
+mantiene reproducible y auditado. La puesta al d\'ia, en cambio, depende de que la fuente siga
+siendo alcanzable de forma autom\'atica: cuando su cortafuegos rechaza al cliente del proceso
+desatendido, la ingesta del mes pasa a un procedimiento manual gobernado que conserva el congelado
+inmutable, las sumas de verificaci\'on y los mismos gates (Secci\'on~2.3).
 
 \section{A.10 Experimento de frontera en GPU y evaluación multi-horizonte}
 
