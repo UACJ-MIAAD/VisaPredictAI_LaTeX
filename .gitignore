@@ -1,0 +1,18 @@
+.DS_Store
+__pycache__/
+.pytest_cache/
+
+# Productos locales de pdfLaTeX; CI los publica como artefactos, no como fuentes.
+reports/latex/*.aux
+reports/latex/*.log
+reports/latex/*.lof
+reports/latex/*.lot
+reports/latex/*.out
+reports/latex/*.pdf
+reports/latex/*.synctex.gz
+reports/latex/*.toc
+reports/paper_micai/*.aux
+reports/paper_micai/*.log
+reports/paper_micai/*.out
+reports/paper_micai/*.pdf
+reports/paper_micai/*.synctex.gz

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "source_repository": "UACJ-MIAAD/VisaPredictAI",
+  "source_commit": "37afb31e41e33b422ddaae848ad8f9e5064bca03",
+  "source_subtrees": {
+    "reports/latex": "2e37781cbb34b245eeb5d4566c401f883ec336e7",
+    "reports/paper_micai": "8d6480fe2168916a972ed7916ca9039990a686fe"
+  },
+  "history_filter": {
+    "preserved_paths": [
+      ".github/workflows/latex.yml",
+      "LICENSE",
+      "reports/latex",
+      "reports/paper_micai",
+      "tests/test_latex_log_gate.py",
+      "tools/check_latex_log.sh"
+    ]
+  }
+}
