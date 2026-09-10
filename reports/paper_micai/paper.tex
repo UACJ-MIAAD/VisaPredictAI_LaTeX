@@ -457,6 +457,22 @@ exposes a $3\times$ optimism in the retrospective hold-out number---a discrepanc
 that any single-split benchmark hides and that practitioners deploying such systems
 must know.
 
+\paragraph{Does segmenting the panel help?} A natural objection to a floor result is
+that the floor may be an artifact of pooling heterogeneous series. We tested the
+obvious remedy. Series were split into \emph{stable} and \emph{unstable} cohorts by a
+rule frozen before any modeling result was inspected and computed strictly from
+information preceding the evaluation window (retrogression rate and worst
+retrogression scaled by the series' own naïve scale), each cohort was trained
+separately, and a per-cohort router was required to clear the same pre-registered
+gate as the system: a material MASE gain, a two-sided exact test surviving Holm
+correction, and no material loss, \emph{at three, six and twelve months
+simultaneously}. \textbf{No cohort router clears it}---not in either table, not for
+either cohort---and the router selected for the unstable filing-date cohort is the
+naïve floor itself, so it competes with its own reference. Long-horizon gains appear
+but do not carry the short horizon, and the rule demands all three. These cohort
+experiments are exploratory and reported as such; they do not license a promotion
+decision. Segmenting by stability, on its own, does not change who wins at one step.
+
 \paragraph{Threats to validity.} (1)~Per-horizon interval scales are empirical
 quantiles, not a multi-step guarantee; observed 95\% coverage falls from
 $\approx$0.97 to $\approx$0.88 across horizons in the scored vintages, and the
@@ -470,7 +486,16 @@ only $\approx$14 distinct series; DFF conclusions therefore rest on a small
 effective sample and pairwise DFF comparisons should be read as indicative.
 (4)~Deep results depend on a single accelerator and a fixed seed set. (5)~Some
 statistical models converge only on series subsets (survivorship), disclosed where
-aggregates are averaged.
+aggregates are averaged. (6)~The source publishes behind an application
+firewall that rejects automated clients, so monthly ingestion is currently
+\emph{semi-automatic}: the page is fetched by hand and enters through the same
+governed command, which preserves the immutable freeze, the per-artifact checksums and
+the month-to-panel gate. What this threatens is freshness, and with it the rate at
+which live vintages accrue---the very evidence item~(2) is waiting on---rather than the
+integrity of what has already been collected; the panel at the cut reported here has no
+missing month. The current state of the source is published in the pipeline's ingestion
+feed rather than restated here, so that a state which changes is recorded in one place
+only.
 
 % =====================================================================
 \section{Conclusions}
