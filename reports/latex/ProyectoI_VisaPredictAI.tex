@@ -312,7 +312,7 @@ RLinear, TiDE, LSTM, DeepAR, ARIMA-LSTM, N-BEATS, N-HiTS, TFT) y un \textit{foun
 model} zero-shot (Chronos).
 \item \textbf{Validación walk-forward.}\cita{2} Validación temporal con ventana
 expansible y paso mensual que evalúa cada modelo sin fuga de información, reservando
-los últimos 24 meses como conjunto independiente.
+los últimos 24 meses como un conjunto reservado independiente (\textit{hold-out}).
 \item \textbf{Cuantificación de incertidumbre.} Genera intervalos de predicción al
 95\,\% por dos mecanismos (probabilístico nativo y conforme dividido) y reporta su
 cobertura empírica.
@@ -336,7 +336,7 @@ cobertura empírica.
   \node[store] (db) {Carga de series \textit{(vista $e=F$)}};
   \node[box, right=0.5cm of db] (pre) {Preprocesa\-miento \textit{(huecos, escala, calendario)}};
   \node[box, right=0.5cm of pre] (mod) {Catálogo de \textbf{\factNModels{} modelos}};
-  \node[box, right=0.5cm of mod] (wf) {Walk-forward \textit{(hold-out 24 m)}};
+  \node[box, right=0.5cm of mod] (wf) {Walk-forward \textit{(24 meses reservados)}};
   \node[outbox, right=0.5cm of wf] (pi) {Pronóstico $+$ PI 95\,\%};
   \draw[arr] (db) -- (pre);
   \draw[arr] (pre) -- (mod);
@@ -389,7 +389,7 @@ respaldo versionado, del cual el procesamiento parte de forma reproducible.
 La Figura~\ref{fig:fuente} muestra un boletín real (julio de 2026) tal como se publica: un
 encabezado institucional y, para cada tabla, una matriz con las categorías migratorias en las
 filas y los países o áreas de cargabilidad en las columnas. Cada celda contiene uno de tres
-valores: una \textbf{fecha de prioridad} en formato \texttt{DDMMMYY} (p.\,ej.\ \texttt{01FEB18}),
+valores: una \textbf{fecha de prioridad} en formato \texttt{DDMMMYY} (p.\,ej., \texttt{01FEB18}),
 la marca \textbf{\textit{Current}} (\texttt{C}, sin rezago ese mes) o \textbf{\textit{Unavailable}}
 (\texttt{U}, sin números disponibles). La Figura~\ref{fig:tabla_pub} reproduce, con esa misma
 estructura, la tabla \textit{Final Action Dates} de preferencia por empleo del mismo boletín,
@@ -638,7 +638,7 @@ Automatización & Tarea programada de integración continua & Boletín nuevo a p
 \end{tabular}
 \end{table}
 
-\paragraph{Cantidad de los datos obtenidos.} El proceso descrito produjo un panel de
+\paragraph{Cantidad de datos obtenidos.} El proceso descrito produjo un panel de
 \factNObsFmt{} registros distribuidos en \factNSeriesStructural{} series y \factNMonths{}
 meses consecutivos, sin meses faltantes, con nueve variables por registro que documenta el
 Apéndice~A.11. La Tabla~\ref{tab:censo_obtencion} desglosa el volumen obtenido por
@@ -904,7 +904,7 @@ su papel es indispensable, porque una de ellas es la variable dependiente, cuatr
 dimensiones de corte o de agregación, una es el índice temporal y las tres restantes son
 equivalencia, régimen y trazabilidad: gobiernan qué observación es utilizable, pero no son
 insumo predictivo. Confundir una anotación con un insumo es precisamente el tipo de error
-que el EDA existe para prevenir. La Tabla~\ref{tab:eda_variables} precisa qué mide cada
+que el análisis exploratorio busca evitar. La Tabla~\ref{tab:eda_variables} precisa qué mide cada
 variable, con qué papel entra en el análisis y qué se hace con ella.
 
 \begin{table}[H]
@@ -947,17 +947,17 @@ boletín publicado \\
 \end{table}
 
 \paragraph{Técnicas y herramientas.} El análisis combina estadística descriptiva,
-inspección gráfica y pruebas formales de hipótesis, en ese orden: primero se observa la
-estructura, después se contrasta lo observado con pruebas cuya hipótesis nula está declarada.
-Las técnicas aplicadas son las siguientes: censo descriptivo y de completitud del panel;
-histogramas, diagramas de violín y diagramas de cumbres para la forma de las distribuciones;
-mapas de calor de correlación con agrupamiento jerárquico y correlación cruzada con retardos
-para las relaciones entre series; descomposición estacional y funciones de autocorrelación
-para la estructura temporal; pruebas de raíz unitaria, de estacionariedad, de ruido blanco y
-de independencia para formalizar los diagnósticos; detección de cambios de régimen y filtrado
-robusto para separar el desplazamiento estructural del atípico puntual; y un catálogo de
-características por serie que permite analizar el panel como una tabla en lugar de serie por
-serie. Todo se ejecuta con software libre y con versiones fijadas, sobre el mismo entorno
+inspección gráfica y pruebas formales de hipótesis, en ese orden. Primero se observa la
+estructura; después se contrasta lo observado con pruebas cuya hipótesis nula está declarada.
+El censo descriptivo y de completitud dimensiona el panel. Histogramas, diagramas de violín
+y diagramas de cumbres describen la forma de las distribuciones, mientras que los mapas de
+calor con agrupamiento jerárquico y la correlación cruzada con retardos estudian las relaciones
+entre series. La estructura temporal se examina mediante descomposición estacional y funciones
+de autocorrelación; las pruebas de raíz unitaria, estacionariedad, ruido blanco e independencia
+formalizan esos diagnósticos. Finalmente, la detección de cambios de régimen y el filtrado
+robusto separan los desplazamientos estructurales de los atípicos puntuales, y un catálogo de
+características permite analizar el panel como una tabla en lugar de serie por serie. Todo se
+ejecuta con software libre y con versiones fijadas, sobre el mismo entorno
 reproducible de la fase de obtención (Apéndice~A.14), de modo que un solo entorno reproduce
 datos y análisis. Cada figura y cada estadístico de esta sección se genera por programa a
 partir del panel versionado, nunca a mano.
@@ -1559,7 +1559,7 @@ Segundo, una des-redundancia por correlación de Spearman, en el espíritu de la
 de mínima redundancia y máxima relevancia (mRMR) \cita{21}, que conserva una sola
 característica representativa de cada grupo colineal. Es importante acotar qué es este
 análisis: una \textbf{caracterización retrospectiva de la dificultad}, que relaciona
-descriptores calculados sobre la serie completa con el MASE de hold-out del modelo
+descriptores calculados sobre la serie completa con el MASE del conjunto reservado del modelo
 campeón para describir \textit{qué} series resultan difíciles de pronosticar. No es una
 selección predictiva de insumos (los modelos consumen los rezagos, el calendario y las
 máscaras de ausencia a través del motor de características, no estos descriptores) ni
@@ -1573,13 +1573,13 @@ mutua) no aporta: pocos descriptores bien elegidos superan a muchos correlaciona
 \cita{22}.
 
 \paragraph{Nota sobre la ingeniería de características viva.} Igual que el EDA, la
-ingeniería de características y la limpieza mantienen un catálogo versionado
-(las \feFactNCleanDecisions{} decisiones de limpieza y \feFactNFeDecisions{} de
-características, cada una con el módulo que la implementa y la falla que previene, el
-registro de limpieza de cada consolidación y el resultado vigente de la selección) que
-se regenera de forma automática con cada boletín nuevo junto con su galería de figuras
-y un reporte ejecutivo en PDF, consultables públicamente desde la aplicación de
-demostración (Apéndice~A).
+ingeniería de características y la limpieza mantienen un catálogo versionado. Este reúne
+las \feFactNCleanDecisions{} decisiones de limpieza y \feFactNFeDecisions{} de
+características, cada una con el módulo que la implementa y la falla que previene, además
+del registro de limpieza de cada consolidación y del resultado vigente de la selección.
+El catálogo se regenera de forma automática con cada boletín nuevo junto con su galería
+de figuras y un reporte ejecutivo en PDF. Ambos son consultables públicamente desde la
+aplicación de demostración (Apéndice~A).
 
 \subsubsection{Métodos del estado del arte evaluados y descartados por diagnóstico}
 
@@ -1637,12 +1637,11 @@ máximo ocurre en el retardo cero: el co-movimiento es contemporáneo.}
 \subsubsection{Síntesis: hallazgos del análisis y decisiones que inducen}
 
 Un análisis exploratorio no termina en la descripción: termina cuando cada hallazgo se
-traduce en una decisión verificable sobre el modelado. Las
-Tablas~\ref{tab:eda_sintesis} y~\ref{tab:eda_sintesis2} recapitulan los doce hallazgos
-principales de esta sección, la evidencia concreta que los sostiene y la consecuencia que
-cada uno tiene para la fase siguiente: la primera reúne los que describen la estructura, la
-cobertura y la forma de los datos; la segunda, los que se refieren a las anomalías, a las
-dependencias entre series y al alcance de lo que el sistema puede prometer. Leídas en
+traduce en una decisión verificable sobre el modelado. Las Tablas~\ref{tab:eda_sintesis}
+y~\ref{tab:eda_sintesis2} recapitulan los doce hallazgos principales, la evidencia concreta
+que los sostiene y la consecuencia de cada uno para la fase siguiente. La primera reúne los
+hallazgos sobre estructura, cobertura y forma de los datos. La segunda presenta los relativos
+a anomalías, dependencias entre series y alcance de lo que el sistema puede prometer. Leídas en
 conjunto, describen un panel de series fuertemente tendenciales, sin ciclo anual, integradas
 de orden uno, con distribuciones de avance asimétricas y de cola pesada, con anomalías
 mayoritariamente estructurales y con un co-movimiento contemporáneo que no permite usar un
@@ -1804,20 +1803,22 @@ ausencia misma es información. Por ello el tratamiento es doble. Para
 \textbf{caracterizar y visualizar} se imputa con suavizado de Kalman sobre un modelo de
 espacio de estados, el método de referencia de \texttt{imputeTS} \cita{23}, superior a
 la interpolación lineal (Figura~\ref{fig:eda_kalman}). Para \textbf{modelar}, la
-rejilla mensual de entrenamiento se construye con relleno estrictamente causal: cada
+rejilla mensual de entrenamiento se construye con relleno estrictamente causal. Cada
 mes sin fecha publicada ($C$/$U$) arrastra la última observación anterior
 (\textit{last observation carried forward}, LOCF), de modo que el valor de un mes
-depende solo de observaciones anteriores o iguales a ese mes; mutar cualquier valor
+depende solo de observaciones anteriores o iguales a ese mes. Mutar cualquier valor
 posterior a un origen de pronóstico no altera ningún insumo en ese origen ni antes de
-él, propiedad verificada por pruebas metamórficas automatizadas. Esta política
+él; esta propiedad se verifica mediante pruebas metamórficas automatizadas. La política
 sustituye a la interpolación lineal bidireccional de las campañas previas, que usaba
 el extremo futuro de cada hueco. Los valores de relleno jamás se puntúan (solo se
-califican los meses con fecha publicada, máscara $e=F$). Los árboles de gradiente
-sobre la serie diferenciada reciben además las máscaras de ausencia MNAR (indicador
-de observación y meses desde la última observación) con retardo de un mes (el último
-mes cerrado, conocido en el origen), de modo que puedan descontar los tramos
-arrastrados; el resto del catálogo usa la política causal hacia adelante explícita,
-sin covariables de máscara.
+califican los meses con fecha publicada, máscara $e=F$).
+
+Los árboles de gradiente sobre la serie diferenciada reciben además dos máscaras de
+ausencia MNAR: el indicador de observación y los meses transcurridos desde la última
+observación. Ambas se incorporan con un retardo de un mes, correspondiente al último mes
+cerrado y conocido en el origen, para que el modelo pueda descontar los tramos arrastrados.
+El resto del catálogo usa la política causal hacia adelante explícita, sin covariables de
+máscara.
 \item \textbf{Regularización mensual.} Para los modelos que exigen frecuencia fija, la
 rejilla se completa con el mismo relleno causal hacia adelante: todo mes sin fecha
 arrastra la última observación publicada, sin usar jamás el extremo futuro del hueco
@@ -1911,8 +1912,20 @@ covariables.}
 
 \subsection{1.3.1 Definición de las técnicas de modelado a utilizar}
 
-Se comparan los \textbf{\factNModels{} modelos} de la Tabla~\ref{tab:modelos}: tres líneas base de
-referencia y seis familias complementarias. El naïve estacional es el denominador de la
+\paragraph{Formulación del problema.} VisaPredict AI aborda una regresión temporal en panel:
+para cada combinación de país o área de cargabilidad, categoría migratoria y tipo de tabla,
+pronostica una fecha de prioridad futura. No es una tarea de clasificación, porque la variable
+de interés es ordenada y cuantificable; tampoco es agrupamiento, pues las series y sus
+identificadores ya están definidos. FAD y DFF se modelan por separado, y el entrenamiento usa
+únicamente las celdas con fecha publicada (estado $F$). Los estados \textit{Current} ($C$) y
+\textit{Unavailable} ($U$) se conservan como información de régimen, sin convertirlos en fechas
+ni en etiquetas objetivo.
+
+\paragraph{Criterios de selección.} Se comparan los \textbf{\factNModels{} modelos} de la
+Tabla~\ref{tab:modelos}: tres líneas base de referencia y seis familias complementarias. El
+catálogo se evalúa por su adecuación al carácter temporal de los datos, su capacidad para
+generalizar fuera de la muestra, la diversidad de sus supuestos y un costo computacional
+compatible con la actualización mensual. El naïve estacional es el denominador de la
 métrica MASE ($m=12$); el \textbf{naïve-1} (repetir el último valor publicado, es decir,
 un paseo aleatorio) es el piso operativo que cualquier modelo debe justificar; y la
 deriva (\textit{drift}) le añade el avance medio histórico. Incluir estas líneas base no
@@ -1921,9 +1934,11 @@ nulo, ``no moverse'' es una predicción formidable a un paso, y omitirla dejarí
 piso honesto a toda la comparación. Como las series distan de ser estacionales, se
 reporta en paralelo la MASE escalada por el naïve-1 ($m=1$); se conserva $m=12$ como
 métrica principal por comparabilidad con la práctica estándar y con las campañas
-previas del proyecto (la definición formal y su referencia se dan en §2.1). La elección del resto del catálogo responde al problema:
-las series son fechas que avanzan con tendencia fuerte, estacionalidad anual casi nula y
-retrogresiones ocasionales, por lo que conviene contrastar el espectro completo,
+previas del proyecto (la definición formal y su referencia se dan en §2.1).
+
+La elección del resto del catálogo responde al problema. Las series son fechas que avanzan
+con tendencia fuerte, estacionalidad anual casi nula y retrogresiones ocasionales. Por ello
+conviene contrastar el espectro completo,
 desde modelos lineales parsimoniosos (ARIMA, SARIMA, ETS, Theta, tendencia lineal
 local) hasta modelos de alta capacidad (árboles de potenciación de gradiente sobre
 deltas, redes profundas), y verificar empíricamente cuál conviene a este régimen de
@@ -1940,6 +1955,7 @@ ajustarse a estos datos.
 catálogo de \factNModels{} modelos, con su justificación. Los árboles operan sobre la primera
 diferencia; Chronos es zero-shot.}
 \label{tab:modelos}
+\label{tab:modelos_a6}
 \begin{tabular}{p{2.9cm} l l}
 \toprule
 \rowcolor{uacjblue!15}
@@ -1964,11 +1980,11 @@ nula y retrogresiones ocasionales.
 
 \paragraph{Referencia: naïve-1, deriva y naïve estacional.} El naïve estacional repite el
 valor de doce meses atrás; es el denominador de la MASE, y todos los modelos serios lo baten
-por amplio margen (MASE de hold-out $1.249$), lo que confirma que las series son
+por amplio margen (MASE del conjunto reservado $1.249$), lo que confirma que las series son
 predecibles. La línea base que de verdad exige es el \textbf{naïve-1}: repetir el último
 corte publicado, la predicción óptima de un paseo aleatorio. Ninguno de los tres aprende
 nada; el naïve-1, sin embargo, resulta el rival a vencer de todo el capítulo de resultados
-(MASE de hold-out $\factNaiveOneFadMean$ en FAD y $\factNaiveOneDffMean$ en DFF), porque en estas colas familiares,
+(MASE del conjunto reservado $\factNaiveOneFadMean$ en FAD y $\factNaiveOneDffMean$ en DFF), porque en estas colas familiares,
 del $28$\,\% de meses congelados en FAD al $66$\,\% en DFF (Tabla~\ref{tab:eda_descriptiva}),
 la fecha se repite con frecuencia. La deriva, que añade el avance medio, apenas lo matiza.
 
@@ -2026,6 +2042,13 @@ $0.184$ ocupa la zona media-baja de la tabla: la transferencia aporta un pronós
 razonable sin entrenar, pero ya no supera a las redes locales correctamente especificadas ni
 se acerca a los parsimoniosos o al piso ingenuo.
 
+\paragraph{Técnicas no seleccionadas.} Los algoritmos evolutivos, los métodos de enjambre y
+la optimización multiobjetivo no se usan como predictores principales. Son técnicas apropiadas
+para buscar soluciones en espacios de decisión, mientras que este proyecto estima una variable
+temporal futura y no asigna recursos ni optimiza varios objetivos operativos. La optimización de
+hiperparámetros forma parte del ajuste de algunos modelos, pero no sustituye a la técnica
+predictiva ni constituye por sí misma una familia de pronóstico.
+
 En conjunto, esta comparación de sesgos inductivos anticipa el resultado central del Capítulo de
 resultados: en un panel dominado por meses congelados, el piso del paseo aleatorio a un paso
 no lo supera con significancia ningún modelo puntual (ni parsimonioso, ni de árboles, ni
@@ -2035,14 +2058,174 @@ calibrada y la coherencia transversal (§2.2).
 
 \subsection{1.3.2 Creación de la arquitectura general del sistema y definición del flujo de trabajo}
 
-Los \factNModels{} modelos se exponen tras una interfaz común (\texttt{fit}/\texttt{predict})
-mediante la biblioteca \textit{darts}, lo que permite una comparación justa y reúsa
-el motor de validación temporal y la generación de bandas probabilísticas sin
-reimplementarlos. El flujo de trabajo es el de la Figura~\ref{fig:arquitectura}: las
-piezas de código propio son la cascada ARIMA-LSTM (un envoltorio que ajusta un ARIMA,
-calcula sus residuales y entrena un LSTM sobre ellos), el envoltorio que diferencia las
-series para los árboles de potenciación de gradiente y el adaptador que evalúa Chronos
-en modo zero-shot.
+\paragraph{Propósito arquitectónico.} VisaPredict AI se diseñó como un sistema modular de
+procesamiento por lotes, adecuado a la periodicidad mensual del \textit{Visa Bulletin}. No
+es un servicio que pronostica en línea después de cada consulta: una nueva fuente entra al
+flujo, se valida, produce una versión trazable de datos y modelos, y sólo entonces genera
+artefactos estáticos para consulta. Esta decisión reduce la complejidad operativa, evita que
+un cálculo parcial llegue al usuario y permite reproducir cada resultado a partir del
+código, los datos y la configuración que lo originaron.
+
+\paragraph{Vista general.} La arquitectura de la Figura~\ref{fig:arquitectura_a7} separa
+ocho componentes con responsabilidades explícitas. El portal oficial es la fuente; la
+instantánea congelada es la evidencia primaria; el panel y el almacén son las capas de datos
+procesados; la matriz de características alimenta al catálogo de modelos; la evaluación
+temporal decide qué resultados son admisibles; y la capa de publicación expone únicamente
+artefactos versionados. El seguimiento, las pruebas y los controles de procedencia atraviesan
+todo el flujo. Esta vista extremo a extremo complementa la Figura~\ref{fig:arquitectura},
+que detalla exclusivamente el flujo interno de modelado.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\footnotesize,
+  stage/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!8,
+    line width=0.8pt, text width=2.55cm, align=center, minimum height=1.15cm,
+    inner sep=4pt},
+  source/.style={stage, fill=uacjyellow!25, draw=uacjblack},
+  output/.style={stage, fill=regC!14, draw=regC},
+  band/.style={rectangle, rounded corners=3pt, draw=uacjgray, fill=uacjgray!10,
+    text width=13.3cm, align=center, minimum height=0.75cm, inner sep=4pt},
+  arr/.style={-{Latex[length=2.2mm]}, uacjgray, line width=0.9pt},
+  lab/.style={font=\scriptsize\itshape, text=uacjgray, align=center}]
+  \node[source] (src) at (0,0) {\textbf{1. Fuente}\\Portal oficial del \textit{Visa Bulletin}};
+  \node[stage] (raw) at (3.25,0) {\textbf{2. Evidencia}\\Instantánea HTML congelada};
+  \node[stage] (panel) at (6.50,0) {\textbf{3. Panel limpio}\\CSV largo mensual};
+  \node[stage] (db) at (9.75,0) {\textbf{4. Almacén}\\DuckDB + vistas analíticas};
+  \draw[arr] (src)--(raw);\draw[arr] (raw)--(panel);\draw[arr] (panel)--(db);
+
+  \node[stage] (fe) at (9.75,-2.25) {\textbf{5. Variables}\\Rezagos, calendario y máscaras};
+  \node[stage] (model) at (6.50,-2.25) {\textbf{6. Modelado}\\Catálogo de \factNModels{} modelos};
+  \node[stage] (eval) at (3.25,-2.25) {\textbf{7. Evaluación}\\Validación temporal + métricas};
+  \node[output] (release) at (0,-2.25) {\textbf{8. Publicación}\\JSON, CSV, \LaTeX{} y portal};
+  \draw[arr] (db)--(fe);\draw[arr] (fe)--(model);\draw[arr] (model)--(eval);
+  \draw[arr] (eval)--(release);
+
+  \node[band] (gov) at (4.88,-4.05) {\textbf{Capas transversales:} Git + DVC para
+  versionado \quad $\bullet$ \quad registro de experimentos \quad $\bullet$ \quad
+  pruebas, contratos de datos y procedencia};
+  \node[lab, below=1mm of release] {Consulta web y recuperación documental};
+\end{tikzpicture}%
+}
+\caption[Arquitectura general de VisaPredict AI]{Arquitectura extremo a extremo por
+componentes: la fuente oficial se transforma en evidencia congelada, panel, almacén,
+características, modelos y resultados evaluados antes de la publicación. El versionado,
+la trazabilidad y las pruebas son responsabilidades transversales.}
+\label{fig:arquitectura_a7}
+\end{figure}
+
+\paragraph{Adquisición y evidencia de origen.} El primer componente incorpora cada boletín
+mensual desde el sitio del Departamento de Estado. La descarga utiliza
+\texttt{requests} y el análisis del documento emplea \texttt{BeautifulSoup}
+\cita{7}\cita{8}. Sin embargo, la fuente puede rechazar clientes automatizados; por ello
+la arquitectura admite una captura manual controlada cuando la automatización no está
+disponible. En ambos casos, el límite es el mismo: se conserva primero una instantánea
+inmutable y se verifica su suma de comprobación. El resto del procesamiento se ejecuta sin
+red sobre esa evidencia. Así, la restricción de acceso amenaza la oportunidad de la
+actualización, pero no autoriza a omitir controles de integridad.
+
+\paragraph{Preparación y almacenamiento.} El segundo bloque convierte las tablas del
+boletín en un panel largo con frecuencia mensual. \texttt{pandas} realiza la
+normalización y las transformaciones tabulares \cita{9}; las reglas de calidad verifican
+claves, dominio, fechas, duplicados y continuidad antes de aceptar el panel. El archivo CSV
+constituye la interfaz abierta, mientras DuckDB organiza la misma información en un esquema
+dimensional con vistas para análisis y modelado \cita{59}. DVC registra las dependencias y
+los productos de cada etapa, y Git conserva el código y los punteros de versión
+\cita{57}. Esta separación permite reconstruir un resultado sin confundir el dato fuente,
+la transformación y el producto derivado.
+
+\paragraph{Construcción de características.} El módulo de preprocesamiento recibe una serie
+mensual y produce exclusivamente información disponible en cada origen de pronóstico:
+rezagos del nivel y del avance, variables cíclicas del calendario, máscaras de régimen y
+características descriptivas seleccionadas. \texttt{NumPy}, \texttt{SciPy} y
+\texttt{statsmodels} apoyan los cálculos numéricos y estadísticos
+\cita{60}\cita{61}. Los parámetros de escalamiento se estiman sólo con el tramo de
+entrenamiento y las pruebas de causalidad impiden que una observación futura modifique una
+fila anterior.
+
+\paragraph{Capa de modelado.} Los \factNModels{} modelos se exponen tras una interfaz común
+(\texttt{fit}/\texttt{predict}) mediante la biblioteca \textit{Darts} \cita{62}, lo que
+permite una comparación justa y reúsa el motor de validación temporal y la generación de
+bandas probabilísticas sin reimplementarlos. PyTorch sustenta las redes neuronales
+\cita{63}, y \texttt{scikit-learn} aporta interfaces y utilidades para aprendizaje
+automático \cita{64}. XGBoost, LightGBM y CatBoost implementan los regresores sobre avances
+\cita{30}\cita{31}\cita{32}. Los modelos locales se ajustan por serie y los globales
+aprenden de varias series, pero ambos consumen la misma representación causal. Las piezas de
+código propio son la cascada ARIMA-LSTM (un envoltorio que ajusta un ARIMA, calcula sus
+residuales y entrena un LSTM sobre ellos), el envoltorio que diferencia las series para los
+árboles de potenciación de gradiente y el adaptador que evalúa Chronos en modo zero-shot.
+
+\paragraph{Evaluación, selección e incertidumbre.} La salida de un modelo no pasa
+directamente a publicación. El motor de evaluación recorre orígenes cronológicos con ventana
+expansible y reserva una cola final independiente. En cada origen calcula las mismas métricas
+y conserva la identidad de la tabla, la serie, el modelo y la configuración. Cuando una
+técnica produce distribuciones o bandas, también se mide la cobertura. Las líneas base de
+la sección~1.3.1 permanecen dentro de la comparación; por tanto, un modelo complejo no se
+promueve sólo porque converja, sino porque demuestra una mejora verificable sobre una
+referencia pertinente.
+
+\paragraph{Artefactos, consulta y retroalimentación.} Los resultados aceptados se
+materializan en archivos CSV y JSON para consumo programático y en macros \LaTeX{} para los
+documentos académicos. El portal bilingüe lee estos artefactos versionados; no vuelve a
+entrenar modelos durante una consulta. La recuperación documental usa la misma versión
+publicada, lo que evita que el sitio y sus respuestas describan cortes distintos. Cuando
+llega un boletín posterior, sus valores reales se incorporan a un registro prospectivo y
+alimentan una nueva evaluación. El flujo es, por tanto, cíclico: publicar no concluye el
+proceso, sino que abre la siguiente oportunidad de contrastar los pronósticos.
+
+\paragraph{Flujo de trabajo operativo.} La Tabla~\ref{tab:flujo_a7} resume la interacción
+entre componentes. Cada paso recibe una entrada identificable, genera una salida verificable
+y posee una condición que impide avanzar cuando el resultado no es confiable.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\caption[Flujo de trabajo del sistema]{Secuencia operativa, productos y puertas de
+aceptación de VisaPredict AI.}
+\label{tab:flujo_a7}
+\begin{tabular}{>{\centering\arraybackslash}p{0.65cm}
+                >{\RaggedRight\arraybackslash}p{2.65cm}
+                >{\RaggedRight\arraybackslash}p{4.20cm}
+                >{\RaggedRight\arraybackslash}p{5.65cm}}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Paso} & \textbf{Componente} & \textbf{Producto} & \textbf{Condición para continuar} \\ \midrule
+1 & Captura & Instantánea del boletín & Archivo identificable, íntegro y asociado al mes esperado. \\
+2 & Extracción & Tablas normalizadas & Estructura reconocida y valores dentro del dominio permitido. \\
+3 & Consolidación & Panel mensual largo & Claves únicas, continuidad temporal y registro de limpieza aceptado. \\
+4 & Almacenamiento & DuckDB, vistas y conjunto entrenable & Restricciones de integridad y dependencias DVC coherentes. \\
+5 & Preprocesamiento & Matriz de características causal & Ningún dato posterior altera una fila construida en un origen anterior. \\
+6 & Modelado & Pronósticos por modelo y serie & Configuración, semilla, código y datos quedan identificados. \\
+7 & Evaluación & Métricas, intervalos y comparación & Cobertura completa, línea base presente y conjunto reservado intacto. \\
+8 & Publicación & Artefactos académicos y portal & Consistencia entre superficies y procedencia verificable. \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Seguimiento, calidad y reproducibilidad.} Cada ejecución registra sus parámetros
+y métricas en un formato ligero que puede sincronizarse con MLflow \cita{58}. Las pruebas
+automatizadas cubren código, contratos de datos, causalidad, coherencia entre artefactos y
+compilación documental. Ruff verifica estilo, mypy comprueba tipos y pytest ejecuta la
+batería funcional; GitHub Actions reproduce estas verificaciones antes de integrar cambios
+\cita{65}. Ningún paso de publicación se interpreta como exitoso por la sola existencia de
+un archivo: su procedencia y su cobertura deben corresponder a la misma versión.
+
+\paragraph{Escalabilidad, seguridad y disponibilidad.} La escala actual permite ejecutar el
+almacén de forma embebida y distribuir las campañas de modelado por tabla, familia o serie.
+La modularidad permite ampliar el catálogo sin modificar la adquisición ni la publicación.
+En seguridad, el sistema procesa exclusivamente datos públicos y agregados; no recibe
+expedientes ni información personal de solicitantes. Las sumas de comprobación, los
+artefactos inmutables y las puertas de calidad reducen el riesgo de sustitución accidental.
+En disponibilidad, la captura contempla la intervención humana cuando la fuente bloquea la
+automatización, mientras todas las etapas posteriores continúan siendo reproducibles sin
+conexión.
+
+\paragraph{Síntesis arquitectónica.} La arquitectura vincula cada decisión técnica con una
+responsabilidad: la evidencia se congela antes de transformarla; los datos se validan antes
+de modelarlos; las técnicas compiten antes de seleccionarse; y los resultados se acreditan
+antes de publicarse. Esta secuencia hace que VisaPredict AI sea mantenible y auditable, y
+permite incorporar nuevos boletines, modelos o superficies de consulta sin romper la
+trazabilidad de las versiones anteriores.
 
 % ------------------------------------------------------------
 \section{1.4 Desarrollo}
@@ -2263,7 +2446,7 @@ final del horizonte.
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{results_holdout_mexico_F3_FAD.png}
-\caption[Pronóstico vs. real en el hold-out]{Pronóstico del modelo ETS amortiguado frente a
+\caption[Pronóstico vs. real en el conjunto reservado]{Pronóstico del modelo ETS amortiguado frente a
 los valores reales sobre el conjunto reservado de 24 meses, México/F3/FAD.}
 \label{fig:holdout}
 \end{figure}
@@ -2282,7 +2465,7 @@ decir, 600 evaluaciones modelo-serie (una combinación falló por un problema nu
 y se reporta como ausente, sin abortar el barrido). En cada
 origen, el pronóstico a un paso usa solo información del pasado, de modo que la
 comparación entre modelos está libre de fuga. Las métricas de selección se calculan
-sobre la región previa al conjunto reservado; las de hold-out, sobre los 24 meses
+sobre la región previa al conjunto reservado; las del conjunto reservado, sobre los 24 meses
 finales. Cada corrida se registra de forma reproducible con semilla fija y su
 procedencia (versión del código, hiperparámetros) queda en un registro auditable. El
 mismo protocolo se aplica de forma independiente a la tabla DFF (§2.2), sin comparar
@@ -2332,7 +2515,7 @@ intervalo de predicción conforme). El \textbf{demostrador desplegado}, en cambi
 robustez y simplicidad una \textbf{receta campeona por tabla} (Final Action Dates: mediana de
 Theta+ETS+SARIMA; Dates for Filing: SARIMA), versionada y revisada por el procedimiento
 campeón-retador del Apéndice~A.8. Ese procedimiento incorpora ahora al \textbf{naïve-1 como
-retador formal}: aunque supera al campeón en el pronóstico a un paso del hold-out, su
+retador formal}: aunque supera al campeón en el pronóstico a un paso del conjunto reservado, su
 promoción se \textbf{retiene} por una decisión de gobernanza documentada (el gate evalúa
 $h=1$, pero el producto sirve horizontes de 1 a 12 meses, donde repetir el último valor se
 degrada) y un despliegue en sombra congela cada mes su añada para decidir con evidencia
@@ -2342,7 +2525,7 @@ modelos se contrasta de antemano con las pruebas de la §2.2, para no confundir 
 mejora.
 
 El Algoritmo~\ref{alg:walkforward} resume el procedimiento de validación: en cada origen del
-hold-out el modelo se entrena \textit{solo} con el pasado, predice un paso y deriva su
+conjunto reservado el modelo se entrena \textit{solo} con el pasado, predice un paso y deriva su
 intervalo de los errores de calibración anteriores, de modo que ninguna observación futura
 interviene. La Tabla~\ref{tab:notacion} reúne la notación empleada.
 
@@ -2351,7 +2534,7 @@ interviene. La Tabla~\ref{tab:notacion} reúne la notación empleada.
 \label{alg:walkforward}
 \begin{algorithmic}[1]
 \Require serie $y_{1:T}$, modelo $\mathcal{M}$, horizonte de prueba $H$, nivel $\alpha$
-\Ensure errores $\{e_t\}$ e intervalos $\{[L_t,U_t]\}$ sobre el hold-out
+\Ensure errores $\{e_t\}$ e intervalos $\{[L_t,U_t]\}$ sobre el conjunto reservado
 \For{$t = T-H+1$ \textbf{hasta} $T$}
   \State entrenar $\mathcal{M}$ con $y_{1:t-1}$ \Comment{nada del mes $t$ en adelante}
   \State $\hat{y}_t \gets \mathcal{M}.\textsc{predecir}(1)$
@@ -2394,12 +2577,12 @@ métrica de selección encabezan los árboles con hiperparámetros optimizados (
 LightGBM, $0.101$), seguidos de la deriva ($0.105$) y de Theta ($0.110$, el listón
 parsimonioso de selección). Pero en el conjunto reservado el orden se invierte:
 \textbf{ningún modelo entrenado bate al naïve-1} (repetir el último corte publicado),
-cuya MASE de hold-out es $\factNaiveOneFadMean$ en media y $\factNaiveOneFadMedian$ en mediana. ETS amortiguado
+cuya MASE del conjunto reservado es $\factNaiveOneFadMean$ en media y $\factNaiveOneFadMedian$ en mediana. ETS amortiguado
 ($\factEtsFadMean$) y Theta ($\factThetaFadMean$) quedan como los mejores modelos
 entrenados; los árboles optimizados ($0.123$--$0.126$) y las redes locales reformuladas
 sobre la primera diferencia (TFT $0.122$, NLinear $0.128$) se agolpan justo detrás, ya
 sin el colapso por sobreajuste de las campañas iniciales; Chronos en modo zero-shot
-($0.291$ de hold-out) y Prophet cierran la parte baja, y solo el naïve estacional
+($0.291$ en el conjunto reservado) y Prophet cierran la parte baja, y solo el naïve estacional
 ($1.249$) queda fuera de concurso. La explicación es estructural: con el
 $\factPctFrozen$\,\% de los avances mensuales del panel en cero, ``no moverse'' acierta casi
 siempre a un paso, y el margen restante lo dominan las retrogresiones impredecibles. El
@@ -2420,7 +2603,7 @@ Chronos es zero-shot (sin entrenar).}
 \begin{tabular}{lcccc}
 \toprule
 \rowcolor{uacjblue!15}
-\textbf{Modelo} & \textbf{MASE sel.} & \textbf{MASE hold-out} & \textbf{sMAPE sel.} & \textbf{sMAPE hold-out} \\ \midrule
+\textbf{Modelo} & \textbf{MASE sel.} & \textbf{\shortstack{MASE\\reservado}} & \textbf{sMAPE sel.} & \textbf{\shortstack{sMAPE\\reservado}} \\ \midrule
 % --- FAD: 25 series familia, run 20260704T100200-ea94a2a (experiments/make_tex_tables.py) ---
 XGBoost & \textbf{0.101} & 0.125 & 0.39 & 0.33 \\
 LightGBM & 0.101 & 0.123 & 0.39 & 0.33 \\
@@ -2467,10 +2650,10 @@ confianza de modelos (Model Confidence Set) \cita{46} y el ranking de Friedman-N
 \paragraph{Resultados sobre la tabla DFF.} Como FAD y DFF se evalúan por separado, el
 mismo protocolo (los \factNModels{} modelos) se aplicó a las 25 series DFF de preferencia familiar
 (Tabla~\ref{tab:comparacion_dff}). El piso es aquí aún más elocuente: \textbf{naïve-1 y
-Theta empatan exactamente a la cabeza} (selección $0.077$ y hold-out
-$\factNaiveOneDffMean$ ambos): la variante automática de Theta colapsa a un
+Theta empatan exactamente a la cabeza} (MASE de selección $0.077$ y MASE del conjunto
+reservado $\factNaiveOneDffMean$, ambas): la variante automática de Theta colapsa a un
 comportamiento casi idéntico al paseo aleatorio, una ratificación independiente del piso.
-Les siguen ETS ($\factEtsDffMean$ de hold-out) y, ya optimizados, los árboles CatBoost y
+Les siguen ETS (MASE $\factEtsDffMean$ en el conjunto reservado) y, ya optimizados, los árboles CatBoost y
 XGBoost ($0.105$). En estas series más cortas (disponibles solo desde octubre de 2015)
 dos de cada tres avances mensuales son nulos, de modo que ``no moverse'' domina aún más
 que en FAD; la Figura~\ref{fig:ranking} resume el desempeño de todo el repertorio sobre
@@ -2479,7 +2662,7 @@ ambas tablas. Se mantiene, además, la
 ajustarse en 13 de 25 series y ARIMA en 20 (falla numérica \textit{LinAlgError} en
 muestras cortas), y la cascada ARIMA-LSTM \textbf{no pudo ajustarse en ninguna} (se
 omite de la tabla), pues su componente de red requiere más historia que la disponible en
-la ventana inicial de DFF. El error de hold-out de SARIMA ($0.100$) aparenta competir,
+la ventana inicial de DFF. El error del conjunto reservado de SARIMA ($0.100$) aparenta competir,
 pero se promedia solo sobre las 13 series donde convergió (un sesgo de supervivencia) y
 no es comparable con los modelos que corrieron en las 25. Este contraste, y la
 inviabilidad numérica de los modelos de mayor capacidad con pocos datos, es la razón por
@@ -2491,14 +2674,14 @@ la que el sistema evalúa cada tabla por separado y no asume un único modelo un
 \caption[Comparación de los \factNModels{} modelos (DFF)]{Desempeño promedio sobre las 25 series DFF
 de preferencia familiar, ordenado por MASE de selección (la primera fila en negritas;
 naïve-1 y Theta empatan). Promediado solo sobre las series con ajuste exitoso ($n$); la
-cascada ARIMA-LSTM se omite por no converger en ninguna. El hold-out de SARIMA solo cubre
+cascada ARIMA-LSTM se omite por no converger en ninguna. El conjunto reservado de SARIMA solo cubre
 13 series (sesgo de supervivencia).}
 \label{tab:comparacion_dff}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{lccccc}
 \toprule
 \rowcolor{uacjblue!15}
-\textbf{Modelo} & \textbf{MASE sel.} & \textbf{MASE hold-out} & \textbf{sMAPE sel.} & \textbf{sMAPE hold-out} & \textbf{$n$} \\ \midrule
+\textbf{Modelo} & \textbf{MASE sel.} & \textbf{\shortstack{MASE\\reservado}} & \textbf{sMAPE sel.} & \textbf{\shortstack{sMAPE\\reservado}} & \textbf{$n$} \\ \midrule
 % --- DFF: 25 series familia, run 20260704T100200-ea94a2a (experiments/make_tex_tables.py) ---
 Naïve-1 (paseo aleatorio) & \textbf{0.077} & \textbf{0.086} & 0.21 & 0.20 & 25 \\
 Theta & 0.077 & 0.086 & 0.21 & 0.20 & 25 \\
@@ -2530,7 +2713,7 @@ SARIMA & 1.699 & 0.100 & 0.51 & 0.26 & 13 \\
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{results_ranking_mase.pdf}
-\caption[Ranking de desempeño del repertorio de modelos]{Desempeño (MASE de hold-out,
+\caption[Ranking de desempeño del repertorio de modelos]{Desempeño (MASE del conjunto reservado,
 promediado sobre las 25 series familiares) de cada modelo del repertorio, ordenado de mejor
 a peor; la línea discontinua marca el listón parsimonioso (ETS/Theta en FAD, ETS en DFF) y
 los modelos resaltados son los parsimoniosos líderes; la línea base naïve-1 queda por
@@ -2592,7 +2775,7 @@ fuga, estrategias de conjunto \cita{48} implementadas en sus formas fuertes: la
 $K\in\{2,3,5\}$), un \textit{stacking} global con un único vector de pesos por tabla
 regularizado en el simplex, y un selector de modelo por características de serie
 (meta-aprendizaje sobre el catálogo de características de §1.2). \textbf{Ninguna rompe el
-piso}: comparando medias de MASE de hold-out sobre las mismas series distintas (15 en
+piso}: comparando medias de MASE del conjunto reservado sobre las mismas series distintas (15 en
 FAD, 14 en DFF, descontando las pseudo-réplicas del corte mundial), la mejor combinación
 alcanza $0.120$ en FAD, peor que el naïve-1 en ese mismo conjunto ($\factNaiveOneFadDedupMean$), y $0.077$
 en DFF, donde \textit{empata} con el piso (también $0.077$ en media sobre esas series)
@@ -2627,7 +2810,7 @@ reproducible y extiende la evaluación a horizontes de hasta cinco años. Las me
 configuraciones globales, PatchTST sobre nivel alcanza MASE $=0.122$ y BiTCN sobre
 diferencia $0.128$ (Tabla~\ref{tab:global_deep}), compiten con los mejores modelos
 entrenados por serie, y la \textbf{optimización de hiperparámetros con la arquitectura en
-el espacio de búsqueda} (búsqueda única con parada temprana, sin tocar el hold-out; la
+el espacio de búsqueda} (búsqueda única con parada temprana, sin tocar el conjunto reservado; la
 configuración ganadora reentrenada con cinco semillas) lleva a \textbf{AutoBiTCN a MASE
 $=\factAutobitcnFadMean$}: por primera vez un modelo profundo queda \textit{por debajo}
 del par parsimonioso ETS-Theta ($\factEtsFadMean$--$\factThetaFadMean$) en FAD. Agrupar
@@ -2699,7 +2882,7 @@ paseo aleatorio en el pronóstico a un paso en ninguna de las dos tablas}.
 \includegraphics[width=0.82\textwidth]{results_multiseed_ci.pdf}
 \caption[Validación multi-semilla: deep global vs. listón]{Validación con cinco semillas
 independientes del ganador profundo global (variando la inicialización de pesos sobre la
-configuración optimizada): media e intervalo de confianza al 95\,\% del MASE de hold-out,
+configuración optimizada): media e intervalo de confianza al 95\,\% del MASE del conjunto reservado,
 contrastados con el listón parsimonioso y, en FAD, con el oráculo de selección perfecta.
 En ambas tablas la media del modelo profundo queda por debajo del listón parsimonioso
 (en FAD por un margen mínimo, con el intervalo cruzándolo); el piso del naïve-1 ($\factNaiveOneFadMean$
@@ -2803,7 +2986,7 @@ mientras el intervalo al $95$\,\% conserva su cobertura empírica.}
 \caption[Barrido de modelos profundos globales de frontera (FAD)]{Barrido de las ocho
 arquitecturas profundas de frontera entrenadas de forma global sobre las 25 series FAD
 familiares (mejor configuración por modelo; medias multi-semilla en las principales). DeepAR
-diverge numéricamente y se omite. MASE de hold-out; el listón parsimonioso es
+diverge numéricamente y se omite. MASE del conjunto reservado; el listón parsimonioso es
 ETS/Theta $=\factEtsFadMean$--$\factThetaFadMean$ y el piso ingenuo es el naïve-1
 ($\factNaiveOneFadMean$). El mejor profundo optimizado queda por debajo del listón parsimonioso pero
 por encima del piso (validación multi-semilla más abajo).}
@@ -2816,7 +2999,7 @@ por encima del piso (validación multi-semilla más abajo).}
 \begin{tabular}{lcc}
 \toprule
 \rowcolor{uacjblue!15}
-\textbf{Modelo / configuración} & \textbf{Técnica} & \textbf{MASE hold-out} \\ \midrule
+\textbf{Modelo / configuración} & \textbf{Técnica} & \textbf{\shortstack{MASE\\reservado}} \\ \midrule
 PatchTST & global, nivel & 0.122 \\
 BiTCN & global, diferencia & 0.128 \\
 TiDE & global, diferencia & 0.133 \\
@@ -2845,12 +3028,12 @@ migratoria; la fecha de prioridad se expresa en años.}
 \paragraph{Backtest por categoría: el pronóstico sobre el lapso reservado.} Más allá de una
 serie, el backtest completo sobre las \textbf{25 combinaciones país$\times$categoría} de cada
 tabla (Figuras~\ref{fig:grid_fad} y~\ref{fig:grid_dff}) permite ver cómo el modelo sigue la
-trayectoria escalonada y los avances de cada cola migratoria \textit{dentro del lapso de
-hold-out} (sombreado), con su intervalo de predicción al $95$\,\%. El pronóstico reproduce
+trayectoria escalonada y los avances de cada cola migratoria \textit{dentro del lapso del
+conjunto reservado} (sombreado), con su intervalo de predicción al $95$\,\%. El pronóstico reproduce
 tanto las series que avanzan con rapidez (F2A) como las prácticamente estancadas (varias
 F3/F4), y su banda se ensancha precisamente donde la fecha da saltos. Las
 Tablas~\ref{tab:fcst_fad} y~\ref{tab:fcst_dff} traducen esa cercanía a días: contrastan, en
-el último mes con fecha publicada del hold-out, la fecha real con la pronosticada y su
+el último mes con fecha publicada del conjunto reservado, la fecha real con la pronosticada y su
 diferencia $\Delta$, junto al error absoluto medio (MAE) sobre todo el lapso. En las
 categorías estancadas el error cae a pocos días (México~F4 y F3 en DFF, $0$~días), mientras
 que en las de movimiento rápido se sitúa en algunos meses; las áreas no sobre-suscritas
@@ -2859,18 +3042,18 @@ que en las de movimiento rápido se sitúa en algunos meses; las áreas no sobre
 \begin{figure}[p]
 \centering
 \includegraphics[width=\textwidth]{results_backtest_grid_FAD.pdf}
-\caption[Backtest por categoría sobre el hold-out (FAD)]{Backtest del pronóstico sobre el
+\caption[Backtest por categoría sobre el conjunto reservado (FAD)]{Backtest del pronóstico sobre el
 conjunto reservado de 24 meses para las 25 combinaciones país$\times$categoría de la tabla
 FAD. Cada panel contrasta la fecha de prioridad real (estado F) con el pronóstico de la red
 profunda global (BiTCN) y su intervalo de predicción al $95$\,\%; la franja sombreada marca
-el lapso de hold-out. La fecha de prioridad se expresa en años.}
+el lapso del conjunto reservado. La fecha de prioridad se expresa en años.}
 \label{fig:grid_fad}
 \end{figure}
 
 \begin{figure}[p]
 \centering
 \includegraphics[width=\textwidth]{results_backtest_grid_DFF.pdf}
-\caption[Backtest por categoría sobre el hold-out (DFF)]{Backtest análogo para las 25
+\caption[Backtest por categoría sobre el conjunto reservado (DFF)]{Backtest análogo para las 25
 combinaciones país$\times$categoría de la tabla DFF. Las series prácticamente constantes
 (p.\,ej. varias de Filipinas) aparecen como líneas planas que el modelo reproduce con error
 casi nulo; las de movimiento rápido muestran bandas de predicción más anchas.}
@@ -2881,9 +3064,9 @@ casi nulo; las de movimiento rápido muestran bandas de predicción más anchas.
 \centering
 \footnotesize
 \caption[Pronóstico vs.\ fecha real por categoría (FAD)]{Comparación, por serie, de la fecha
-de prioridad real y la pronosticada en el último mes con fecha publicada del hold-out (tabla
+de prioridad real y la pronosticada en el último mes con fecha publicada del conjunto reservado (tabla
 FAD). $\Delta$ es la diferencia (pronóstico $-$ real) en días (en \textbf{negrita} cuando es
-menor a un mes) y MAE el error absoluto medio en días sobre todo el lapso de hold-out.}
+menor a un mes) y MAE el error absoluto medio en días sobre todo el lapso del conjunto reservado.}
 \label{tab:fcst_fad}
 \begin{tabular}{llccrr}
 \toprule
@@ -2989,8 +3172,8 @@ de selección), el TFT diferenciado ($0.127$) y el naïve-1 ($0.129$); en DFF el
 piso ingenuo. Las series EB, más cortas y con congelamientos aún más largos que las
 familiares, castigan además a los modelos rígidos (Theta cae a $0.439$ en FAD). Este
 agrupamiento de líneas base y modelos ligeros al frente (en selección) reproduce el
-observado en las categorías familiares; su confirmación formal en hold-out, donde el
-naïve-1 emerge como piso según la inversión selección$\rightarrow$hold-out documentada en la
+observado en las categorías familiares; su confirmación formal en el conjunto reservado, donde el
+naïve-1 emerge como piso según la inversión selección$\rightarrow$conjunto reservado documentada en la
 Tabla~\ref{tab:comparacion_modelos}, queda para la evaluación extendida por categoría de
 empleo. La evidencia disponible ya sugiere que las conclusiones del sistema no son un
 artefacto de las categorías familiares.
@@ -3101,10 +3284,10 @@ el capítulo de resultados es un hallazgo del propio sistema, obtenido al exigir
 base más honesta posible: en un panel donde el $\factPctFrozen$\,\% de los avances
 mensuales es nulo, \textbf{repetir el último corte publicado (naïve-1) es el rival a
 vencer en el pronóstico a un paso, y ningún modelo puntual lo supera con significancia
-estadística}. El naïve-1 promedia MASE de hold-out $\factNaiveOneFadMean$ en FAD y $\factNaiveOneDffMean$ en DFF (donde
+estadística}. El naïve-1 promedia MASE del conjunto reservado $\factNaiveOneFadMean$ en FAD y $\factNaiveOneDffMean$ en DFF (donde
 Theta \textit{empata} con él al colapsar a un comportamiento casi de paseo aleatorio). El
 conjunto de confianza de modelos al $90$\,\% lo retiene como único miembro en ambas
-tablas, y el propio naïve-1 gana el hold-out en \factNaiveOneFadHoldoutWins{} de las 25 series FAD. Documentar este piso con un
+tablas, y el propio naïve-1 gana \factNaiveOneFadHoldoutWins{} de las 25 series FAD en el conjunto reservado. Documentar este piso con un
 protocolo reproducible, en lugar de omitir la línea base que lo revela, es una decisión de
 honestidad metodológica que da valor de ingeniería al resto del sistema.
 
@@ -3207,7 +3390,7 @@ naïve-1 de su propia cohorte y \cohortFactScanBate{} por encima, con
 \cohortFactCampanaLanes{} corridas aisladas de las que \cohortFactCampanaOk{} terminaron,
 tampoco produjo ninguna receta que batiera ese piso (\cohortFactCampanaBate{} de
 \cohortFactCampanaPrimarias{} recetas primarias). Finalmente, el enrutador por cohorte, que
-escoge el método con la evidencia anterior al hold-out y se evalúa solo sobre él, se sometió al
+escoge el método con la evidencia anterior al conjunto reservado y se evalúa solo sobre él, se sometió al
 mismo gate del sistema: mejora material de al menos \cohortFactRouterMargen{} en MASE, contraste
 bilateral con corrección de Holm al \cohortFactRouterAlfa{} y ninguna pérdida material, exigidos
 \textbf{en los tres horizontes} evaluados.
@@ -3235,7 +3418,7 @@ versionado y ninguna se teclea a mano.
 \caption[Enrutado por cohorte contra el naïve-1 de cada cohorte]{Enrutado por cohorte frente al
 naïve-1 de la propia cohorte, por tabla, cohorte y horizonte. El efecto es positivo cuando el
 enrutador mejora; la significancia es la del contraste bilateral tras la corrección de Holm sobre
-los tres horizontes de la celda. Retrospectivo, con selección disjunta del hold-out.}
+los tres horizontes de la celda. Retrospectivo, con selección disjunta del conjunto reservado.}
 \label{tab:cohortes}
 \input{cohortes.tex}
 \end{table}
@@ -3520,6 +3703,22 @@ lifecycle with MLflow,'' \textit{IEEE Data Engineering Bulletin}, vol. 41, n.\te
 pp. 39--45, 2018.
 \item\label{bib:59} M. Raasveldt y H. M\"uhleisen, ``DuckDB: An embeddable analytical
 database,'' en \textit{Proc.\ ACM SIGMOD Int.\ Conf.\ on Management of Data}, 2019, pp.\ 1981--1984.
+\item\label{bib:60} S. Seabold y J. Perktold, ``statsmodels: Econometric and statistical
+modeling with Python,'' en \textit{Proc.\ 9th Python in Science Conf.\ (SciPy)}, 2010,
+pp. 92--96.
+\item\label{bib:61} P. Virtanen \textit{et al.}, ``SciPy 1.0: Fundamental algorithms for
+scientific computing in Python,'' \textit{Nature Methods}, vol. 17, n.\textsuperscript{o} 3,
+pp. 261--272, 2020.
+\item\label{bib:62} J. Herzen \textit{et al.}, ``Darts: User-friendly modern machine
+learning for time series,'' \textit{Journal of Machine Learning Research}, vol. 23,
+n.\textsuperscript{o} 124, pp. 1--6, 2022.
+\item\label{bib:63} A. Paszke \textit{et al.}, ``PyTorch: An imperative style,
+high-performance deep learning library,'' en \textit{Advances in Neural Information
+Processing Systems}, vol. 32, 2019, pp. 8024--8035.
+\item\label{bib:64} F. Pedregosa \textit{et al.}, ``Scikit-learn: Machine learning in
+Python,'' \textit{Journal of Machine Learning Research}, vol. 12, pp. 2825--2830, 2011.
+\item\label{bib:65} GitHub, ``GitHub Actions documentation,'' 2026. [En línea].
+Disponible en: \url{https://docs.github.com/actions}
 \end{enumerate}
 
 % ============================================================
@@ -3547,7 +3746,7 @@ documento puede atarse al código exacto que lo generó y reconstruirse. La capa
 modelado se prueba en integración continua con un piso de cobertura propio.
 
 La Tabla~\ref{tab:hparams} reúne los hiperparámetros principales, \textit{fijados antes}
-del conjunto de prueba para evitar cualquier ajuste retrospectivo a la métrica de hold-out.
+del conjunto de prueba para evitar cualquier ajuste retrospectivo a la métrica del conjunto reservado.
 
 \begin{table}[H]
 \centering
@@ -3555,13 +3754,13 @@ del conjunto de prueba para evitar cualquier ajuste retrospectivo a la métrica 
 \caption[Hiperparámetros principales del protocolo]{Hiperparámetros principales de cada
 componente, fijados antes del conjunto de prueba reservado. La búsqueda de
 hiperparámetros (Optuna) usa exclusivamente validación interna sobre el tramo de
-entrenamiento, sin tocar los 24 meses de hold-out.}
+entrenamiento, sin tocar los 24 meses del conjunto reservado.}
 \label{tab:hparams}
 \begin{tabular}{@{}p{4.2cm} p{9.3cm}@{}}
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{Componente} & \textbf{Configuración} \\ \midrule
-Validación \textit{walk-forward} & hold-out 24 meses, paso 1 mes, reajuste por origen \\
+Validación \textit{walk-forward} & conjunto reservado 24 meses, paso 1 mes, reajuste por origen \\
 Escala de la MASE & naïve estacional, periodo $m=12$, solo entrenamiento \\
 ARIMA / SARIMA & orden por AIC; estacionalidad $m=12$ \\
 ETS & tendencia amortiguada; estacionalidad $m=12$ \\
@@ -3799,7 +3998,7 @@ documentaci\'on pasiva.}
 \rowcolor{uacjblue!15}
 \textbf{Guardarra\'il} & \textbf{Qu\'e verifica} & \textbf{D\'onde corre} \\ \midrule
 Consistencia & Toda cifra del documento, portal y docs coincide con la fuente \'unica de verdad & CI + previo a \textit{push} \\
-Regresi\'on de modelos & El error de hold-out de una rejilla fija no se degrada & CI (capa de modelado) \\
+Regresi\'on de modelos & El error del conjunto reservado de una rejilla fija no se degrada & CI (capa de modelado) \\
 Monitor de \textit{drift} & Desempe\~no, cobertura y datos del \'ultimo bolet\'in & Proceso mensual \\
 Tarjeta de modelo & La ficha del sistema no diverge de las cifras canónicas & CI (capa base) \\
 \bottomrule
@@ -3808,12 +4007,12 @@ Tarjeta de modelo & La ficha del sistema no diverge de las cifras canónicas & C
 
 La receta desplegada no se fija a mano: es un \textbf{dato versionado} (un manifiesto) que
 solo cambia mediante un procedimiento auditado de campe\'on-retador. Este eval\'ua la receta
-en producci\'on frente a un conjunto de alternativas sobre el hold-out reservado, mediante una
+en producci\'on frente a un conjunto de alternativas sobre el conjunto reservado, mediante una
 prueba de rangos con signo de Wilcoxon por serie con control del error por comparaciones
 m\'ultiples, y emite un veredicto: una alternativa solo se recomienda si supera al campe\'on
 con significancia y un margen material. El veredicto vigente es el m\'as instructivo del
-proyecto: el retador que cruza el umbral en ambas tablas es el \textbf{na\"ive-1} (MASE de
-hold-out, en \textbf{media sobre las series deduplicadas}: $\factNaiveOneFadDedupMean$ frente al campe\'on
+proyecto: el retador que cruza el umbral en ambas tablas es el \textbf{na\"ive-1} (MASE del
+conjunto reservado, en \textbf{media sobre las series deduplicadas}: $\factNaiveOneFadDedupMean$ frente al campe\'on
 $\factFadChampionMean$ en FAD; $\factNaiveOneDffDedupMean$ frente a $\factDffChampionMean$ en DFF, con
 significancia bajo la prueba y la correcci\'on ya descritas, y margen material), pero su promoci\'on se \textbf{retiene}
 por una decisi\'on de gobernanza documentada: el gate eval\'ua el pron\'ostico a un paso y
@@ -3837,8 +4036,8 @@ almac\'en de experimentos.
 \centering
 \includegraphics[width=0.90\textwidth]{mlops_mlflow_champion.png}
 \caption[Veredicto campe\'on-retador registrado]{Registro del procedimiento campe\'on-retador
-en el almac\'en de experimentos: las recetas desplegadas para FAD y DFF con su error medio de
-hold-out, conservadas como corridas trazables. Fuente: captura de la interfaz de MLflow.}
+en el almac\'en de experimentos: las recetas desplegadas para FAD y DFF con su error medio del
+conjunto reservado, conservadas como corridas trazables. Fuente: captura de la interfaz de MLflow.}
 \label{fig:mlflow_champion}
 \end{figure}
 
@@ -3920,7 +4119,7 @@ pronóstico (uno a sesenta meses), sobre el retrospectivo rodante de toda la his
 observaciones con fecha. La deriva (línea sólida) queda por debajo del naïve-1 (línea discontinua)
 en ambas tablas; la región sombreada es su ventaja. Los anillos huecos marcan los horizontes en
 que la ventaja no alcanza significancia tras la corrección de Holm. Estas cifras son retrospectivas
-y no sustituyen al piso del hold-out fijo desplegado.}
+y no sustituyen al piso del conjunto reservado fijo desplegado.}
 \label{fig:horizonte}
 \end{figure}
 
@@ -3928,7 +4127,7 @@ y no sustituyen al piso del hold-out fijo desplegado.}
 \centering
 \caption[Campeón por horizonte (retrospectivo rodante)]{Campeón por horizonte: MASE de la deriva y
 del naïve-1, su diferencia porcentual y la significancia de Holm, por tabla y horizonte.
-Retrospectivo rodante, solo estado F, escala canónica; no es el hold-out fijo, donde el naïve-1 es
+Retrospectivo rodante, solo estado F, escala canónica; no es el conjunto reservado fijo, donde el naïve-1 es
 el piso desplegado.}
 \label{tab:horizonte}
 \input{horizon_champion.tex}
@@ -3937,7 +4136,7 @@ el piso desplegado.}
 \paragraph{Por qué la deriva no se despliega.} Esa ventaja es \textbf{dependiente del régimen}.
 Sobre veinticinco años las fechas avanzan con deriva casi constante y extrapolar la pendiente gana;
 pero la ventana reciente reservada para la evaluación desplegada, los últimos veinticuatro meses,
-trae retrogresiones, y ahí la pendiente de la deriva perjudica: en el hold-out fijo el naïve-1
+trae retrogresiones, y ahí la pendiente de la deriva perjudica: en el conjunto reservado fijo el naïve-1
 vuelve a ser más seguro en el pronóstico a un paso. Por eso el sistema despliega el piso robusto y
 registra a la deriva como \textbf{retador formal no promovible} en la gobernanza campeón-retador
 (Apéndice~A.8): su ventaja retrospectiva queda documentada y versionada sin comprometer la decisión
