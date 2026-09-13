@@ -312,7 +312,7 @@ RLinear, TiDE, LSTM, DeepAR, ARIMA-LSTM, N-BEATS, N-HiTS, TFT) y un \textit{foun
 model} zero-shot (Chronos).
 \item \textbf{Validación walk-forward.}\cita{2} Validación temporal con ventana
 expansible y paso mensual que evalúa cada modelo sin fuga de información, reservando
-los últimos 24 meses como conjunto independiente.
+los últimos 24 meses como un conjunto reservado independiente (\textit{hold-out}).
 \item \textbf{Cuantificación de incertidumbre.} Genera intervalos de predicción al
 95\,\% por dos mecanismos (probabilístico nativo y conforme dividido) y reporta su
 cobertura empírica.
@@ -389,7 +389,7 @@ respaldo versionado, del cual el procesamiento parte de forma reproducible.
 La Figura~\ref{fig:fuente} muestra un boletín real (julio de 2026) tal como se publica: un
 encabezado institucional y, para cada tabla, una matriz con las categorías migratorias en las
 filas y los países o áreas de cargabilidad en las columnas. Cada celda contiene uno de tres
-valores: una \textbf{fecha de prioridad} en formato \texttt{DDMMMYY} (p.\,ej.\ \texttt{01FEB18}),
+valores: una \textbf{fecha de prioridad} en formato \texttt{DDMMMYY} (p.\,ej., \texttt{01FEB18}),
 la marca \textbf{\textit{Current}} (\texttt{C}, sin rezago ese mes) o \textbf{\textit{Unavailable}}
 (\texttt{U}, sin números disponibles). La Figura~\ref{fig:tabla_pub} reproduce, con esa misma
 estructura, la tabla \textit{Final Action Dates} de preferencia por empleo del mismo boletín,
@@ -638,7 +638,7 @@ Automatización & Tarea programada de integración continua & Boletín nuevo a p
 \end{tabular}
 \end{table}
 
-\paragraph{Cantidad de los datos obtenidos.} El proceso descrito produjo un panel de
+\paragraph{Cantidad de datos obtenidos.} El proceso descrito produjo un panel de
 \factNObsFmt{} registros distribuidos en \factNSeriesStructural{} series y \factNMonths{}
 meses consecutivos, sin meses faltantes, con nueve variables por registro que documenta el
 Apéndice~A.11. La Tabla~\ref{tab:censo_obtencion} desglosa el volumen obtenido por
@@ -904,7 +904,7 @@ su papel es indispensable, porque una de ellas es la variable dependiente, cuatr
 dimensiones de corte o de agregación, una es el índice temporal y las tres restantes son
 equivalencia, régimen y trazabilidad: gobiernan qué observación es utilizable, pero no son
 insumo predictivo. Confundir una anotación con un insumo es precisamente el tipo de error
-que el EDA existe para prevenir. La Tabla~\ref{tab:eda_variables} precisa qué mide cada
+que el análisis exploratorio busca evitar. La Tabla~\ref{tab:eda_variables} precisa qué mide cada
 variable, con qué papel entra en el análisis y qué se hace con ella.
 
 \begin{table}[H]
@@ -947,17 +947,17 @@ boletín publicado \\
 \end{table}
 
 \paragraph{Técnicas y herramientas.} El análisis combina estadística descriptiva,
-inspección gráfica y pruebas formales de hipótesis, en ese orden: primero se observa la
-estructura, después se contrasta lo observado con pruebas cuya hipótesis nula está declarada.
-Las técnicas aplicadas son las siguientes: censo descriptivo y de completitud del panel;
-histogramas, diagramas de violín y diagramas de cumbres para la forma de las distribuciones;
-mapas de calor de correlación con agrupamiento jerárquico y correlación cruzada con retardos
-para las relaciones entre series; descomposición estacional y funciones de autocorrelación
-para la estructura temporal; pruebas de raíz unitaria, de estacionariedad, de ruido blanco y
-de independencia para formalizar los diagnósticos; detección de cambios de régimen y filtrado
-robusto para separar el desplazamiento estructural del atípico puntual; y un catálogo de
-características por serie que permite analizar el panel como una tabla en lugar de serie por
-serie. Todo se ejecuta con software libre y con versiones fijadas, sobre el mismo entorno
+inspección gráfica y pruebas formales de hipótesis, en ese orden. Primero se observa la
+estructura; después se contrasta lo observado con pruebas cuya hipótesis nula está declarada.
+El censo descriptivo y de completitud dimensiona el panel. Histogramas, diagramas de violín
+y diagramas de cumbres describen la forma de las distribuciones, mientras que los mapas de
+calor con agrupamiento jerárquico y la correlación cruzada con retardos estudian las relaciones
+entre series. La estructura temporal se examina mediante descomposición estacional y funciones
+de autocorrelación; las pruebas de raíz unitaria, estacionariedad, ruido blanco e independencia
+formalizan esos diagnósticos. Finalmente, la detección de cambios de régimen y el filtrado
+robusto separan los desplazamientos estructurales de los atípicos puntuales, y un catálogo de
+características permite analizar el panel como una tabla en lugar de serie por serie. Todo se
+ejecuta con software libre y con versiones fijadas, sobre el mismo entorno
 reproducible de la fase de obtención (Apéndice~A.14), de modo que un solo entorno reproduce
 datos y análisis. Cada figura y cada estadístico de esta sección se genera por programa a
 partir del panel versionado, nunca a mano.
@@ -1573,13 +1573,13 @@ mutua) no aporta: pocos descriptores bien elegidos superan a muchos correlaciona
 \cita{22}.
 
 \paragraph{Nota sobre la ingeniería de características viva.} Igual que el EDA, la
-ingeniería de características y la limpieza mantienen un catálogo versionado
-(las \feFactNCleanDecisions{} decisiones de limpieza y \feFactNFeDecisions{} de
-características, cada una con el módulo que la implementa y la falla que previene, el
-registro de limpieza de cada consolidación y el resultado vigente de la selección) que
-se regenera de forma automática con cada boletín nuevo junto con su galería de figuras
-y un reporte ejecutivo en PDF, consultables públicamente desde la aplicación de
-demostración (Apéndice~A).
+ingeniería de características y la limpieza mantienen un catálogo versionado. Este reúne
+las \feFactNCleanDecisions{} decisiones de limpieza y \feFactNFeDecisions{} de
+características, cada una con el módulo que la implementa y la falla que previene, además
+del registro de limpieza de cada consolidación y del resultado vigente de la selección.
+El catálogo se regenera de forma automática con cada boletín nuevo junto con su galería
+de figuras y un reporte ejecutivo en PDF. Ambos son consultables públicamente desde la
+aplicación de demostración (Apéndice~A).
 
 \subsubsection{Métodos del estado del arte evaluados y descartados por diagnóstico}
 
@@ -1637,12 +1637,11 @@ máximo ocurre en el retardo cero: el co-movimiento es contemporáneo.}
 \subsubsection{Síntesis: hallazgos del análisis y decisiones que inducen}
 
 Un análisis exploratorio no termina en la descripción: termina cuando cada hallazgo se
-traduce en una decisión verificable sobre el modelado. Las
-Tablas~\ref{tab:eda_sintesis} y~\ref{tab:eda_sintesis2} recapitulan los doce hallazgos
-principales de esta sección, la evidencia concreta que los sostiene y la consecuencia que
-cada uno tiene para la fase siguiente: la primera reúne los que describen la estructura, la
-cobertura y la forma de los datos; la segunda, los que se refieren a las anomalías, a las
-dependencias entre series y al alcance de lo que el sistema puede prometer. Leídas en
+traduce en una decisión verificable sobre el modelado. Las Tablas~\ref{tab:eda_sintesis}
+y~\ref{tab:eda_sintesis2} recapitulan los doce hallazgos principales, la evidencia concreta
+que los sostiene y la consecuencia de cada uno para la fase siguiente. La primera reúne los
+hallazgos sobre estructura, cobertura y forma de los datos. La segunda presenta los relativos
+a anomalías, dependencias entre series y alcance de lo que el sistema puede prometer. Leídas en
 conjunto, describen un panel de series fuertemente tendenciales, sin ciclo anual, integradas
 de orden uno, con distribuciones de avance asimétricas y de cola pesada, con anomalías
 mayoritariamente estructurales y con un co-movimiento contemporáneo que no permite usar un
@@ -1804,20 +1803,22 @@ ausencia misma es información. Por ello el tratamiento es doble. Para
 \textbf{caracterizar y visualizar} se imputa con suavizado de Kalman sobre un modelo de
 espacio de estados, el método de referencia de \texttt{imputeTS} \cita{23}, superior a
 la interpolación lineal (Figura~\ref{fig:eda_kalman}). Para \textbf{modelar}, la
-rejilla mensual de entrenamiento se construye con relleno estrictamente causal: cada
+rejilla mensual de entrenamiento se construye con relleno estrictamente causal. Cada
 mes sin fecha publicada ($C$/$U$) arrastra la última observación anterior
 (\textit{last observation carried forward}, LOCF), de modo que el valor de un mes
-depende solo de observaciones anteriores o iguales a ese mes; mutar cualquier valor
+depende solo de observaciones anteriores o iguales a ese mes. Mutar cualquier valor
 posterior a un origen de pronóstico no altera ningún insumo en ese origen ni antes de
-él, propiedad verificada por pruebas metamórficas automatizadas. Esta política
+él; esta propiedad se verifica mediante pruebas metamórficas automatizadas. La política
 sustituye a la interpolación lineal bidireccional de las campañas previas, que usaba
 el extremo futuro de cada hueco. Los valores de relleno jamás se puntúan (solo se
-califican los meses con fecha publicada, máscara $e=F$). Los árboles de gradiente
-sobre la serie diferenciada reciben además las máscaras de ausencia MNAR (indicador
-de observación y meses desde la última observación) con retardo de un mes (el último
-mes cerrado, conocido en el origen), de modo que puedan descontar los tramos
-arrastrados; el resto del catálogo usa la política causal hacia adelante explícita,
-sin covariables de máscara.
+califican los meses con fecha publicada, máscara $e=F$).
+
+Los árboles de gradiente sobre la serie diferenciada reciben además dos máscaras de
+ausencia MNAR: el indicador de observación y los meses transcurridos desde la última
+observación. Ambas se incorporan con un retardo de un mes, correspondiente al último mes
+cerrado y conocido en el origen, para que el modelo pueda descontar los tramos arrastrados.
+El resto del catálogo usa la política causal hacia adelante explícita, sin covariables de
+máscara.
 \item \textbf{Regularización mensual.} Para los modelos que exigen frecuencia fija, la
 rejilla se completa con el mismo relleno causal hacia adelante: todo mes sin fecha
 arrastra la última observación publicada, sin usar jamás el extremo futuro del hueco
@@ -1911,8 +1912,20 @@ covariables.}
 
 \subsection{1.3.1 Definición de las técnicas de modelado a utilizar}
 
-Se comparan los \textbf{\factNModels{} modelos} de la Tabla~\ref{tab:modelos}: tres líneas base de
-referencia y seis familias complementarias. El naïve estacional es el denominador de la
+\paragraph{Formulación del problema.} VisaPredict AI aborda una regresión temporal en panel:
+para cada combinación de país o área de cargabilidad, categoría migratoria y tipo de tabla,
+pronostica una fecha de prioridad futura. No es una tarea de clasificación, porque la variable
+de interés es ordenada y cuantificable; tampoco es agrupamiento, pues las series y sus
+identificadores ya están definidos. FAD y DFF se modelan por separado, y el entrenamiento usa
+únicamente las celdas con fecha publicada (estado $F$). Los estados \textit{Current} ($C$) y
+\textit{Unavailable} ($U$) se conservan como información de régimen, sin convertirlos en fechas
+ni en etiquetas objetivo.
+
+\paragraph{Criterios de selección.} Se comparan los \textbf{\factNModels{} modelos} de la
+Tabla~\ref{tab:modelos}: tres líneas base de referencia y seis familias complementarias. El
+catálogo se evalúa por su adecuación al carácter temporal de los datos, su capacidad para
+generalizar fuera de la muestra, la diversidad de sus supuestos y un costo computacional
+compatible con la actualización mensual. El naïve estacional es el denominador de la
 métrica MASE ($m=12$); el \textbf{naïve-1} (repetir el último valor publicado, es decir,
 un paseo aleatorio) es el piso operativo que cualquier modelo debe justificar; y la
 deriva (\textit{drift}) le añade el avance medio histórico. Incluir estas líneas base no
@@ -1921,9 +1934,11 @@ nulo, ``no moverse'' es una predicción formidable a un paso, y omitirla dejarí
 piso honesto a toda la comparación. Como las series distan de ser estacionales, se
 reporta en paralelo la MASE escalada por el naïve-1 ($m=1$); se conserva $m=12$ como
 métrica principal por comparabilidad con la práctica estándar y con las campañas
-previas del proyecto (la definición formal y su referencia se dan en §2.1). La elección del resto del catálogo responde al problema:
-las series son fechas que avanzan con tendencia fuerte, estacionalidad anual casi nula y
-retrogresiones ocasionales, por lo que conviene contrastar el espectro completo,
+previas del proyecto (la definición formal y su referencia se dan en §2.1).
+
+La elección del resto del catálogo responde al problema. Las series son fechas que avanzan
+con tendencia fuerte, estacionalidad anual casi nula y retrogresiones ocasionales. Por ello
+conviene contrastar el espectro completo,
 desde modelos lineales parsimoniosos (ARIMA, SARIMA, ETS, Theta, tendencia lineal
 local) hasta modelos de alta capacidad (árboles de potenciación de gradiente sobre
 deltas, redes profundas), y verificar empíricamente cuál conviene a este régimen de
@@ -1940,6 +1955,7 @@ ajustarse a estos datos.
 catálogo de \factNModels{} modelos, con su justificación. Los árboles operan sobre la primera
 diferencia; Chronos es zero-shot.}
 \label{tab:modelos}
+\label{tab:modelos_a6}
 \begin{tabular}{p{2.9cm} l l}
 \toprule
 \rowcolor{uacjblue!15}
@@ -2025,6 +2041,13 @@ cuánto vale la transferencia de conocimiento frente a la escasez. Con MASE de s
 $0.184$ ocupa la zona media-baja de la tabla: la transferencia aporta un pronóstico
 razonable sin entrenar, pero ya no supera a las redes locales correctamente especificadas ni
 se acerca a los parsimoniosos o al piso ingenuo.
+
+\paragraph{Técnicas no seleccionadas.} Los algoritmos evolutivos, los métodos de enjambre y
+la optimización multiobjetivo no se usan como predictores principales. Son técnicas apropiadas
+para buscar soluciones en espacios de decisión, mientras que este proyecto estima una variable
+temporal futura y no asigna recursos ni optimiza varios objetivos operativos. La optimización de
+hiperparámetros forma parte del ajuste de algunos modelos, pero no sustituye a la técnica
+predictiva ni constituye por sí misma una familia de pronóstico.
 
 En conjunto, esta comparación de sesgos inductivos anticipa el resultado central del Capítulo de
 resultados: en un panel dominado por meses congelados, el piso del paseo aleatorio a un paso
