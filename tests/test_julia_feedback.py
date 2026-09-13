@@ -49,8 +49,12 @@ def test_los_tres_anglicismos_se_introducen_con_espanol_primero() -> None:
     assert _primera_aparicion_bilingue(texto, "leakage", "fuga de información")
 
 
+def test_hold_out_solo_permanece_en_su_introduccion_bilingue() -> None:
+    assert _texto().lower().count("hold-out") == 1
+
+
 def test_la_guarda_no_prohibe_usos_tecnicos_posteriores() -> None:
-    ejemplo = "conjunto reservado (\\textit{hold-out}); después, hold-out_forecasts.csv"
+    ejemplo = "conjunto reservado (\\textit{hold-out}); después, holdout_forecasts.csv"
     assert _primera_aparicion_bilingue(ejemplo, "hold-out", "conjunto reservado")
 
 

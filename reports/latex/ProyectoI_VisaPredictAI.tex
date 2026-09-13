@@ -336,7 +336,7 @@ cobertura empírica.
   \node[store] (db) {Carga de series \textit{(vista $e=F$)}};
   \node[box, right=0.5cm of db] (pre) {Preprocesa\-miento \textit{(huecos, escala, calendario)}};
   \node[box, right=0.5cm of pre] (mod) {Catálogo de \textbf{\factNModels{} modelos}};
-  \node[box, right=0.5cm of mod] (wf) {Walk-forward \textit{(hold-out 24 m)}};
+  \node[box, right=0.5cm of mod] (wf) {Walk-forward \textit{(24 meses reservados)}};
   \node[outbox, right=0.5cm of wf] (pi) {Pronóstico $+$ PI 95\,\%};
   \draw[arr] (db) -- (pre);
   \draw[arr] (pre) -- (mod);
@@ -1559,7 +1559,7 @@ Segundo, una des-redundancia por correlación de Spearman, en el espíritu de la
 de mínima redundancia y máxima relevancia (mRMR) \cita{21}, que conserva una sola
 característica representativa de cada grupo colineal. Es importante acotar qué es este
 análisis: una \textbf{caracterización retrospectiva de la dificultad}, que relaciona
-descriptores calculados sobre la serie completa con el MASE de hold-out del modelo
+descriptores calculados sobre la serie completa con el MASE del conjunto reservado del modelo
 campeón para describir \textit{qué} series resultan difíciles de pronosticar. No es una
 selección predictiva de insumos (los modelos consumen los rezagos, el calendario y las
 máscaras de ausencia a través del motor de características, no estos descriptores) ni
@@ -1980,11 +1980,11 @@ nula y retrogresiones ocasionales.
 
 \paragraph{Referencia: naïve-1, deriva y naïve estacional.} El naïve estacional repite el
 valor de doce meses atrás; es el denominador de la MASE, y todos los modelos serios lo baten
-por amplio margen (MASE de hold-out $1.249$), lo que confirma que las series son
+por amplio margen (MASE del conjunto reservado $1.249$), lo que confirma que las series son
 predecibles. La línea base que de verdad exige es el \textbf{naïve-1}: repetir el último
 corte publicado, la predicción óptima de un paseo aleatorio. Ninguno de los tres aprende
 nada; el naïve-1, sin embargo, resulta el rival a vencer de todo el capítulo de resultados
-(MASE de hold-out $\factNaiveOneFadMean$ en FAD y $\factNaiveOneDffMean$ en DFF), porque en estas colas familiares,
+(MASE del conjunto reservado $\factNaiveOneFadMean$ en FAD y $\factNaiveOneDffMean$ en DFF), porque en estas colas familiares,
 del $28$\,\% de meses congelados en FAD al $66$\,\% en DFF (Tabla~\ref{tab:eda_descriptiva}),
 la fecha se repite con frecuencia. La deriva, que añade el avance medio, apenas lo matiza.
 
@@ -2286,7 +2286,7 @@ final del horizonte.
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{results_holdout_mexico_F3_FAD.png}
-\caption[Pronóstico vs. real en el hold-out]{Pronóstico del modelo ETS amortiguado frente a
+\caption[Pronóstico vs. real en el conjunto reservado]{Pronóstico del modelo ETS amortiguado frente a
 los valores reales sobre el conjunto reservado de 24 meses, México/F3/FAD.}
 \label{fig:holdout}
 \end{figure}
@@ -2305,7 +2305,7 @@ decir, 600 evaluaciones modelo-serie (una combinación falló por un problema nu
 y se reporta como ausente, sin abortar el barrido). En cada
 origen, el pronóstico a un paso usa solo información del pasado, de modo que la
 comparación entre modelos está libre de fuga. Las métricas de selección se calculan
-sobre la región previa al conjunto reservado; las de hold-out, sobre los 24 meses
+sobre la región previa al conjunto reservado; las del conjunto reservado, sobre los 24 meses
 finales. Cada corrida se registra de forma reproducible con semilla fija y su
 procedencia (versión del código, hiperparámetros) queda en un registro auditable. El
 mismo protocolo se aplica de forma independiente a la tabla DFF (§2.2), sin comparar
@@ -2355,7 +2355,7 @@ intervalo de predicción conforme). El \textbf{demostrador desplegado}, en cambi
 robustez y simplicidad una \textbf{receta campeona por tabla} (Final Action Dates: mediana de
 Theta+ETS+SARIMA; Dates for Filing: SARIMA), versionada y revisada por el procedimiento
 campeón-retador del Apéndice~A.8. Ese procedimiento incorpora ahora al \textbf{naïve-1 como
-retador formal}: aunque supera al campeón en el pronóstico a un paso del hold-out, su
+retador formal}: aunque supera al campeón en el pronóstico a un paso del conjunto reservado, su
 promoción se \textbf{retiene} por una decisión de gobernanza documentada (el gate evalúa
 $h=1$, pero el producto sirve horizontes de 1 a 12 meses, donde repetir el último valor se
 degrada) y un despliegue en sombra congela cada mes su añada para decidir con evidencia
@@ -2365,7 +2365,7 @@ modelos se contrasta de antemano con las pruebas de la §2.2, para no confundir 
 mejora.
 
 El Algoritmo~\ref{alg:walkforward} resume el procedimiento de validación: en cada origen del
-hold-out el modelo se entrena \textit{solo} con el pasado, predice un paso y deriva su
+conjunto reservado el modelo se entrena \textit{solo} con el pasado, predice un paso y deriva su
 intervalo de los errores de calibración anteriores, de modo que ninguna observación futura
 interviene. La Tabla~\ref{tab:notacion} reúne la notación empleada.
 
@@ -2374,7 +2374,7 @@ interviene. La Tabla~\ref{tab:notacion} reúne la notación empleada.
 \label{alg:walkforward}
 \begin{algorithmic}[1]
 \Require serie $y_{1:T}$, modelo $\mathcal{M}$, horizonte de prueba $H$, nivel $\alpha$
-\Ensure errores $\{e_t\}$ e intervalos $\{[L_t,U_t]\}$ sobre el hold-out
+\Ensure errores $\{e_t\}$ e intervalos $\{[L_t,U_t]\}$ sobre el conjunto reservado
 \For{$t = T-H+1$ \textbf{hasta} $T$}
   \State entrenar $\mathcal{M}$ con $y_{1:t-1}$ \Comment{nada del mes $t$ en adelante}
   \State $\hat{y}_t \gets \mathcal{M}.\textsc{predecir}(1)$
@@ -2417,12 +2417,12 @@ métrica de selección encabezan los árboles con hiperparámetros optimizados (
 LightGBM, $0.101$), seguidos de la deriva ($0.105$) y de Theta ($0.110$, el listón
 parsimonioso de selección). Pero en el conjunto reservado el orden se invierte:
 \textbf{ningún modelo entrenado bate al naïve-1} (repetir el último corte publicado),
-cuya MASE de hold-out es $\factNaiveOneFadMean$ en media y $\factNaiveOneFadMedian$ en mediana. ETS amortiguado
+cuya MASE del conjunto reservado es $\factNaiveOneFadMean$ en media y $\factNaiveOneFadMedian$ en mediana. ETS amortiguado
 ($\factEtsFadMean$) y Theta ($\factThetaFadMean$) quedan como los mejores modelos
 entrenados; los árboles optimizados ($0.123$--$0.126$) y las redes locales reformuladas
 sobre la primera diferencia (TFT $0.122$, NLinear $0.128$) se agolpan justo detrás, ya
 sin el colapso por sobreajuste de las campañas iniciales; Chronos en modo zero-shot
-($0.291$ de hold-out) y Prophet cierran la parte baja, y solo el naïve estacional
+($0.291$ en el conjunto reservado) y Prophet cierran la parte baja, y solo el naïve estacional
 ($1.249$) queda fuera de concurso. La explicación es estructural: con el
 $\factPctFrozen$\,\% de los avances mensuales del panel en cero, ``no moverse'' acierta casi
 siempre a un paso, y el margen restante lo dominan las retrogresiones impredecibles. El
@@ -2443,7 +2443,7 @@ Chronos es zero-shot (sin entrenar).}
 \begin{tabular}{lcccc}
 \toprule
 \rowcolor{uacjblue!15}
-\textbf{Modelo} & \textbf{MASE sel.} & \textbf{MASE hold-out} & \textbf{sMAPE sel.} & \textbf{sMAPE hold-out} \\ \midrule
+\textbf{Modelo} & \textbf{MASE sel.} & \textbf{\shortstack{MASE\\reservado}} & \textbf{sMAPE sel.} & \textbf{\shortstack{sMAPE\\reservado}} \\ \midrule
 % --- FAD: 25 series familia, run 20260704T100200-ea94a2a (experiments/make_tex_tables.py) ---
 XGBoost & \textbf{0.101} & 0.125 & 0.39 & 0.33 \\
 LightGBM & 0.101 & 0.123 & 0.39 & 0.33 \\
@@ -2490,10 +2490,10 @@ confianza de modelos (Model Confidence Set) \cita{46} y el ranking de Friedman-N
 \paragraph{Resultados sobre la tabla DFF.} Como FAD y DFF se evalúan por separado, el
 mismo protocolo (los \factNModels{} modelos) se aplicó a las 25 series DFF de preferencia familiar
 (Tabla~\ref{tab:comparacion_dff}). El piso es aquí aún más elocuente: \textbf{naïve-1 y
-Theta empatan exactamente a la cabeza} (selección $0.077$ y hold-out
-$\factNaiveOneDffMean$ ambos): la variante automática de Theta colapsa a un
+Theta empatan exactamente a la cabeza} (MASE de selección $0.077$ y MASE del conjunto
+reservado $\factNaiveOneDffMean$, ambas): la variante automática de Theta colapsa a un
 comportamiento casi idéntico al paseo aleatorio, una ratificación independiente del piso.
-Les siguen ETS ($\factEtsDffMean$ de hold-out) y, ya optimizados, los árboles CatBoost y
+Les siguen ETS (MASE $\factEtsDffMean$ en el conjunto reservado) y, ya optimizados, los árboles CatBoost y
 XGBoost ($0.105$). En estas series más cortas (disponibles solo desde octubre de 2015)
 dos de cada tres avances mensuales son nulos, de modo que ``no moverse'' domina aún más
 que en FAD; la Figura~\ref{fig:ranking} resume el desempeño de todo el repertorio sobre
@@ -2502,7 +2502,7 @@ ambas tablas. Se mantiene, además, la
 ajustarse en 13 de 25 series y ARIMA en 20 (falla numérica \textit{LinAlgError} en
 muestras cortas), y la cascada ARIMA-LSTM \textbf{no pudo ajustarse en ninguna} (se
 omite de la tabla), pues su componente de red requiere más historia que la disponible en
-la ventana inicial de DFF. El error de hold-out de SARIMA ($0.100$) aparenta competir,
+la ventana inicial de DFF. El error del conjunto reservado de SARIMA ($0.100$) aparenta competir,
 pero se promedia solo sobre las 13 series donde convergió (un sesgo de supervivencia) y
 no es comparable con los modelos que corrieron en las 25. Este contraste, y la
 inviabilidad numérica de los modelos de mayor capacidad con pocos datos, es la razón por
@@ -2514,14 +2514,14 @@ la que el sistema evalúa cada tabla por separado y no asume un único modelo un
 \caption[Comparación de los \factNModels{} modelos (DFF)]{Desempeño promedio sobre las 25 series DFF
 de preferencia familiar, ordenado por MASE de selección (la primera fila en negritas;
 naïve-1 y Theta empatan). Promediado solo sobre las series con ajuste exitoso ($n$); la
-cascada ARIMA-LSTM se omite por no converger en ninguna. El hold-out de SARIMA solo cubre
+cascada ARIMA-LSTM se omite por no converger en ninguna. El conjunto reservado de SARIMA solo cubre
 13 series (sesgo de supervivencia).}
 \label{tab:comparacion_dff}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{lccccc}
 \toprule
 \rowcolor{uacjblue!15}
-\textbf{Modelo} & \textbf{MASE sel.} & \textbf{MASE hold-out} & \textbf{sMAPE sel.} & \textbf{sMAPE hold-out} & \textbf{$n$} \\ \midrule
+\textbf{Modelo} & \textbf{MASE sel.} & \textbf{\shortstack{MASE\\reservado}} & \textbf{sMAPE sel.} & \textbf{\shortstack{sMAPE\\reservado}} & \textbf{$n$} \\ \midrule
 % --- DFF: 25 series familia, run 20260704T100200-ea94a2a (experiments/make_tex_tables.py) ---
 Naïve-1 (paseo aleatorio) & \textbf{0.077} & \textbf{0.086} & 0.21 & 0.20 & 25 \\
 Theta & 0.077 & 0.086 & 0.21 & 0.20 & 25 \\
@@ -2553,7 +2553,7 @@ SARIMA & 1.699 & 0.100 & 0.51 & 0.26 & 13 \\
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{results_ranking_mase.pdf}
-\caption[Ranking de desempeño del repertorio de modelos]{Desempeño (MASE de hold-out,
+\caption[Ranking de desempeño del repertorio de modelos]{Desempeño (MASE del conjunto reservado,
 promediado sobre las 25 series familiares) de cada modelo del repertorio, ordenado de mejor
 a peor; la línea discontinua marca el listón parsimonioso (ETS/Theta en FAD, ETS en DFF) y
 los modelos resaltados son los parsimoniosos líderes; la línea base naïve-1 queda por
@@ -2615,7 +2615,7 @@ fuga, estrategias de conjunto \cita{48} implementadas en sus formas fuertes: la
 $K\in\{2,3,5\}$), un \textit{stacking} global con un único vector de pesos por tabla
 regularizado en el simplex, y un selector de modelo por características de serie
 (meta-aprendizaje sobre el catálogo de características de §1.2). \textbf{Ninguna rompe el
-piso}: comparando medias de MASE de hold-out sobre las mismas series distintas (15 en
+piso}: comparando medias de MASE del conjunto reservado sobre las mismas series distintas (15 en
 FAD, 14 en DFF, descontando las pseudo-réplicas del corte mundial), la mejor combinación
 alcanza $0.120$ en FAD, peor que el naïve-1 en ese mismo conjunto ($\factNaiveOneFadDedupMean$), y $0.077$
 en DFF, donde \textit{empata} con el piso (también $0.077$ en media sobre esas series)
@@ -2650,7 +2650,7 @@ reproducible y extiende la evaluación a horizontes de hasta cinco años. Las me
 configuraciones globales, PatchTST sobre nivel alcanza MASE $=0.122$ y BiTCN sobre
 diferencia $0.128$ (Tabla~\ref{tab:global_deep}), compiten con los mejores modelos
 entrenados por serie, y la \textbf{optimización de hiperparámetros con la arquitectura en
-el espacio de búsqueda} (búsqueda única con parada temprana, sin tocar el hold-out; la
+el espacio de búsqueda} (búsqueda única con parada temprana, sin tocar el conjunto reservado; la
 configuración ganadora reentrenada con cinco semillas) lleva a \textbf{AutoBiTCN a MASE
 $=\factAutobitcnFadMean$}: por primera vez un modelo profundo queda \textit{por debajo}
 del par parsimonioso ETS-Theta ($\factEtsFadMean$--$\factThetaFadMean$) en FAD. Agrupar
@@ -2722,7 +2722,7 @@ paseo aleatorio en el pronóstico a un paso en ninguna de las dos tablas}.
 \includegraphics[width=0.82\textwidth]{results_multiseed_ci.pdf}
 \caption[Validación multi-semilla: deep global vs. listón]{Validación con cinco semillas
 independientes del ganador profundo global (variando la inicialización de pesos sobre la
-configuración optimizada): media e intervalo de confianza al 95\,\% del MASE de hold-out,
+configuración optimizada): media e intervalo de confianza al 95\,\% del MASE del conjunto reservado,
 contrastados con el listón parsimonioso y, en FAD, con el oráculo de selección perfecta.
 En ambas tablas la media del modelo profundo queda por debajo del listón parsimonioso
 (en FAD por un margen mínimo, con el intervalo cruzándolo); el piso del naïve-1 ($\factNaiveOneFadMean$
@@ -2826,7 +2826,7 @@ mientras el intervalo al $95$\,\% conserva su cobertura empírica.}
 \caption[Barrido de modelos profundos globales de frontera (FAD)]{Barrido de las ocho
 arquitecturas profundas de frontera entrenadas de forma global sobre las 25 series FAD
 familiares (mejor configuración por modelo; medias multi-semilla en las principales). DeepAR
-diverge numéricamente y se omite. MASE de hold-out; el listón parsimonioso es
+diverge numéricamente y se omite. MASE del conjunto reservado; el listón parsimonioso es
 ETS/Theta $=\factEtsFadMean$--$\factThetaFadMean$ y el piso ingenuo es el naïve-1
 ($\factNaiveOneFadMean$). El mejor profundo optimizado queda por debajo del listón parsimonioso pero
 por encima del piso (validación multi-semilla más abajo).}
@@ -2839,7 +2839,7 @@ por encima del piso (validación multi-semilla más abajo).}
 \begin{tabular}{lcc}
 \toprule
 \rowcolor{uacjblue!15}
-\textbf{Modelo / configuración} & \textbf{Técnica} & \textbf{MASE hold-out} \\ \midrule
+\textbf{Modelo / configuración} & \textbf{Técnica} & \textbf{\shortstack{MASE\\reservado}} \\ \midrule
 PatchTST & global, nivel & 0.122 \\
 BiTCN & global, diferencia & 0.128 \\
 TiDE & global, diferencia & 0.133 \\
@@ -2868,12 +2868,12 @@ migratoria; la fecha de prioridad se expresa en años.}
 \paragraph{Backtest por categoría: el pronóstico sobre el lapso reservado.} Más allá de una
 serie, el backtest completo sobre las \textbf{25 combinaciones país$\times$categoría} de cada
 tabla (Figuras~\ref{fig:grid_fad} y~\ref{fig:grid_dff}) permite ver cómo el modelo sigue la
-trayectoria escalonada y los avances de cada cola migratoria \textit{dentro del lapso de
-hold-out} (sombreado), con su intervalo de predicción al $95$\,\%. El pronóstico reproduce
+trayectoria escalonada y los avances de cada cola migratoria \textit{dentro del lapso del
+conjunto reservado} (sombreado), con su intervalo de predicción al $95$\,\%. El pronóstico reproduce
 tanto las series que avanzan con rapidez (F2A) como las prácticamente estancadas (varias
 F3/F4), y su banda se ensancha precisamente donde la fecha da saltos. Las
 Tablas~\ref{tab:fcst_fad} y~\ref{tab:fcst_dff} traducen esa cercanía a días: contrastan, en
-el último mes con fecha publicada del hold-out, la fecha real con la pronosticada y su
+el último mes con fecha publicada del conjunto reservado, la fecha real con la pronosticada y su
 diferencia $\Delta$, junto al error absoluto medio (MAE) sobre todo el lapso. En las
 categorías estancadas el error cae a pocos días (México~F4 y F3 en DFF, $0$~días), mientras
 que en las de movimiento rápido se sitúa en algunos meses; las áreas no sobre-suscritas
@@ -2882,18 +2882,18 @@ que en las de movimiento rápido se sitúa en algunos meses; las áreas no sobre
 \begin{figure}[p]
 \centering
 \includegraphics[width=\textwidth]{results_backtest_grid_FAD.pdf}
-\caption[Backtest por categoría sobre el hold-out (FAD)]{Backtest del pronóstico sobre el
+\caption[Backtest por categoría sobre el conjunto reservado (FAD)]{Backtest del pronóstico sobre el
 conjunto reservado de 24 meses para las 25 combinaciones país$\times$categoría de la tabla
 FAD. Cada panel contrasta la fecha de prioridad real (estado F) con el pronóstico de la red
 profunda global (BiTCN) y su intervalo de predicción al $95$\,\%; la franja sombreada marca
-el lapso de hold-out. La fecha de prioridad se expresa en años.}
+el lapso del conjunto reservado. La fecha de prioridad se expresa en años.}
 \label{fig:grid_fad}
 \end{figure}
 
 \begin{figure}[p]
 \centering
 \includegraphics[width=\textwidth]{results_backtest_grid_DFF.pdf}
-\caption[Backtest por categoría sobre el hold-out (DFF)]{Backtest análogo para las 25
+\caption[Backtest por categoría sobre el conjunto reservado (DFF)]{Backtest análogo para las 25
 combinaciones país$\times$categoría de la tabla DFF. Las series prácticamente constantes
 (p.\,ej. varias de Filipinas) aparecen como líneas planas que el modelo reproduce con error
 casi nulo; las de movimiento rápido muestran bandas de predicción más anchas.}
@@ -2904,9 +2904,9 @@ casi nulo; las de movimiento rápido muestran bandas de predicción más anchas.
 \centering
 \footnotesize
 \caption[Pronóstico vs.\ fecha real por categoría (FAD)]{Comparación, por serie, de la fecha
-de prioridad real y la pronosticada en el último mes con fecha publicada del hold-out (tabla
+de prioridad real y la pronosticada en el último mes con fecha publicada del conjunto reservado (tabla
 FAD). $\Delta$ es la diferencia (pronóstico $-$ real) en días (en \textbf{negrita} cuando es
-menor a un mes) y MAE el error absoluto medio en días sobre todo el lapso de hold-out.}
+menor a un mes) y MAE el error absoluto medio en días sobre todo el lapso del conjunto reservado.}
 \label{tab:fcst_fad}
 \begin{tabular}{llccrr}
 \toprule
@@ -3012,8 +3012,8 @@ de selección), el TFT diferenciado ($0.127$) y el naïve-1 ($0.129$); en DFF el
 piso ingenuo. Las series EB, más cortas y con congelamientos aún más largos que las
 familiares, castigan además a los modelos rígidos (Theta cae a $0.439$ en FAD). Este
 agrupamiento de líneas base y modelos ligeros al frente (en selección) reproduce el
-observado en las categorías familiares; su confirmación formal en hold-out, donde el
-naïve-1 emerge como piso según la inversión selección$\rightarrow$hold-out documentada en la
+observado en las categorías familiares; su confirmación formal en el conjunto reservado, donde el
+naïve-1 emerge como piso según la inversión selección$\rightarrow$conjunto reservado documentada en la
 Tabla~\ref{tab:comparacion_modelos}, queda para la evaluación extendida por categoría de
 empleo. La evidencia disponible ya sugiere que las conclusiones del sistema no son un
 artefacto de las categorías familiares.
@@ -3124,10 +3124,10 @@ el capítulo de resultados es un hallazgo del propio sistema, obtenido al exigir
 base más honesta posible: en un panel donde el $\factPctFrozen$\,\% de los avances
 mensuales es nulo, \textbf{repetir el último corte publicado (naïve-1) es el rival a
 vencer en el pronóstico a un paso, y ningún modelo puntual lo supera con significancia
-estadística}. El naïve-1 promedia MASE de hold-out $\factNaiveOneFadMean$ en FAD y $\factNaiveOneDffMean$ en DFF (donde
+estadística}. El naïve-1 promedia MASE del conjunto reservado $\factNaiveOneFadMean$ en FAD y $\factNaiveOneDffMean$ en DFF (donde
 Theta \textit{empata} con él al colapsar a un comportamiento casi de paseo aleatorio). El
 conjunto de confianza de modelos al $90$\,\% lo retiene como único miembro en ambas
-tablas, y el propio naïve-1 gana el hold-out en \factNaiveOneFadHoldoutWins{} de las 25 series FAD. Documentar este piso con un
+tablas, y el propio naïve-1 gana \factNaiveOneFadHoldoutWins{} de las 25 series FAD en el conjunto reservado. Documentar este piso con un
 protocolo reproducible, en lugar de omitir la línea base que lo revela, es una decisión de
 honestidad metodológica que da valor de ingeniería al resto del sistema.
 
@@ -3230,7 +3230,7 @@ naïve-1 de su propia cohorte y \cohortFactScanBate{} por encima, con
 \cohortFactCampanaLanes{} corridas aisladas de las que \cohortFactCampanaOk{} terminaron,
 tampoco produjo ninguna receta que batiera ese piso (\cohortFactCampanaBate{} de
 \cohortFactCampanaPrimarias{} recetas primarias). Finalmente, el enrutador por cohorte, que
-escoge el método con la evidencia anterior al hold-out y se evalúa solo sobre él, se sometió al
+escoge el método con la evidencia anterior al conjunto reservado y se evalúa solo sobre él, se sometió al
 mismo gate del sistema: mejora material de al menos \cohortFactRouterMargen{} en MASE, contraste
 bilateral con corrección de Holm al \cohortFactRouterAlfa{} y ninguna pérdida material, exigidos
 \textbf{en los tres horizontes} evaluados.
@@ -3258,7 +3258,7 @@ versionado y ninguna se teclea a mano.
 \caption[Enrutado por cohorte contra el naïve-1 de cada cohorte]{Enrutado por cohorte frente al
 naïve-1 de la propia cohorte, por tabla, cohorte y horizonte. El efecto es positivo cuando el
 enrutador mejora; la significancia es la del contraste bilateral tras la corrección de Holm sobre
-los tres horizontes de la celda. Retrospectivo, con selección disjunta del hold-out.}
+los tres horizontes de la celda. Retrospectivo, con selección disjunta del conjunto reservado.}
 \label{tab:cohortes}
 \input{cohortes.tex}
 \end{table}
@@ -3570,7 +3570,7 @@ documento puede atarse al código exacto que lo generó y reconstruirse. La capa
 modelado se prueba en integración continua con un piso de cobertura propio.
 
 La Tabla~\ref{tab:hparams} reúne los hiperparámetros principales, \textit{fijados antes}
-del conjunto de prueba para evitar cualquier ajuste retrospectivo a la métrica de hold-out.
+del conjunto de prueba para evitar cualquier ajuste retrospectivo a la métrica del conjunto reservado.
 
 \begin{table}[H]
 \centering
@@ -3578,13 +3578,13 @@ del conjunto de prueba para evitar cualquier ajuste retrospectivo a la métrica 
 \caption[Hiperparámetros principales del protocolo]{Hiperparámetros principales de cada
 componente, fijados antes del conjunto de prueba reservado. La búsqueda de
 hiperparámetros (Optuna) usa exclusivamente validación interna sobre el tramo de
-entrenamiento, sin tocar los 24 meses de hold-out.}
+entrenamiento, sin tocar los 24 meses del conjunto reservado.}
 \label{tab:hparams}
 \begin{tabular}{@{}p{4.2cm} p{9.3cm}@{}}
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{Componente} & \textbf{Configuración} \\ \midrule
-Validación \textit{walk-forward} & hold-out 24 meses, paso 1 mes, reajuste por origen \\
+Validación \textit{walk-forward} & conjunto reservado 24 meses, paso 1 mes, reajuste por origen \\
 Escala de la MASE & naïve estacional, periodo $m=12$, solo entrenamiento \\
 ARIMA / SARIMA & orden por AIC; estacionalidad $m=12$ \\
 ETS & tendencia amortiguada; estacionalidad $m=12$ \\
@@ -3822,7 +3822,7 @@ documentaci\'on pasiva.}
 \rowcolor{uacjblue!15}
 \textbf{Guardarra\'il} & \textbf{Qu\'e verifica} & \textbf{D\'onde corre} \\ \midrule
 Consistencia & Toda cifra del documento, portal y docs coincide con la fuente \'unica de verdad & CI + previo a \textit{push} \\
-Regresi\'on de modelos & El error de hold-out de una rejilla fija no se degrada & CI (capa de modelado) \\
+Regresi\'on de modelos & El error del conjunto reservado de una rejilla fija no se degrada & CI (capa de modelado) \\
 Monitor de \textit{drift} & Desempe\~no, cobertura y datos del \'ultimo bolet\'in & Proceso mensual \\
 Tarjeta de modelo & La ficha del sistema no diverge de las cifras canónicas & CI (capa base) \\
 \bottomrule
@@ -3831,12 +3831,12 @@ Tarjeta de modelo & La ficha del sistema no diverge de las cifras canónicas & C
 
 La receta desplegada no se fija a mano: es un \textbf{dato versionado} (un manifiesto) que
 solo cambia mediante un procedimiento auditado de campe\'on-retador. Este eval\'ua la receta
-en producci\'on frente a un conjunto de alternativas sobre el hold-out reservado, mediante una
+en producci\'on frente a un conjunto de alternativas sobre el conjunto reservado, mediante una
 prueba de rangos con signo de Wilcoxon por serie con control del error por comparaciones
 m\'ultiples, y emite un veredicto: una alternativa solo se recomienda si supera al campe\'on
 con significancia y un margen material. El veredicto vigente es el m\'as instructivo del
-proyecto: el retador que cruza el umbral en ambas tablas es el \textbf{na\"ive-1} (MASE de
-hold-out, en \textbf{media sobre las series deduplicadas}: $\factNaiveOneFadDedupMean$ frente al campe\'on
+proyecto: el retador que cruza el umbral en ambas tablas es el \textbf{na\"ive-1} (MASE del
+conjunto reservado, en \textbf{media sobre las series deduplicadas}: $\factNaiveOneFadDedupMean$ frente al campe\'on
 $\factFadChampionMean$ en FAD; $\factNaiveOneDffDedupMean$ frente a $\factDffChampionMean$ en DFF, con
 significancia bajo la prueba y la correcci\'on ya descritas, y margen material), pero su promoci\'on se \textbf{retiene}
 por una decisi\'on de gobernanza documentada: el gate eval\'ua el pron\'ostico a un paso y
@@ -3860,8 +3860,8 @@ almac\'en de experimentos.
 \centering
 \includegraphics[width=0.90\textwidth]{mlops_mlflow_champion.png}
 \caption[Veredicto campe\'on-retador registrado]{Registro del procedimiento campe\'on-retador
-en el almac\'en de experimentos: las recetas desplegadas para FAD y DFF con su error medio de
-hold-out, conservadas como corridas trazables. Fuente: captura de la interfaz de MLflow.}
+en el almac\'en de experimentos: las recetas desplegadas para FAD y DFF con su error medio del
+conjunto reservado, conservadas como corridas trazables. Fuente: captura de la interfaz de MLflow.}
 \label{fig:mlflow_champion}
 \end{figure}
 
@@ -3943,7 +3943,7 @@ pronóstico (uno a sesenta meses), sobre el retrospectivo rodante de toda la his
 observaciones con fecha. La deriva (línea sólida) queda por debajo del naïve-1 (línea discontinua)
 en ambas tablas; la región sombreada es su ventaja. Los anillos huecos marcan los horizontes en
 que la ventaja no alcanza significancia tras la corrección de Holm. Estas cifras son retrospectivas
-y no sustituyen al piso del hold-out fijo desplegado.}
+y no sustituyen al piso del conjunto reservado fijo desplegado.}
 \label{fig:horizonte}
 \end{figure}
 
@@ -3951,7 +3951,7 @@ y no sustituyen al piso del hold-out fijo desplegado.}
 \centering
 \caption[Campeón por horizonte (retrospectivo rodante)]{Campeón por horizonte: MASE de la deriva y
 del naïve-1, su diferencia porcentual y la significancia de Holm, por tabla y horizonte.
-Retrospectivo rodante, solo estado F, escala canónica; no es el hold-out fijo, donde el naïve-1 es
+Retrospectivo rodante, solo estado F, escala canónica; no es el conjunto reservado fijo, donde el naïve-1 es
 el piso desplegado.}
 \label{tab:horizonte}
 \input{horizon_champion.tex}
@@ -3960,7 +3960,7 @@ el piso desplegado.}
 \paragraph{Por qué la deriva no se despliega.} Esa ventaja es \textbf{dependiente del régimen}.
 Sobre veinticinco años las fechas avanzan con deriva casi constante y extrapolar la pendiente gana;
 pero la ventana reciente reservada para la evaluación desplegada, los últimos veinticuatro meses,
-trae retrogresiones, y ahí la pendiente de la deriva perjudica: en el hold-out fijo el naïve-1
+trae retrogresiones, y ahí la pendiente de la deriva perjudica: en el conjunto reservado fijo el naïve-1
 vuelve a ser más seguro en el pronóstico a un paso. Por eso el sistema despliega el piso robusto y
 registra a la deriva como \textbf{retador formal no promovible} en la gobernanza campeón-retador
 (Apéndice~A.8): su ventaja retrospectiva queda documentada y versionada sin comprometer la decisión
