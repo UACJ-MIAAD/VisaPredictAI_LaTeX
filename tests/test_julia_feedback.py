@@ -62,6 +62,26 @@ def test_la_tabla_de_a6_queda_reconciliada_en_el_maestro() -> None:
     assert r"\label{tab:modelos_a6}" in _texto()
 
 
+def test_a7_reconcilia_una_vista_extremo_a_extremo_distinta_del_flujo_de_modelado() -> None:
+    texto = _texto()
+    assert texto.count(r"\label{fig:arquitectura}") == 1
+    assert texto.count(r"\label{fig:arquitectura_a7}") == 1
+    assert texto.count(r"\label{tab:flujo_a7}") == 1
+    assert "Esta vista extremo a extremo complementa" in texto
+    assert "detalla exclusivamente el flujo interno de modelado" in texto
+
+
+def test_a7_remapea_nueve_fuentes_y_anade_seis_sin_renumerar() -> None:
+    texto = _texto()
+    inicio = texto.index(r"\subsection{1.3.2 ")
+    fin = texto.index(r"\section{1.4 Desarrollo}", inicio)
+    citadas = {int(valor) for valor in re.findall(r"\\cita\{(\d+)\}", texto[inicio:fin])}
+    assert citadas == {7, 8, 9, 30, 31, 32, 57, 58, 59, 60, 61, 62, 63, 64, 65}
+    assert [int(valor) for valor in re.findall(r"\\item\\label\{bib:(6[0-5])\}", texto)] == list(
+        range(60, 66)
+    )
+
+
 def test_referencias_del_maestro_son_contiguas_y_todas_se_usan() -> None:
     texto = _texto()
     referencias = [int(valor) for valor in re.findall(r"\\item\\label\{bib:(\d+)\}", texto)]

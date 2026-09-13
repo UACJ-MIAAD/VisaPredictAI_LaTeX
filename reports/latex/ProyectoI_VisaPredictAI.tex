@@ -2058,14 +2058,174 @@ calibrada y la coherencia transversal (§2.2).
 
 \subsection{1.3.2 Creación de la arquitectura general del sistema y definición del flujo de trabajo}
 
-Los \factNModels{} modelos se exponen tras una interfaz común (\texttt{fit}/\texttt{predict})
-mediante la biblioteca \textit{darts}, lo que permite una comparación justa y reúsa
-el motor de validación temporal y la generación de bandas probabilísticas sin
-reimplementarlos. El flujo de trabajo es el de la Figura~\ref{fig:arquitectura}: las
-piezas de código propio son la cascada ARIMA-LSTM (un envoltorio que ajusta un ARIMA,
-calcula sus residuales y entrena un LSTM sobre ellos), el envoltorio que diferencia las
-series para los árboles de potenciación de gradiente y el adaptador que evalúa Chronos
-en modo zero-shot.
+\paragraph{Propósito arquitectónico.} VisaPredict AI se diseñó como un sistema modular de
+procesamiento por lotes, adecuado a la periodicidad mensual del \textit{Visa Bulletin}. No
+es un servicio que pronostica en línea después de cada consulta: una nueva fuente entra al
+flujo, se valida, produce una versión trazable de datos y modelos, y sólo entonces genera
+artefactos estáticos para consulta. Esta decisión reduce la complejidad operativa, evita que
+un cálculo parcial llegue al usuario y permite reproducir cada resultado a partir del
+código, los datos y la configuración que lo originaron.
+
+\paragraph{Vista general.} La arquitectura de la Figura~\ref{fig:arquitectura_a7} separa
+ocho componentes con responsabilidades explícitas. El portal oficial es la fuente; la
+instantánea congelada es la evidencia primaria; el panel y el almacén son las capas de datos
+procesados; la matriz de características alimenta al catálogo de modelos; la evaluación
+temporal decide qué resultados son admisibles; y la capa de publicación expone únicamente
+artefactos versionados. El seguimiento, las pruebas y los controles de procedencia atraviesan
+todo el flujo. Esta vista extremo a extremo complementa la Figura~\ref{fig:arquitectura},
+que detalla exclusivamente el flujo interno de modelado.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\footnotesize,
+  stage/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!8,
+    line width=0.8pt, text width=2.55cm, align=center, minimum height=1.15cm,
+    inner sep=4pt},
+  source/.style={stage, fill=uacjyellow!25, draw=uacjblack},
+  output/.style={stage, fill=regC!14, draw=regC},
+  band/.style={rectangle, rounded corners=3pt, draw=uacjgray, fill=uacjgray!10,
+    text width=13.3cm, align=center, minimum height=0.75cm, inner sep=4pt},
+  arr/.style={-{Latex[length=2.2mm]}, uacjgray, line width=0.9pt},
+  lab/.style={font=\scriptsize\itshape, text=uacjgray, align=center}]
+  \node[source] (src) at (0,0) {\textbf{1. Fuente}\\Portal oficial del \textit{Visa Bulletin}};
+  \node[stage] (raw) at (3.25,0) {\textbf{2. Evidencia}\\Instantánea HTML congelada};
+  \node[stage] (panel) at (6.50,0) {\textbf{3. Panel limpio}\\CSV largo mensual};
+  \node[stage] (db) at (9.75,0) {\textbf{4. Almacén}\\DuckDB + vistas analíticas};
+  \draw[arr] (src)--(raw);\draw[arr] (raw)--(panel);\draw[arr] (panel)--(db);
+
+  \node[stage] (fe) at (9.75,-2.25) {\textbf{5. Variables}\\Rezagos, calendario y máscaras};
+  \node[stage] (model) at (6.50,-2.25) {\textbf{6. Modelado}\\Catálogo de \factNModels{} modelos};
+  \node[stage] (eval) at (3.25,-2.25) {\textbf{7. Evaluación}\\Validación temporal + métricas};
+  \node[output] (release) at (0,-2.25) {\textbf{8. Publicación}\\JSON, CSV, \LaTeX{} y portal};
+  \draw[arr] (db)--(fe);\draw[arr] (fe)--(model);\draw[arr] (model)--(eval);
+  \draw[arr] (eval)--(release);
+
+  \node[band] (gov) at (4.88,-4.05) {\textbf{Capas transversales:} Git + DVC para
+  versionado \quad $\bullet$ \quad registro de experimentos \quad $\bullet$ \quad
+  pruebas, contratos de datos y procedencia};
+  \node[lab, below=1mm of release] {Consulta web y recuperación documental};
+\end{tikzpicture}%
+}
+\caption[Arquitectura general de VisaPredict AI]{Arquitectura extremo a extremo por
+componentes: la fuente oficial se transforma en evidencia congelada, panel, almacén,
+características, modelos y resultados evaluados antes de la publicación. El versionado,
+la trazabilidad y las pruebas son responsabilidades transversales.}
+\label{fig:arquitectura_a7}
+\end{figure}
+
+\paragraph{Adquisición y evidencia de origen.} El primer componente incorpora cada boletín
+mensual desde el sitio del Departamento de Estado. La descarga utiliza
+\texttt{requests} y el análisis del documento emplea \texttt{BeautifulSoup}
+\cita{7}\cita{8}. Sin embargo, la fuente puede rechazar clientes automatizados; por ello
+la arquitectura admite una captura manual controlada cuando la automatización no está
+disponible. En ambos casos, el límite es el mismo: se conserva primero una instantánea
+inmutable y se verifica su suma de comprobación. El resto del procesamiento se ejecuta sin
+red sobre esa evidencia. Así, la restricción de acceso amenaza la oportunidad de la
+actualización, pero no autoriza a omitir controles de integridad.
+
+\paragraph{Preparación y almacenamiento.} El segundo bloque convierte las tablas del
+boletín en un panel largo con frecuencia mensual. \texttt{pandas} realiza la
+normalización y las transformaciones tabulares \cita{9}; las reglas de calidad verifican
+claves, dominio, fechas, duplicados y continuidad antes de aceptar el panel. El archivo CSV
+constituye la interfaz abierta, mientras DuckDB organiza la misma información en un esquema
+dimensional con vistas para análisis y modelado \cita{59}. DVC registra las dependencias y
+los productos de cada etapa, y Git conserva el código y los punteros de versión
+\cita{57}. Esta separación permite reconstruir un resultado sin confundir el dato fuente,
+la transformación y el producto derivado.
+
+\paragraph{Construcción de características.} El módulo de preprocesamiento recibe una serie
+mensual y produce exclusivamente información disponible en cada origen de pronóstico:
+rezagos del nivel y del avance, variables cíclicas del calendario, máscaras de régimen y
+características descriptivas seleccionadas. \texttt{NumPy}, \texttt{SciPy} y
+\texttt{statsmodels} apoyan los cálculos numéricos y estadísticos
+\cita{60}\cita{61}. Los parámetros de escalamiento se estiman sólo con el tramo de
+entrenamiento y las pruebas de causalidad impiden que una observación futura modifique una
+fila anterior.
+
+\paragraph{Capa de modelado.} Los \factNModels{} modelos se exponen tras una interfaz común
+(\texttt{fit}/\texttt{predict}) mediante la biblioteca \textit{Darts} \cita{62}, lo que
+permite una comparación justa y reúsa el motor de validación temporal y la generación de
+bandas probabilísticas sin reimplementarlos. PyTorch sustenta las redes neuronales
+\cita{63}, y \texttt{scikit-learn} aporta interfaces y utilidades para aprendizaje
+automático \cita{64}. XGBoost, LightGBM y CatBoost implementan los regresores sobre avances
+\cita{30}\cita{31}\cita{32}. Los modelos locales se ajustan por serie y los globales
+aprenden de varias series, pero ambos consumen la misma representación causal. Las piezas de
+código propio son la cascada ARIMA-LSTM (un envoltorio que ajusta un ARIMA, calcula sus
+residuales y entrena un LSTM sobre ellos), el envoltorio que diferencia las series para los
+árboles de potenciación de gradiente y el adaptador que evalúa Chronos en modo zero-shot.
+
+\paragraph{Evaluación, selección e incertidumbre.} La salida de un modelo no pasa
+directamente a publicación. El motor de evaluación recorre orígenes cronológicos con ventana
+expansible y reserva una cola final independiente. En cada origen calcula las mismas métricas
+y conserva la identidad de la tabla, la serie, el modelo y la configuración. Cuando una
+técnica produce distribuciones o bandas, también se mide la cobertura. Las líneas base de
+la sección~1.3.1 permanecen dentro de la comparación; por tanto, un modelo complejo no se
+promueve sólo porque converja, sino porque demuestra una mejora verificable sobre una
+referencia pertinente.
+
+\paragraph{Artefactos, consulta y retroalimentación.} Los resultados aceptados se
+materializan en archivos CSV y JSON para consumo programático y en macros \LaTeX{} para los
+documentos académicos. El portal bilingüe lee estos artefactos versionados; no vuelve a
+entrenar modelos durante una consulta. La recuperación documental usa la misma versión
+publicada, lo que evita que el sitio y sus respuestas describan cortes distintos. Cuando
+llega un boletín posterior, sus valores reales se incorporan a un registro prospectivo y
+alimentan una nueva evaluación. El flujo es, por tanto, cíclico: publicar no concluye el
+proceso, sino que abre la siguiente oportunidad de contrastar los pronósticos.
+
+\paragraph{Flujo de trabajo operativo.} La Tabla~\ref{tab:flujo_a7} resume la interacción
+entre componentes. Cada paso recibe una entrada identificable, genera una salida verificable
+y posee una condición que impide avanzar cuando el resultado no es confiable.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\caption[Flujo de trabajo del sistema]{Secuencia operativa, productos y puertas de
+aceptación de VisaPredict AI.}
+\label{tab:flujo_a7}
+\begin{tabular}{>{\centering\arraybackslash}p{0.65cm}
+                >{\RaggedRight\arraybackslash}p{2.65cm}
+                >{\RaggedRight\arraybackslash}p{4.20cm}
+                >{\RaggedRight\arraybackslash}p{5.65cm}}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Paso} & \textbf{Componente} & \textbf{Producto} & \textbf{Condición para continuar} \\ \midrule
+1 & Captura & Instantánea del boletín & Archivo identificable, íntegro y asociado al mes esperado. \\
+2 & Extracción & Tablas normalizadas & Estructura reconocida y valores dentro del dominio permitido. \\
+3 & Consolidación & Panel mensual largo & Claves únicas, continuidad temporal y registro de limpieza aceptado. \\
+4 & Almacenamiento & DuckDB, vistas y conjunto entrenable & Restricciones de integridad y dependencias DVC coherentes. \\
+5 & Preprocesamiento & Matriz de características causal & Ningún dato posterior altera una fila construida en un origen anterior. \\
+6 & Modelado & Pronósticos por modelo y serie & Configuración, semilla, código y datos quedan identificados. \\
+7 & Evaluación & Métricas, intervalos y comparación & Cobertura completa, línea base presente y conjunto reservado intacto. \\
+8 & Publicación & Artefactos académicos y portal & Consistencia entre superficies y procedencia verificable. \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Seguimiento, calidad y reproducibilidad.} Cada ejecución registra sus parámetros
+y métricas en un formato ligero que puede sincronizarse con MLflow \cita{58}. Las pruebas
+automatizadas cubren código, contratos de datos, causalidad, coherencia entre artefactos y
+compilación documental. Ruff verifica estilo, mypy comprueba tipos y pytest ejecuta la
+batería funcional; GitHub Actions reproduce estas verificaciones antes de integrar cambios
+\cita{65}. Ningún paso de publicación se interpreta como exitoso por la sola existencia de
+un archivo: su procedencia y su cobertura deben corresponder a la misma versión.
+
+\paragraph{Escalabilidad, seguridad y disponibilidad.} La escala actual permite ejecutar el
+almacén de forma embebida y distribuir las campañas de modelado por tabla, familia o serie.
+La modularidad permite ampliar el catálogo sin modificar la adquisición ni la publicación.
+En seguridad, el sistema procesa exclusivamente datos públicos y agregados; no recibe
+expedientes ni información personal de solicitantes. Las sumas de comprobación, los
+artefactos inmutables y las puertas de calidad reducen el riesgo de sustitución accidental.
+En disponibilidad, la captura contempla la intervención humana cuando la fuente bloquea la
+automatización, mientras todas las etapas posteriores continúan siendo reproducibles sin
+conexión.
+
+\paragraph{Síntesis arquitectónica.} La arquitectura vincula cada decisión técnica con una
+responsabilidad: la evidencia se congela antes de transformarla; los datos se validan antes
+de modelarlos; las técnicas compiten antes de seleccionarse; y los resultados se acreditan
+antes de publicarse. Esta secuencia hace que VisaPredict AI sea mantenible y auditable, y
+permite incorporar nuevos boletines, modelos o superficies de consulta sin romper la
+trazabilidad de las versiones anteriores.
 
 % ------------------------------------------------------------
 \section{1.4 Desarrollo}
@@ -3543,6 +3703,22 @@ lifecycle with MLflow,'' \textit{IEEE Data Engineering Bulletin}, vol. 41, n.\te
 pp. 39--45, 2018.
 \item\label{bib:59} M. Raasveldt y H. M\"uhleisen, ``DuckDB: An embeddable analytical
 database,'' en \textit{Proc.\ ACM SIGMOD Int.\ Conf.\ on Management of Data}, 2019, pp.\ 1981--1984.
+\item\label{bib:60} S. Seabold y J. Perktold, ``statsmodels: Econometric and statistical
+modeling with Python,'' en \textit{Proc.\ 9th Python in Science Conf.\ (SciPy)}, 2010,
+pp. 92--96.
+\item\label{bib:61} P. Virtanen \textit{et al.}, ``SciPy 1.0: Fundamental algorithms for
+scientific computing in Python,'' \textit{Nature Methods}, vol. 17, n.\textsuperscript{o} 3,
+pp. 261--272, 2020.
+\item\label{bib:62} J. Herzen \textit{et al.}, ``Darts: User-friendly modern machine
+learning for time series,'' \textit{Journal of Machine Learning Research}, vol. 23,
+n.\textsuperscript{o} 124, pp. 1--6, 2022.
+\item\label{bib:63} A. Paszke \textit{et al.}, ``PyTorch: An imperative style,
+high-performance deep learning library,'' en \textit{Advances in Neural Information
+Processing Systems}, vol. 32, 2019, pp. 8024--8035.
+\item\label{bib:64} F. Pedregosa \textit{et al.}, ``Scikit-learn: Machine learning in
+Python,'' \textit{Journal of Machine Learning Research}, vol. 12, pp. 2825--2830, 2011.
+\item\label{bib:65} GitHub, ``GitHub Actions documentation,'' 2026. [En línea].
+Disponible en: \url{https://docs.github.com/actions}
 \end{enumerate}
 
 % ============================================================
