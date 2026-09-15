@@ -2243,17 +2243,260 @@ trazabilidad de las versiones anteriores.
 
 \subsection{1.4.1 Implementación del modelo}
 
-La implementación reúsa el almacén DuckDB del Objetivo~1 y se apoya en
-\textit{darts} sobre \textit{PyTorch} para los modelos de redes neuronales,
-\textit{statsmodels} para ARIMA/SARIMA/ETS/Theta, \textit{Prophet}, los árboles
-\textit{XGBoost}/\textit{LightGBM}/\textit{CatBoost} y \textit{chronos-forecasting} para
-el \textit{foundation model}. Durante
-la implementación se enfrentaron retos de entorno propios de versiones recientes en
-\textit{Apple Silicon}: el entrenamiento de redes recurrentes con múltiples hilos
-provocaba fallos de segmentación, resueltos forzando un solo hilo de cómputo; y el
-orden de carga de las bibliotecas de cómputo paralelo de XGBoost y PyTorch debía
-fijarse explícitamente para evitar conflictos. Estos ajustes se documentan en el
-código para garantizar la reproducibilidad.
+\paragraph{Alcance del primer avance.} Esta etapa convierte el diseño de las
+secciones~1.3.1 y~1.3.2 en una cadena ejecutable de preparación, ajuste, pronóstico,
+evaluación y persistencia. El objetivo del avance no es declarar un modelo definitivo, sino
+demostrar que las familias seleccionadas comparten un protocolo temporal, que sus parámetros
+quedan gobernados y que ningún resultado parcial puede confundirse con una ejecución completa.
+Al cierre de esta entrega, la capa de modelado, sus pruebas iniciales y las puertas de
+aceptación están implementadas; la regeneración integral de resultados permanece separada y
+sólo se ejecutará después de acreditar los insumos, el código y los entornos.
+
+\paragraph{Del diseño al código.} La implementación toma como entrada el panel mensual
+validado y el almacén DuckDB descritos en la sección~1.3.2 \cita{59}. Una capa de acceso
+recupera cada serie por tabla, país o área de cargabilidad y categoría; otra construye una
+representación mensual causal; un registro canónico asigna a cada identificador lógico su
+familia, fuente de pronóstico y política de persistencia; y un motor de recorrido temporal
+aplica la misma partición y las mismas métricas a todos los candidatos. Esta separación evita
+que cada modelo introduzca, de manera accidental, su propia definición del conjunto de
+entrenamiento o del periodo evaluado.
+
+La Figura~\ref{fig:implementacion_a8} resume la ruta implementada. Las flechas representan
+productos explícitos, no llamadas informales entre cuadernos: cada etapa recibe una entrada
+validada y produce una salida verificable antes de habilitar la siguiente.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\footnotesize,
+  box/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!8,
+    line width=0.8pt, text width=2.7cm, align=center, minimum height=1.15cm,
+    inner sep=5pt},
+  guard/.style={box, draw=regC, fill=regC!12},
+  store/.style={box, draw=uacjblack, fill=uacjyellow!22},
+  arr/.style={-{Latex[length=2.2mm]}, uacjgray, line width=0.9pt}]
+  \node[store] (data) at (0,0) {\textbf{Panel acreditado}\\Serie mensual y máscaras};
+  \node[box] (prep) at (3.5,0) {\textbf{Preparación causal}\\Rezagos, calendario y escala};
+  \node[box] (registry) at (7.0,0) {\textbf{Registro de modelos}\\Constructor y configuración};
+  \node[box] (walk) at (10.5,0) {\textbf{Recorrido temporal}\\Ajuste y pronóstico a un paso};
+  \draw[arr] (data)--(prep);
+  \draw[arr] (prep)--(registry);
+  \draw[arr] (registry)--(walk);
+
+  \node[guard] (metrics) at (8.75,-2.25) {\textbf{Evaluación común}\\MASE, errores y cobertura};
+  \node[store] (artifacts) at (5.25,-2.25) {\textbf{Persistencia}\\Pronósticos, modelos y recibos};
+  \node[guard] (gate) at (1.75,-2.25) {\textbf{Puerta de aceptación}\\Cobertura y procedencia};
+  \draw[arr] (walk)--(metrics);
+  \draw[arr] (metrics)--(artifacts);
+  \draw[arr] (artifacts)--(gate);
+\end{tikzpicture}%
+}
+\caption[Cadena implementada para el modelado]{Cadena implementada para transformar una
+serie acreditada en pronósticos evaluados. La preparación sólo usa información disponible
+en el origen; el registro separa la identidad lógica del modelo de su biblioteca; y la puerta
+final rechaza artefactos con cobertura o procedencia incompletas.}
+\label{fig:implementacion_a8}
+\end{figure}
+
+\paragraph{Representación causal de cada serie.} La variable dependiente es el número de
+días transcurridos desde una época fija hasta la fecha de prioridad publicada. Los meses sin
+fecha numérica conservan su régimen y su máscara de observación; no se convierten en ceros.
+Para cada origen, los huecos admitidos se tratan sólo con datos anteriores, la escala se
+estima con el tramo de entrenamiento y las covariables de calendario se calculan sin observar
+el futuro. En los árboles de potenciación, el objetivo es el avance mensual y no el nivel,
+porque esta representación permite extrapolar cambios sin presentar como predicción futura
+el máximo histórico aprendido. XGBoost, LightGBM y CatBoost implementan esta familia
+\cita{30}\cita{31}\cita{32}.
+
+\paragraph{Familias implementadas.} La interfaz común de Darts \cita{62} coordina el ajuste
+y el pronóstico de las técnicas estadísticas y de varias redes; PyTorch sustenta los modelos
+profundos \cita{63}; y \texttt{scikit-learn} aporta transformadores y contratos de estimación
+\cita{64}. El catálogo mantiene cuatro funciones complementarias: líneas base ingenuas y con
+deriva para fijar un piso; modelos estadísticos como ARIMA, SARIMA, ETS, Theta y Kalman;
+regresores de árboles sobre diferencias; y redes locales o globales para representar patrones
+no lineales. Chronos se incorpora como modelo fundacional en modo de transferencia sin ajuste
+sobre el panel \cita{41}. La identidad se define por el nombre lógico, pues dos candidatos
+pueden compartir una clase de biblioteca y, aun así, representar protocolos diferentes.
+
+La Tabla~\ref{tab:familias_impl_a8} muestra cómo esas familias se materializan en el código.
+La persistencia no se equipara automáticamente con evaluación: un modelo puede producir un
+pronóstico obligatorio aunque su envoltorio no exponga un estado reutilizable. En ese caso se
+conserva el pronóstico generado por el recorrido temporal, junto con su contexto, en lugar de
+inventar un modelo serializado.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption[Implementación por familia de modelos]{Decisiones de implementación por familia.
+Todas se someten a la misma partición temporal y a la misma puerta de cobertura.}
+\label{tab:familias_impl_a8}
+\begin{tabular}{@{}p{3.0cm}p{3.8cm}p{3.3cm}p{3.2cm}@{}}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Familia} & \textbf{Representación} & \textbf{Ajuste} & \textbf{Producto conservado} \\ \midrule
+Líneas base & Nivel o deriva mensual & Determinista por origen & Pronóstico y métricas \\
+Estadísticos & Nivel, tendencia y estacionalidad & Ventana expansible & Modelo reutilizable cuando existe; pronóstico siempre \\
+Árboles & Primera diferencia y covariables causales & Reajuste por origen & Modelo, pronóstico y configuración \\
+Redes locales & Nivel escalado o diferencia & Reajuste periódico & Estado entrenado y pronóstico \\
+Redes globales & Panel de múltiples series & Una configuración, varias semillas & Pronóstico por semilla y agregado acreditado \\
+Fundacional & Serie histórica convertida al formato del modelo & Cero ajuste sobre el panel & Pronóstico y revisión inmutable del modelo \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Pseudocódigo principal.} El Algoritmo~\ref{alg:implementacion_a8} expresa el
+recorrido implementado. La rejilla esperada se deriva del panel y del registro antes de
+entrenar; por eso un archivo con menos filas no puede autodeclararse completo. Los últimos
+24 meses forman el conjunto reservado independiente, mientras la selección y el ajuste de
+hiperparámetros ocurren exclusivamente en la región anterior.
+
+\begingroup
+\algrenewcommand\algorithmicrequire{\textbf{Entrada:}}
+\algrenewcommand\algorithmicensure{\textbf{Salida:}}
+\algrenewcommand\algorithmicforall{\textbf{para cada}}
+\algrenewcommand\algorithmicdo{\textbf{hacer}}
+\algrenewcommand\algorithmicif{\textbf{si}}
+\algrenewcommand\algorithmicthen{\textbf{entonces}}
+\algrenewcommand\algorithmicend{\textbf{fin}}
+\begin{algorithm}[H]
+\caption{Implementación y acreditación del recorrido temporal}
+\label{alg:implementacion_a8}
+\begin{algorithmic}[1]
+\Require Panel $P$, tabla $T$, registro $\mathcal{M}$, entrenamiento mínimo $L_T$,
+conjunto reservado $H=24$ y semilla $s$
+\Ensure Pronósticos, métricas y recibo de cobertura de una misma ejecución
+\State Verificar identidad, esquema y suma de comprobación de $P$
+\State Derivar del panel la rejilla esperada $K$ de series, modelos y meses objetivo
+\ForAll{serie elegible $u$ de $T$}
+  \State Ordenar $u$ por mes y separar selección de los últimos $H$ objetivos
+  \ForAll{modelo $m$ declarado en $\mathcal{M}$}
+    \State Construir $m$ con la configuración registrada y fijar la semilla $s$
+    \ForAll{origen mensual $o$ posterior a $L_T$}
+      \State Ajustar transformaciones únicamente con observaciones de fecha $\leq o$
+      \If{la política de $m$ exige ajuste en $o$}
+        \State Ajustar $m$ sobre la ventana expansible disponible en $o$
+      \EndIf
+      \State Pronosticar un paso, para el objetivo mensual siguiente a $o$
+      \State Registrar clave, valor pronosticado, valor real si existe y máscara evaluable
+    \EndFor
+    \State Calcular métricas sólo sobre objetivos observados, con escala previa al objetivo
+  \EndFor
+\EndFor
+\State Rechazar duplicados, valores no finitos o cualquier diferencia entre $K$ y lo producido
+\State Escribir por promoción atómica artefactos y recibo ligado a datos, código y parámetros
+\end{algorithmic}
+\end{algorithm}
+\endgroup
+
+\paragraph{Configuración gobernada.} Los valores principales se concentran en un módulo de
+configuración y no se repiten dentro de cada algoritmo. La Tabla~\ref{tab:parametros_a8}
+presenta los parámetros del protocolo vigente. La semilla controla las fuentes estocásticas;
+el periodo 12 representa la frecuencia anual del boletín; y las ventanas mínimas distintas
+reconocen que FAD y DFF tienen longitudes históricas diferentes. Los modelos de bajo costo
+computacional se
+reajustan en cada origen, mientras las redes se actualizan cada doce meses para equilibrar
+validez temporal y costo. En los modelos probabilísticos se usan 500 muestras y su mediana
+como pronóstico puntual, evitando que una sola extracción aleatoria represente la predicción.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption[Parámetros principales de implementación]{Configuración principal compartida por
+los modelos. Los hiperparámetros internos de cada candidato permanecen versionados en el
+registro y no modifican la partición de evaluación.}
+\label{tab:parametros_a8}
+\begin{tabular}{@{}p{3.9cm}p{2.8cm}p{6.8cm}@{}}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Parámetro} & \textbf{Valor} & \textbf{Justificación operativa} \\ \midrule
+Semilla global & 42 & Reproduce inicialización, muestreo y búsquedas estocásticas. \\
+Periodo estacional & 12 meses & Corresponde al ciclo anual de publicación del boletín. \\
+Entrenamiento mínimo & FAD: 60; DFF: 36 meses & Evita ajustar con historia insuficiente y respeta la disponibilidad de cada tabla. \\
+Conjunto reservado & 24 meses & Proporciona una evaluación final común, fuera de selección y optimización. \\
+Pronóstico temporal & horizonte 1; paso 1 & Genera un objetivo por origen mensual y conserva el orden causal. \\
+Reajuste de estadísticos y árboles & cada origen & Implementa una ventana expansible real con toda la historia disponible. \\
+Reajuste de redes & cada 12 meses & Compromiso explícito entre actualización temporal y costo de entrenamiento. \\
+Muestras probabilísticas & 500 por objetivo & La mediana de la distribución se usa como pronóstico puntual estable. \\
+Covariables de árboles & calendario en $t$; máscara en $t-1$ & El calendario futuro es conocido; el régimen del objetivo no lo es. \\
+Escala MASE & finita y positiva & Una escala degenerada queda indefinida y bloquea la agregación; nunca se sustituye por uno. \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Optimización sin fuga.} Los hiperparámetros de los árboles se buscan con Optuna
+\cita{42}, mediante un muestreador TPE con semilla fija y almacenamiento persistente. La
+región anterior al conjunto reservado se divide, a su vez, en entrenamiento, 24 meses de
+\textit{val-tuning} y 12 meses de val-confirmación. El buscador observa sólo la primera cola;
+la segunda decide si la configuración se acepta y el conjunto reservado nunca interviene en
+ninguna de esas decisiones. Para las redes globales, una configuración se selecciona una sola
+vez y luego se vuelve a entrenar con varias semillas; así se separa la elección arquitectónica
+de la variabilidad debida a la inicialización.
+
+\paragraph{Herramientas de implementación.} La solución se desarrolla en Python 3.14 con
+perfiles de dependencias fijados. DuckDB y pandas proporcionan acceso tabular; NumPy, SciPy y
+\texttt{statsmodels} cubren cálculo numérico y estimación estadística
+\cita{9}\cita{60}\cita{61}; Darts, PyTorch y \texttt{scikit-learn} articulan los estimadores;
+y las bibliotecas especializadas implementan los árboles. Git conserva el código y DVC liga
+los datos y artefactos voluminosos a sus versiones \cita{57}. MLflow recibe el registro de
+experimentos \cita{58}, mientras pytest, Ruff y mypy verifican comportamiento, estilo y tipos.
+GitHub Actions reproduce estas puertas antes de integrar cambios \cita{65}.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption[Herramientas usadas en la implementación]{Herramientas y responsabilidad dentro
+del primer avance de implementación.}
+\label{tab:herramientas_a8}
+\begin{tabular}{@{}p{3.4cm}p{3.9cm}p{6.1cm}@{}}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Capa} & \textbf{Herramientas} & \textbf{Responsabilidad} \\ \midrule
+Datos & pandas, DuckDB, DVC & Consultar el panel, materializar entradas y versionar productos. \\
+Estadística & NumPy, SciPy, statsmodels & Transformaciones, escalas, modelos clásicos y métricas. \\
+Aprendizaje automático & Darts, scikit-learn, XGBoost, LightGBM, CatBoost & Interfaz temporal común y regresores sobre diferencias. \\
+Aprendizaje profundo & PyTorch y modelos temporales especializados & Entrenamiento local o global y predicción probabilística. \\
+Optimización & Optuna & Búsqueda anidada, reproducible y persistente de hiperparámetros. \\
+Seguimiento & Git, DVC y MLflow & Relacionar código, datos, configuración, ejecución y resultados. \\
+Calidad & pytest, Ruff, mypy y GitHub Actions & Pruebas, análisis estático y verificación antes de integrar. \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Persistencia, trazabilidad y manejo de errores.} Cada ejecución se identifica con
+la versión del código, la suma de comprobación del panel, la configuración y el entorno. Los
+modelos con estado reutilizable se guardan de forma comprimida; los pronósticos se conservan
+en formato largo con serie, origen, objetivo, horizonte, valor real, máscara evaluable y
+escala. Una promoción atómica impide que un consumidor lea un archivo a medio escribir. Antes
+de publicar, un recibo vuelve a comparar el conjunto exacto de claves esperado con el
+observado: un faltante, un duplicado, un mes sustituido, un valor no finito o una procedencia
+distinta detienen la cadena.
+
+El manejo de errores sigue una política de fallo cerrado. Cada etapa comprueba sus
+precondiciones y finaliza con un código distinto si falla el entorno, el linaje, la cobertura
+o la promoción. No se continúa con archivos antiguos por el solo hecho de que existan, ni se
+etiqueta como éxito una omisión. Las bitácoras se separan por ejecución y los mensajes nombran
+las claves ausentes y no esperadas, de modo que el diagnóstico pueda localizar el campo
+alterado sin revisar manualmente todo el conjunto.
+
+Durante la implementación también se enfrentaron retos de entorno en Apple Silicon. El
+entrenamiento de redes recurrentes con múltiples hilos provocaba fallos de segmentación, por
+lo que el perfil correspondiente limita explícitamente los hilos de cómputo. Asimismo, el
+orden de carga de las bibliotecas paralelas de XGBoost y PyTorch queda fijado para evitar
+conflictos. Estas decisiones forman parte del entorno reproducible y no dependen de ajustes
+manuales posteriores.
+
+\paragraph{Pruebas iniciales y estado del avance.} Las pruebas unitarias verifican escalas,
+transformaciones y constructores; las pruebas contractuales atacan esquemas, duplicados,
+valores no finitos, procedencia y cobertura; y las pruebas de integración confirman que el
+productor real invoca la persistencia que luego exige el consumidor. También se ejecutan
+controles benignos, por ejemplo un mes legítimamente no evaluable con valor real nulo, para
+evitar que el endurecimiento rechace casos válidos. Una prueba maestra compara las métricas
+antes y después de instrumentar el recorrido, y las comprobaciones de causalidad aseguran que
+alterar un dato futuro no modifique una característica pasada.
+
+Este primer avance deja una implementación funcional, modular y auditable, preparada para la
+ejecución controlada de la campaña completa. La separación entre cálculo, acreditación y
+publicación es deliberada: permite corregir un productor o repetir una etapa sin mezclar
+artefactos de campañas distintas, y conserva evidencia suficiente para que otro investigador
+reconstruya qué datos, parámetros y código originaron cada pronóstico.
 
 \subsection{1.4.2 Ajustes al modelo con diferentes configuraciones}
 
