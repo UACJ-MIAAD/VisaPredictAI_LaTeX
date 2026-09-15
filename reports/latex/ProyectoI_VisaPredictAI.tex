@@ -2498,6 +2498,221 @@ publicación es deliberada: permite corregir un productor o repetir una etapa si
 artefactos de campañas distintas, y conserva evidencia suficiente para que otro investigador
 reconstruya qué datos, parámetros y código originaron cada pronóstico.
 
+\paragraph{Continuación del desarrollo: integración pre-ejecución.} El segundo avance se
+concentra en unir los componentes anteriores dentro de una ejecución gobernada. El problema
+ya no es únicamente que cada estimador produzca un valor, sino demostrar que todos los valores
+obligatorios proceden del mismo panel, código, entorno y campaña. Para ello se incorporaron
+cuatro mecanismos: un registro único de modelos, un área de preparación aislada por campaña,
+recibos de cobertura recalculados al leer y un preflight que bloquea la ejecución antes del
+primer entrenamiento si la identidad técnica no coincide.
+
+\paragraph{Registro canónico y fuentes de pronóstico.} El catálogo dejó de depender de
+listas distintas en productores, exportadores y promotores. Cada modelo posee un identificador
+lógico, una familia, una política de persistencia, una fuente de pronóstico y su pertenencia o
+no al conjunto de comparación. A partir de ese registro se derivan las vistas consumidas por
+el resto del sistema. Así, añadir o retirar un candidato exige una modificación explícita de
+la autoridad y no una coincidencia accidental entre nombres de archivos.
+
+La Tabla~\ref{tab:registro_a9} resume las cuatro categorías operativas. SARIMA se incluye entre
+los modelos persistibles porque su estado sobrevive al ciclo guardar--cargar--pronosticar. En
+cambio, los envoltorios automáticos de ETS y Theta no conservan un estado reutilizable para el
+modo de pronóstico empleado; por ello sus predicciones se transportan desde el recorrido
+temporal que ya las calculó. Esta limitación técnica no los vuelve opcionales: su ausencia
+sigue bloqueando la cobertura final.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption[Registro canónico del avance 2]{Categorías derivadas del registro canónico. La
+fuente describe de dónde se obtiene el pronóstico final, no la biblioteca que implementa la
+clase.}
+\label{tab:registro_a9}
+\begin{tabular}{@{}p{3.0cm}p{5.0cm}p{2.1cm}p{3.2cm}@{}}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Categoría} & \textbf{Identificadores} & \textbf{Persistencia} & \textbf{Fuente del pronóstico} \\ \midrule
+Locales recalculados & SARIMA, ARIMA, Kalman, CatBoost y LightGBM & Sí & Exportador acreditado \\
+Locales transportados & ETS y Theta & No & Recorrido temporal oficial \\
+Globales de campaña & BiTCN, PatchTST, TiDE, NHITS y AutoBiTCN & Sí & Salida multisemilla de la campaña \\
+Pisos del conjunto reservado & Naive1 y deriva & No & Comparación interna; no se exportan como finalistas \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Transporte de pronósticos estadísticos.} El recorrido temporal conserva para ETS
+y Theta las 24 filas objetivo por serie y modelo. Las filas nacen del pronóstico, no de un
+cruce con los valores reales: si un mes carece de fecha publicada, la fila permanece con
+\texttt{observed=false} y valor real nulo. El origen se deriva como el periodo mensual anterior
+al objetivo y el horizonte se fija en uno. Cada fila incluye además la escala MASE utilizada,
+que debe ser finita y positiva, y la identidad de campaña, código y panel. El consumidor
+recalcula el conjunto esperado desde el panel vivo y rechaza diferencias, duplicados o
+valores no finitos antes de incorporar las predicciones al archivo final.
+
+\paragraph{Aislamiento de una campaña.} Los productores ya no escriben directamente sobre el
+árbol servido. Como muestra la Figura~\ref{fig:orquestacion_a9}, una campaña comienza con una
+escena limpia y acreditada, crea un espacio de preparación identificado, ejecuta productores
+y consumidores sobre esa misma identidad y sólo promueve el conjunto completo. Si una etapa
+falla, la preparación se conserva para diagnóstico y el árbol anterior permanece intacto.
+DVC conserva los punteros de datos voluminosos \cita{57} y el registro experimental puede
+sincronizarse con MLflow \cita{58}, pero ninguna de esas operaciones sustituye la puerta de
+cobertura.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\footnotesize,
+  stepbox/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!8,
+    line width=0.8pt, text width=2.45cm, align=center, minimum height=1.1cm,
+    inner sep=5pt},
+  check/.style={stepbox, draw=regC, fill=regC!12},
+  stop/.style={stepbox, draw=regU, fill=regU!9},
+  arr/.style={-{Latex[length=2.2mm]}, uacjgray, line width=0.9pt},
+  reject/.style={-{Latex[length=2.2mm]}, regU, dashed, line width=0.9pt}]
+  \node[check] (pre) at (0,0) {\textbf{Preflight}\\Código, panel y entornos};
+  \node[stepbox] (stage) at (3.15,0) {\textbf{Preparación aislada}\\\texttt{campaign\_id}};
+  \node[stepbox] (prod) at (6.30,0) {\textbf{Productores}\\Locales, transporte y globales};
+  \node[check] (receipt) at (9.45,0) {\textbf{Acreditación}\\Claves, hashes y semillas};
+  \node[check] (promote) at (12.60,0) {\textbf{Promoción}\\Conjunto completo};
+  \draw[arr] (pre)--(stage);
+  \draw[arr] (stage)--(prod);
+  \draw[arr] (prod)--(receipt);
+  \draw[arr] (receipt)--(promote);
+  \node[stop] (abort) at (6.30,-2.05) {\textbf{Fallo cerrado}\\Conservar evidencia; no promover};
+  \draw[reject] (pre.south) |- (abort.west);
+  \draw[reject] (prod.south) -- (abort.north);
+  \draw[reject] (receipt.south) |- (abort.east);
+\end{tikzpicture}%
+}
+\caption[Orquestación aislada y con fallo cerrado]{Orquestación del segundo avance. La
+identidad se acredita antes del cálculo; los productos nacen en un espacio aislado; y sólo un
+conjunto completo puede sustituir al árbol servido. Cualquier fallo conserva la versión
+anterior.}
+\label{fig:orquestacion_a9}
+\end{figure}
+
+\paragraph{Cobertura de modelos globales.} Las redes globales se entrenan con cinco semillas
+para separar el efecto de la inicialización de la configuración elegida. Por cada tabla, cada
+semilla debe cubrir exactamente la rejilla de 25 series por 24 meses, es decir, 600 claves
+$(\textit{serie},\textit{mes})$. El productor parte de esa rejilla canónica y agrega una
+columna finita por modelo; nunca construye la salida únicamente con las filas que lograron
+pronóstico. El lector vuelve a derivar la rejilla desde el panel, comprueba los valores reales,
+el conjunto exacto de semillas $s_1,\ldots,s_5$ y el hash de cada archivo, y evalúa los mismos
+marcos que acreditó. De esta forma, cinco archivos truncados de manera idéntica no pueden
+validarse entre sí por simple semejanza.
+
+\paragraph{Pseudocódigo de orquestación.} El Algoritmo~\ref{alg:orquestacion_a9} complementa
+el recorrido por modelo de A8. Expresa la secuencia implementada alrededor del cálculo y la
+propiedad central del avance: después del primer fallo no se ejecutan agregaciones,
+sincronizaciones ni promociones.
+
+\begingroup
+\algrenewcommand\algorithmicrequire{\textbf{Entrada:}}
+\algrenewcommand\algorithmicensure{\textbf{Salida:}}
+\algrenewcommand\algorithmicforall{\textbf{para cada}}
+\algrenewcommand\algorithmicdo{\textbf{hacer}}
+\algrenewcommand\algorithmicif{\textbf{si}}
+\algrenewcommand\algorithmicthen{\textbf{entonces}}
+\algrenewcommand\algorithmicend{\textbf{fin}}
+\begin{algorithm}[H]
+\caption{Orquestación acreditada del segundo avance}
+\label{alg:orquestacion_a9}
+\begin{algorithmic}[1]
+\Require Repositorio limpio $R$, panel $P$, entornos sellados $E$ y registro $\mathcal{M}$
+\Ensure Árbol servido anterior o campaña completa acreditada; nunca una mezcla
+\State Ejecutar contratos de locks, linaje y resolución de importaciones
+\State Emitir el preflight $S_0$ y compararlo con la identidad viva antes de calcular
+\If{$S_0$ no acredita exactamente $(R,P,E,\mathcal{M})$}
+  \State Abortar antes de crear artefactos
+\EndIf
+\State Abrir una transacción y un directorio de preparación para la campaña $c$
+\ForAll{productor requerido $q$ en el orden del flujo}
+  \State Ejecutar $q$ con la identidad de $c$
+  \If{$q$ falla o su recibo no reproduce el conjunto esperado}
+    \State Registrar el fallo, conservar la preparación y abortar inmediatamente
+  \EndIf
+\EndFor
+\State Acreditar $s_1,\ldots,s_5$, transportar ETS/Theta y exportar los modelos requeridos
+\State Revalidar esquema, claves, hashes, procedencia y ausencia de duplicados
+\If{la cobertura observada difiere de la derivada del panel y del registro}
+  \State Abortar sin tocar el árbol servido
+\EndIf
+\State Promover atómicamente la preparación y registrar el estado validado
+\end{algorithmic}
+\end{algorithm}
+\endgroup
+
+\paragraph{Configuración añadida en el avance 2.} La configuración numérica de A8 permanece
+sin cambios; el incremento introduce parámetros de ejecución y aceptación. La
+Tabla~\ref{tab:parametros_a9} los separa de los hiperparámetros del modelo para impedir que una
+decisión de gobernanza se confunda con una búsqueda estadística.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption[Parámetros de integración del avance 2]{Parámetros y condiciones añadidos para la
+integración pre-ejecución.}
+\label{tab:parametros_a9}
+\begin{tabular}{@{}p{4.1cm}p{3.1cm}p{6.3cm}@{}}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Parámetro o condición} & \textbf{Valor} & \textbf{Efecto} \\ \midrule
+Campaña & Identificador único & Separa preparación, bitácora, recibos y promoción. \\
+Tablas evaluadas & FAD y DFF & Mantiene las dos superficies del boletín bajo el mismo protocolo. \\
+Objetivos por serie & 24 meses & Exige la cola completa, incluidos meses no evaluables. \\
+Semillas globales & $1,2,3,4,5$ & Permite agregar variabilidad sin repetir la búsqueda arquitectónica. \\
+Grupo de semillas & Exactamente $s_1$--$s_5$ & Rechaza faltantes, extras o archivos de otra campaña. \\
+Escritura & Preparación + promoción atómica & Impide exponer archivos parciales a los consumidores. \\
+Política ante fallo & Detención inmediata & Prohíbe continuar con agregación o sincronización posterior. \\
+Cobertura & Conjunto exacto de claves & Compara lo esperado desde panel y registro contra lo producido. \\
+Identidad & Código, panel, entorno y campaña & Bloquea la mezcla de artefactos con procedencias distintas. \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Estructura del código y herramientas.} La integración mantiene separado el
+producto de las herramientas de campaña. El módulo de configuración conserva los parámetros
+matemáticos; el registro define el catálogo; el recorrido temporal produce métricas y filas
+de pronóstico; los módulos de transporte y cobertura validan artefactos; y el lanzador sólo
+orquesta esas piezas. Los contratos de entorno comparan los paquetes instalados con los locks,
+el smoke importa los puntos de entrada en procesos limpios y el gate de linaje contrasta cada
+instantánea con su nombre, hash y mes esperado. Esta estructura reduce la dependencia del
+conocimiento tácito y permite probar cada frontera de forma aislada.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption[Módulos principales del avance 2]{Responsabilidades principales de los módulos
+integrados durante el segundo avance.}
+\label{tab:modulos_a9}
+\begin{tabular}{@{}p{4.6cm}p{9.0cm}@{}}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Componente} & \textbf{Responsabilidad} \\ \midrule
+Configuración y registro & Definir parámetros, identidad lógica, persistencia y fuente de cada pronóstico. \\
+Recorrido temporal & Ajustar por origen, registrar 24 objetivos y calcular métricas sin fuga. \\
+Transporte estadístico & Conservar y acreditar ETS/Theta desde el recorrido que los produjo. \\
+Cobertura multisemilla & Validar rejilla, verdad, predicciones finitas, semillas y hashes. \\
+Exportador y promotor & Exigir todos los pronósticos y promover sólo los modelos persistibles y globales. \\
+Preflight y manifiesto & Acreditar código, panel, snapshots, locks, entornos y puntos de entrada. \\
+Lanzador de campaña & Ejecutar en orden, detenerse en el primer fallo y conservar una bitácora por campaña. \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Pruebas adversariales.} El segundo avance no se validó sólo con casos felices.
+Las pruebas sustituyen una serie conservando el conteo, compensan un faltante con un
+duplicado, cambian un único origen mensual, introducen una escala degenerada, mezclan otra
+campaña, alteran un archivo después de acreditarlo y presentan cinco semillas truncadas de la
+misma manera. Cada ataque debe producir un fallo antes de que el artefacto llegue a evaluación
+o publicación. Los controles benignos conservan casos válidos, como un objetivo no observado
+con valor real nulo, para demostrar que la regla no exige datos que el boletín nunca publicó.
+
+\paragraph{Estado al cierre del avance 2.} La integración se encuentra verificada localmente:
+los entornos reproducen sus locks, el linaje de las instantáneas está completo, los puntos de
+entrada importan y los recibos se vuelven a acreditar al consumirlos. La campaña integral no
+forma parte de A9 y no se ha iniciado. Antes de autorizar una ejecución prolongada queda una
+auditoría independiente final sobre el vínculo entre el sello preflight y la transacción que
+posteriormente habilitaría la publicación. Declarar este límite evita presentar una
+preparación técnicamente verde como si ya fuera un resultado experimental nuevo.
+
 \subsection{1.4.2 Ajustes al modelo con diferentes configuraciones}
 
 La validación temporal usa una ventana inicial de 60 meses para FAD y de 36 para
