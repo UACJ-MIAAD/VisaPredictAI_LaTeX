@@ -2713,6 +2713,263 @@ auditoría independiente final sobre el vínculo entre el sello preflight y la t
 posteriormente habilitaría la publicación. Declarar este límite evita presentar una
 preparación técnicamente verde como si ya fuera un resultado experimental nuevo.
 
+\paragraph{Cierre de la implementación: operación acreditada.} El tercer avance finaliza
+la sección 1.4.1 al convertir las piezas verificadas en un protocolo operacional completo.
+El objetivo no es añadir otra familia de modelos, sino establecer cuándo una ejecución puede
+considerarse íntegra, cómo se conserva un resultado reutilizable y qué evidencia debe existir
+antes de exponerlo. La Tabla~\ref{tab:avances_a10} resume la evolución: A8 construyó el
+recorrido por modelo; A9 integró productores y consumidores bajo una identidad de campaña; y
+A10 cierra las transiciones, la persistencia, la recuperación y las superficies de consumo.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption[Progresión de los tres avances de implementación]{Progresión verificable de la
+sección 1.4.1. Cada avance conserva los contratos del anterior y añade una frontera distinta.}
+\label{tab:avances_a10}
+\begin{tabular}{@{}p{2.0cm}p{4.2cm}p{4.0cm}p{3.5cm}@{}}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Avance} & \textbf{Problema resuelto} & \textbf{Producto principal} & \textbf{Puerta de aceptación} \\ \midrule
+A8 & Convertir el diseño en cálculo reproducible & Recorrido temporal, estimadores, parámetros y métricas & Pruebas unitarias, causalidad y maestro dorado \\
+A9 & Integrar componentes sin mezclar procedencias & Registro canónico, preparación aislada, transporte y cobertura & Preflight, recibos y conjuntos exactos de claves \\
+A10 & Cerrar el ciclo de vida del resultado & Estados de campaña, persistencia, promoción y consumo & Auditoría del sello, transacción y publicación \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Identidad operativa y sello de arranque.} Antes de crear un artefacto, el
+lanzador comprueba un repositorio limpio y deriva la identidad desde fuentes vivas: revisión
+del código, suma del panel, inventario de instantáneas, locks, entornos instalados y conjunto
+exacto de puntos de entrada. El preflight materializa esos datos en un sello de esquema
+cerrado; no acepta campos adicionales, listas vacías, rutas absolutas o fuera del proyecto,
+duplicados ni valores numéricos no finitos. El identificador de campaña incorpora el inicio
+de la revisión de código y una fecha válida, por lo que un nombre parecido no sustituye la
+identidad comprobada.
+
+El lanzador vuelve a emitir el preflight inmediatamente antes de abrir la transacción y exige
+igualdad byte a byte con el sello registrado. Esta segunda lectura cierra la ventana entre la
+revisión inicial y el primer productor: si cambió una entrada, un entorno, el panel o la lista
+de módulos, la ejecución termina sin crear resultados. La bitácora se conserva aparte y no
+altera el estado Git que se acredita; aun así, cualquier archivo de cálculo no declarado
+mantiene el árbol sucio y bloquea el arranque.
+
+\paragraph{Máquina de estados de campaña.} Una campaña avanza por estados explícitos, como
+muestra la Figura~\ref{fig:estados_a10}. \texttt{running} indica que las precondiciones fueron
+aceptadas y que los productores pueden escribir únicamente en preparación;
+\texttt{computed} acredita que terminó el cálculo esperado; \texttt{validated} confirma
+esquema, cobertura, hashes y procedencia; y \texttt{published} autoriza sustituir la versión
+servida. Cualquier error conduce a \texttt{failed}; nunca se interpreta la mera existencia de
+un archivo como una transición válida.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\footnotesize,
+  state/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!8,
+    line width=0.9pt, text width=2.35cm, align=center, minimum height=1.05cm,
+    inner sep=5pt},
+  accepted/.style={state, draw=regC, fill=regC!12},
+  failed/.style={state, draw=regU, fill=regU!9},
+  arr/.style={-{Latex[length=2.2mm]}, uacjgray, line width=0.9pt},
+  reject/.style={-{Latex[length=2.2mm]}, regU, dashed, line width=0.9pt}]
+  \node[state] (run) at (0,0) {\textbf{running}\\Identidad aceptada};
+  \node[state] (computed) at (3.45,0) {\textbf{computed}\\Cálculo completo};
+  \node[accepted] (validated) at (6.90,0) {\textbf{validated}\\Cobertura acreditada};
+  \node[accepted] (published) at (10.35,0) {\textbf{published}\\Versión servida};
+  \node[failed] (failed) at (5.18,-2.0) {\textbf{failed}\\Evidencia conservada};
+  \draw[arr] (run)--node[above, fill=white, inner sep=1pt, font=\scriptsize]{productores}(computed);
+  \draw[arr] (computed)--node[above, fill=white, inner sep=1pt, font=\scriptsize]{recibos}(validated);
+  \draw[arr] (validated)--node[above, fill=white, inner sep=1pt, font=\scriptsize]{promoción}(published);
+  \draw[reject] (run.south) |- (failed.west);
+  \draw[reject] (computed.south) -- (failed.north);
+  \draw[reject] (validated.south) |- (failed.east);
+\end{tikzpicture}%
+}
+\caption[Máquina de estados de la campaña]{Máquina de estados del tercer avance. Sólo una
+campaña calculada y validada puede publicarse; cualquier fallo conserva la evidencia y la
+versión servida anterior.}
+\label{fig:estados_a10}
+\end{figure}
+
+\paragraph{Persistencia y ensamblaje del producto.} La persistencia sigue la capacidad
+medida de cada modelo, no el nombre de su clase. SARIMA, ARIMA, Kalman y los regresores de
+árbol conservan su estado local; SARIMA utiliza serialización comprimida y una prueba de
+guardar--cargar--pronosticar con tolerancia cero. Los cinco modelos globales conservan sus
+directorios de campaña. ETS y Theta, en cambio, no se presentan como objetos reutilizables:
+sus 24 pronósticos mensuales se transportan desde el recorrido temporal oficial y se vuelven
+a acreditar al leer.
+
+El promotor exige exactamente los modelos persistibles y globales, mientras el exportador
+exige los doce pronósticos finales definidos por el registro. Esta separación impide dos
+errores opuestos: exigir un objeto que técnicamente no puede reutilizarse o volver opcional un
+pronóstico porque no produce un objeto persistente. La preparación sólo sustituye al árbol
+servido mediante una promoción atómica; si falta un modelo, una serie o un mes, el árbol
+anterior permanece intacto.
+
+\paragraph{Clasificación de artefactos y recuperación.} La inspección de una escena no
+asigna una sola causa por archivo. Un artefacto puede estar incompleto y contaminado al mismo
+tiempo: incompleto cuando no cubre el conjunto esperado; contaminado cuando mezcla campañas,
+versiones, fechas o procedencias. El clasificador aplica ambas etiquetas de manera
+independiente y también inspecciona punteros DVC, pues un archivo pequeño puede acreditar un
+árbol voluminoso incoherente. La Tabla~\ref{tab:fallos_a10} relaciona cada clase de fallo con
+su respuesta segura.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption[Taxonomía de fallos y recuperación]{Taxonomía operacional empleada para detener,
+diagnosticar y recuperar una campaña sin heredar artefactos dudosos.}
+\label{tab:fallos_a10}
+\begin{tabular}{@{}p{3.2cm}p{4.0cm}p{3.1cm}p{3.3cm}@{}}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Fallo} & \textbf{Detección} & \textbf{Respuesta} & \textbf{Recuperación} \\ \midrule
+Entorno divergente & Inventario instalado distinto del lock & Abortar antes de calcular & Reconstruir el entorno aislado \\
+Linaje inválido & Nombre, mes o hash de instantánea distinto & Rechazar la etapa de datos & Restaurar o adquirir la evidencia correcta \\
+Salida incompleta & Claves esperadas ausentes & Conservar preparación; no agregar & Corregir el productor y repetir su etapa \\
+Contaminación & Identidades o añadas incompatibles & Etiquetar y aislar el conjunto & Reconstruir desde entradas acreditadas \\
+Mutación posterior & Hash distinto o segunda lectura inconsistente & Invalidar el recibo & Regenerar artefacto y recibo \\
+Publicación no vinculada & Sello y transacción sin enlace acreditado & Bloquear la promoción final & Auditar y registrar la identidad común \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Superficies de consumo.} El producto no entrena a petición del usuario. Una
+campaña validada materializa archivos CSV y JSON para consulta, tablas y figuras para el
+documento académico y datos estáticos para el portal. Todos se derivan de la misma versión y
+se publican después de la promoción; ninguna interfaz vuelve a calcular silenciosamente un
+modelo ni busca un archivo antiguo como respaldo. Esta arquitectura reduce costo, separa el
+cálculo prolongado de la consulta y permite que una persona sin herramientas de programación
+consuma los resultados mediante el sitio web.
+
+\paragraph{Pseudocódigo del cierre operacional.} El Algoritmo~\ref{alg:cierre_a10} reúne el
+recorrido final. La auditoría independiente aparece como una puerta explícita porque la
+campaña prolongada y la publicación requieren autorización humana separada; omitir esa puerta
+convertiría una preparación local en un resultado experimental sin acreditación suficiente.
+
+\begingroup
+\algrenewcommand\algorithmicrequire{\textbf{Entrada:}}
+\algrenewcommand\algorithmicensure{\textbf{Salida:}}
+\algrenewcommand\algorithmicforall{\textbf{para cada}}
+\algrenewcommand\algorithmicdo{\textbf{hacer}}
+\algrenewcommand\algorithmicif{\textbf{si}}
+\algrenewcommand\algorithmicthen{\textbf{entonces}}
+\algrenewcommand\algorithmicend{\textbf{fin}}
+\begin{algorithm}[H]
+\caption{Cierre operacional y publicación acreditada}
+\label{alg:cierre_a10}
+\begin{algorithmic}[1]
+\Require Sello registrado $S_0$, registro $\mathcal{M}$, panel $P$ y árbol servido $V$
+\Ensure $V$ intacto o una nueva versión completa, acreditada y autorizada
+\State Reemitir el preflight vivo $S_1$
+\If{$S_1 \ne S_0$ o el esquema de $S_0$ es inválido}
+  \State Abortar antes de abrir la transacción
+\EndIf
+\State Abrir la transacción $T$ en estado \texttt{running} y preparar el espacio aislado
+\ForAll{etapa requerida $q$ en el orden declarado}
+  \State Ejecutar $q$ y acreditar sus salidas contra $(S_0,P,\mathcal{M},T)$
+  \If{$q$ falla o produce claves, hashes o identidad incompatibles}
+    \State Marcar $T$ como \texttt{failed}, conservar evidencia y devolver $V$
+  \EndIf
+\EndFor
+\State Marcar $T$ como \texttt{computed} y revalidar todos los recibos al leer
+\If{la cobertura final no es exacta}
+  \State Marcar $T$ como \texttt{failed} y devolver $V$
+\EndIf
+\State Marcar $T$ como \texttt{validated}
+\State Solicitar auditoría independiente del vínculo entre $S_0$, $T$ y las salidas
+\If{la auditoría o la autorización de publicación no existe}
+  \State Conservar la campaña validada sin modificar $V$
+\Else
+  \State Promover atómicamente, marcar $T$ como \texttt{published} y exponer la nueva versión
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+\endgroup
+
+\paragraph{Configuración consolidada.} La Tabla~\ref{tab:config_a10} reúne los parámetros
+que determinan el comportamiento final. Los valores de aceptación no se optimizan junto con
+el modelo: constituyen el protocolo bajo el cual una métrica o un pronóstico adquiere validez.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption[Configuración consolidada de la implementación]{Configuración matemática y
+operacional consolidada al finalizar la sección 1.4.1.}
+\label{tab:config_a10}
+\begin{tabular}{@{}p{4.2cm}p{4.0cm}p{5.3cm}@{}}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Elemento} & \textbf{Valor} & \textbf{Justificación} \\ \midrule
+Superficies & FAD y DFF & Mantener ambos criterios del boletín bajo un protocolo común \\
+Universo por superficie & 25 series elegibles & Derivar cobertura desde el panel y no desde la salida \\
+Cola de evaluación & 24 objetivos mensuales & Conservar meses observados y no observados \\
+Recorrido estadístico & Horizonte 1, paso 1, último punto & Reproducir el recorrido oficial por origen mensual \\
+ETS y Theta & Reajuste en cada paso & Respetar la semántica de los envoltorios automáticos \\
+Modelos globales & Cinco semillas, $s_1$--$s_5$ & Separar configuración e incertidumbre de inicialización \\
+Escala MASE & Finita y estrictamente positiva & Impedir cocientes sin interpretación métrica \\
+Persistencia SARIMA & Compresión nivel 3 & Reducir tamaño sin perder el estado reutilizable \\
+Identidad & Código, panel, snapshots, locks, entornos y campaña & Evitar semejanzas sin procedencia demostrable \\
+Promoción & Cobertura exacta y autorización & Prohibir versiones parciales o no auditadas \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Evidencia y pruebas finales.} Las comprobaciones se distribuyen por nivel para
+evitar que un conjunto de pruebas sintéticas acredite una ruta que el lanzador nunca invoca.
+La Tabla~\ref{tab:pruebas_a10} resume qué evidencia aporta cada técnica. Los controles
+benignos son tan importantes como los ataques: un objetivo no evaluable debe conservarse con
+\texttt{observed=false} y valor real nulo, mientras una predicción o escala no finita debe
+fallar cerradamente.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption[Pruebas y evidencia del avance 3]{Capas de verificación empleadas en el cierre de la
+implementación. Ninguna capa sustituye a las demás.}
+\label{tab:pruebas_a10}
+\begin{tabular}{@{}p{3.4cm}p{5.0cm}p{4.8cm}@{}}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Técnica} & \textbf{Propiedad comprobada} & \textbf{Evidencia esperada} \\ \midrule
+Prueba unitaria & Escalas, constructores, esquemas y tipos & Error localizado o control benigno aceptado \\
+Prueba contractual & Claves, hashes, duplicados, cobertura e identidad & Recibo recalculable y diagnóstico completo \\
+Prueba de integración & El productor real alimenta al consumidor real & Ruta del lanzador ejercitada sin atajos de fixture \\
+Maestro dorado & Instrumentar no altera las métricas existentes & Campos numéricos invariantes antes y después \\
+Prueba metamórfica & Un dato futuro no modifica una entrada pasada & Igualdad de características en orígenes previos \\
+Ataque adversarial & Sustituciones que conservan conteos o forma & Rechazo antes de agregación, promoción o publicación \\
+Auditoría independiente & Código, entorno, datos y protocolo concuerdan & Dictamen de sólo lectura sobre un único estado \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Herramientas, legibilidad y mantenimiento.} Python organiza los módulos de
+datos, modelado, acreditación y publicación; DuckDB materializa el almacén analítico; Git y
+DVC separan código, punteros y cargas voluminosas; y MLflow puede recibir el historial de una
+campaña sin convertirse en autoridad de cobertura. pytest ejecuta controles unitarios y de
+integración, Ruff y mypy revisan la calidad estática, y los flujos automatizados repiten esas
+puertas antes de integrar cambios.
+
+La mantenibilidad se apoya en identificadores lógicos, esquemas cerrados y funciones con una
+responsabilidad verificable. Las listas duplicadas de modelos se sustituyen por vistas
+derivadas del registro; los lectores reciben rutas y derivan la identidad en lugar de aceptar
+declaraciones del llamador; y los mensajes muestran claves ausentes y no esperadas completas.
+El comentario explica la razón de una regla excepcional, mientras el nombre de la función y
+su contrato expresan el comportamiento ordinario.
+
+\paragraph{Cierre de la sección 1.4.1.} Los tres avances dejan documentado el proceso
+inicial, la integración y el cierre operacional de la implementación. El sistema dispone de
+un recorrido temporal causal, catálogo canónico, entornos reproducibles, persistencia según
+capacidad real, cobertura exacta, preparación aislada, estados explícitos, promoción atómica
+y pruebas que atacan tanto piezas como rutas completas. Con ello se satisface el objetivo de
+convertir el diseño en una solución funcional, mantenible y evaluable.
+
+El estado se declara sin anticipar resultados: la implementación está verificada localmente,
+pero la nueva campaña prolongada no se ha ejecutado y la publicación no forma parte de A10.
+Antes de autorizarla se requiere una auditoría final de sólo lectura sobre el mismo estado que
+se pretende ejecutar y, en particular, sobre el vínculo entre el sello comparado al arrancar,
+la transacción y los artefactos que una publicación futura consumiría. Esta frontera separa
+la finalización del software de la obtención de nueva evidencia experimental.
+
+
 \subsection{1.4.2 Ajustes al modelo con diferentes configuraciones}
 
 La validación temporal usa una ventana inicial de 60 meses para FAD y de 36 para
