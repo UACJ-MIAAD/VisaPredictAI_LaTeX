@@ -46,23 +46,28 @@ distintos, no solo color), PDF vectorial.
 (ver el análisis completo en `PAPER_PROSPECTIVE_DRAFT.md` (este directorio) y la auditoría)
 
 - **Reencuadre como paper de aplicación** (dataset + protocolo prospectivo), no de métodos.
-- **Números honestos:** hold-out MASE ~0.11 marcado como *señal de selección, no precisión live*;
-  prospectivo MASE 0.347 / MAE 146 d como titular; gap 3× **declarado**.
+- **Números honestos:** hold-out MASE a un paso marcado como *señal de selección, no precisión live*;
+  prospectivo MASE 0.347 / MAE 146 d (h=1..12, ambas tablas) como titular; el gap se **declara**
+  sin resumirlo en un cociente, porque las dos cifras miden cantidades distintas.
 - **cov95 = 0.92 < nominal** reportado como under-coverage honesta; banda 80 % calibrada en
   split disjunto (cov80 held-out 0.81), no circular; bandas desplegadas por **cuantil empírico
   por horizonte** + ACI (sustituye al heurístico √h, cuyo cov80 h12 caía a 0.72).
-- **El piso del paseo aleatorio como HALLAZGO insignia** (re-campaña AQ, 4-jul-2026): con 45 %
-  de avances mensuales nulos, el naïve-1 gana el hold-out en ambas tablas (FAD 0.100 media /
-  0.089 mediana; DFF 0.086, empate exacto con Theta) y **MCS = {naive1} en ambas**; DM favorece
-  al RW con significancia robusta en DFF (p≈0.002) y no robusta en FAD. El deep AutoBiTCN
-  (0.109) queda por debajo de ETS/Theta (0.114/0.120) pero no del piso; el margen deep-DFF
-  vs Auto-ARIMA justo (0.114 media / 0.102 mediana) es ~21 % pero se disuelve contra naïve-1.
-  Gobernanza: naïve-1 promovible por el gate a h=1, promoción **retenida** (el producto es
-  h=1..12) + despliegue en sombra mensual.
+- **El piso del paseo aleatorio como HALLAZGO insignia** (campaña de re-derivación causal,
+  oct-2026): con 45 % de avances mensuales nulos, el naïve-1 gana el hold-out entre los modelos
+  que cubren las 25 series de cada tabla (FAD 0.157 media / 0.135 mediana; DFF 0.125, empate
+  exacto con Theta); el MCS al 90 % es **{naive1} en FAD y {ETS, naive1} en DFF**. DM favorece al
+  RW con significancia robusta en FAD (p≈0.0003 frente a AutoBiTCN); en DFF el contraste
+  pre-registrado es BiTCN frente a ARIMA y no es significativo (p≈0.065). El deep AutoBiTCN
+  (0.162) queda por debajo de ETS/Theta (0.167/0.171) pero no del piso; en DFF BiTCN (0.122)
+  queda ligeramente por debajo de la media del naïve-1 (0.125), una diferencia descriptiva sin
+  prueba que la respalde; el margen deep-DFF vs Auto-ARIMA justo (0.146 media / 0.138 mediana)
+  es ~16 %. Gobernanza: en FAD el naïve-1 es apto a h=1; en DFF el apto es la mediana
+  SARIMA+ETS+Theta; la promoción se **retiene** (el producto es h=1..12) + despliegue en sombra
+  mensual.
 - **`\paragraph{Causal gap handling and leakage controls}`** (relleno causal LOCF + máscaras
   MNAR rezagadas, ventana expansible, lags pre-origen, rollout recursivo, escala MASE
-  pre-origen, congelado en fecha de origen) + máscara F-only explícita + nota de cifras
-  provisionales pre-corrección.
+  pre-origen, congelado en fecha de origen) + máscara F-only explícita; las cifras ya proceden de
+  la re-derivación causal (la nota de cifras provisionales se retiró con `retro_protocol: f2-causal`).
 - **194 estructurales / 74 evaluables**; "deployed" → "evaluated"; demo RAG = artefacto, no contribución.
 - **Ética/disponibilidad** (datos públicos agregados, sin IRB, no asesoría legal) + **apéndice de
   reproducibilidad** (versiones pin-eadas py3.14, semillas, walk-forward, provenance = scorecard+git SHA).
