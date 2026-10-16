@@ -78,7 +78,8 @@ Our headline finding is a floor that most published comparisons omit: with 45\% 
 month-over-month movements equal to zero, the naïve-1 forecaster (repeat the last
 published cutoff---a random walk) is the model to beat at one step, and \emph{no}
 trained model---parsimonious, tree-based, or deep---beats it with statistical
-significance: naïve-1 alone forms the model confidence set in both tables. The
+significance: naïve-1 alone forms the 90\% model confidence set on FAD and shares it only
+with damped ETS on DFF. The
 value of the system therefore lies where a random walk offers nothing: multi-month
 horizons, calibrated uncertainty, cross-sectional coherence, and a
 champion--challenger governance that tracks the naïve challenger prospectively. We
@@ -228,10 +229,11 @@ a limitation. (iii)~The MASE denominator (in-sample seasonal-naïve error) is
 computed only on data preceding the origin, aligned by date to remain robust to
 $C/U$ gaps. (iv)~For the prospective protocol, the forecast and its calibration are
 \emph{truncated to a dated origin that precedes} the bulletins against which they are
-scored (Sec.~\ref{sec:prospective}). The numerical results reported in this paper
-predate the causal gap-fill correction (applied in code after a 2026-07 audit) and
-are provisional pending re-derivation; the bias is bounded, since scoring was always
-F-only and only gaps crossing a forecast origin were affected.
+scored (Sec.~\ref{sec:prospective}). The retrospective results reported in this paper
+come from the causal re-derivation of October 2026, which recomputed the whole catalog
+under this policy on the 298-month panel (through September 2026, hold-out on the final
+24 months); they supersede the figures of earlier versions, derived with the
+bidirectional interpolation and a shorter panel.
 
 \paragraph{Metrics and significance.} Point accuracy uses MASE (primary, scale-free
 across heterogeneous series), MAE, RMSE, and \smape. Pairwise out-of-sample
@@ -257,37 +259,43 @@ parsimonious production configuration---the median of \{Theta, ETS, SARIMA\} for
 and SARIMA for DFF---chosen for determinism, CPU reproducibility, and robustness.
 The champion is governed by a versioned champion--challenger gate
 (per-series Wilcoxon signed-rank with Holm correction and a material-margin
-requirement); the naïve-1 challenger passes that gate at one step in both tables,
-and its promotion is deliberately \emph{withheld}: the gate measures $h=1$ while
-the product serves $h=1..12$, so a shadow deployment freezes the challenger's
-forecasts monthly and the decision will be taken on prospective multi-horizon
-evidence. Deployed forecasts are additionally projected onto the domain's coherence
+requirement). At one step the naïve-1 challenger passes that gate on FAD; on DFF its
+lower mean error does not survive the Holm correction, and the only passing challenger
+is the median of \{SARIMA, ETS, Theta\}. Promotion is deliberately \emph{withheld}: the
+gate measures $h=1$ while the product serves $h=1..12$, so a shadow deployment freezes
+the naïve-1 challenger's forecasts monthly and the decision will be taken on
+prospective multi-horizon evidence. Deployed forecasts are additionally projected onto the domain's coherence
 cone (country cutoffs may not exceed the worldwide cutoff; FAD may not exceed DFF),
 which removed all 143 violations found in the previous vintage. The projection alters
 the point values of the violating cells; its effect on aggregate point error and
-coverage is quantified in the causal re-derivation, comparing the same cohort before
-and after projection. The prospective evaluation scores the model \emph{actually deployed}.
+coverage could not be quantified retrospectively in the causal re-derivation, because
+pre-projection forecasts were not persisted before it, and is measured on the pairs that
+mature from that campaign onward. The prospective evaluation scores the model \emph{actually deployed}.
 
 % =====================================================================
 \section{Results}
 \label{sec:results}
 
 \paragraph{Per-series benchmark.} Under walk-forward, the benchmark is dominated by
-its floor: \textbf{naïve-1 attains the best hold-out MASE in both tables} (0.100
-mean / 0.089 median on family FAD; 0.086 on DFF, where the automatic Theta variant
-collapses to near-random-walk behavior and ties it exactly). Among trained models,
-ETS and Theta lead (hold-out 0.114 and 0.120 on FAD; 0.094 and 0.086 on DFF), with
-Optuna-tuned trees heading the \emph{selection} metric (0.101) but not the
-hold-out. Locally trained neural models, once re-specified on differenced targets
+its floor: among the models fitted on all 25 family series, \textbf{naïve-1 attains the
+best hold-out MASE in both tables} (0.157 mean / 0.135 median on FAD; 0.125 on DFF, where
+the automatic Theta variant collapses to near-random-walk behavior and ties it exactly;
+ARIMA's lower DFF mean covers only the 23 series where it converged, on which naïve-1
+scores 0.109). Among trained models, ETS and Theta lead (hold-out 0.167 and 0.171 on
+FAD; 0.129 and 0.125 on DFF), with Optuna-tuned trees heading the \emph{selection}
+metric (0.107) but not the hold-out. Locally trained neural models, once re-specified on differenced targets
 (an earlier frozen-scaler specification had inflated their failure), are
 competitive but never below the floor. Trained \emph{globally} (across series, on
 differenced and per-series-normalized targets, with architecture in the
 hyper-parameter search), deep models improve further: on FAD an AutoBiTCN
-configuration reaches mean MASE $0.109$, below ETS/Theta for the first time, yet
-still above naïve-1. On DFF, BiTCN reaches mean MASE $0.090$, ahead of the tuned
-classical baselines but behind the 0.086 floor. We emphasize that this hold-out
-MASE is a \emph{selection signal}, not a prediction of live accuracy; the honest
-out-of-sample number is three times larger (Sec.~\ref{sec:prospective}).
+configuration reaches mean MASE $0.162$, below ETS/Theta, yet still above naïve-1. On
+DFF, BiTCN reaches mean MASE $0.122$, ahead of the tuned classical baselines and
+marginally below naïve-1's $0.125$ mean---a descriptive difference that no registered
+test assesses (its pre-registered Diebold--Mariano comparison is against ARIMA and is
+not significant). We emphasize that this hold-out MASE is a \emph{selection signal},
+not a prediction of live accuracy; the honest out-of-sample evidence is the prospective
+evaluation (Sec.~\ref{sec:prospective}), which measures a different quantity and is
+therefore not reported as a multiple of this one.
 
 \paragraph{Statistical significance.} A Friedman test over the per-series hold-out
 MASE of the pool rejects equal performance in both tables ($p<10^{-19}$;
@@ -295,26 +303,29 @@ Table~\ref{tab:significance}). We deduplicate the cross-sectional pseudo-replica
 first---the worldwide cut-off is repeated identically across several countries, so the
 25 family cells reduce to about 14--15 \emph{distinct} series---which is why the DFF
 test runs on fewer effective series. With a Nemenyi post-hoc (Fig.~\ref{fig:cd}) and a
-90\% Model Confidence Set~\cite{hansen2011}, the \emph{only} model that survives in
-both tables is \textbf{naïve-1} (mean rank 1.2 on FAD, 2.39 on DFF); ETS, Theta,
-SARIMA, the gradient-boosted trees, and all deep models are excluded. Against
-naïve-1, Diebold--Mariano on per-series-scaled errors favors the random walk over
-the best global deep model with robust significance on DFF ($p\approx0.002$, stable
-under the choice of deep model) and non-robustly on FAD ($p\approx0.011$ against
-AutoBiTCN but $p\approx0.91$ against BiTCN). In short: at one step, nothing
-separates from the floor in its own favor.
+90\% Model Confidence Set~\cite{hansen2011}, the \emph{only} model that survives on
+FAD is \textbf{naïve-1} (mean rank 1.6); on DFF naïve-1 (2.86) is joined by damped ETS
+(5.18), which the $\approx$14 distinct DFF series cannot separate from it. Theta,
+SARIMA, the gradient-boosted trees, and all deep models are excluded in both tables.
+Diebold--Mariano on per-series-scaled errors compares the best global deep model with
+the best parsimonious model of each table: on FAD that is naïve-1, favored with robust
+significance over AutoBiTCN ($p\approx0.0003$; $p\approx0.0015$ against PatchTST); on
+DFF it is ARIMA, and BiTCN's edge is not significant ($p\approx0.065$; $p\approx0.52$
+against PatchTST). In short: at one step, nothing separates from the floor in its own
+favor.
 
 \begin{table}[t]\centering\footnotesize
 \caption{Friedman--Nemenyi over the per-series hold-out MASE of the model pool.
 Lower mean rank is better; $^\star$ marks membership in the 90\% Model Confidence
-Set. The Friedman $p$ rejects equal performance; only naïve-1 enters the MCS.}
+Set. The Friedman $p$ rejects equal performance; naïve-1 enters the MCS in both
+tables, joined by ETS on DFF.}
 \label{tab:significance}
 \begin{tabular}{lllp{6.1cm}}
 \toprule
 Table & \#models & Friedman $p$ & Top-6 by mean rank (MCS $^\star$) \\
 \midrule
-FAD & 23 & $8.8{\times}10^{-65}$ & naive1 (1.20$^\star$), theta (6.16), ets (6.24), lightgbm (7.16), arima (7.40), llt (7.72) \\
-DFF & 21 & $2.5{\times}10^{-21}$ & naive1 (2.39$^\star$), theta (3.86), ets (5.14), tft (6.14), llt (7.00), nlinear (8.29) \\
+FAD & 22 & $8.7{\times}10^{-54}$ & naive1 (1.60$^\star$), ets (6.54), lightgbm (6.88), theta (6.90), xgboost (7.76), llt (7.80) \\
+DFF & 21 & $5.0{\times}10^{-20}$ & naive1 (2.86$^\star$), theta (4.29), ets (5.18$^\star$), llt (6.79), tft (7.07), nlinear (8.43) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -322,10 +333,10 @@ DFF & 21 & $2.5{\times}10^{-21}$ & naive1 (2.39$^\star$), theta (3.86), ets (5.1
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.92\textwidth]{fig_cd_diagram.pdf}
-% ALT-TEXT: Demsar critical-difference diagram for the FAD model pool; naive-1 (1.20)
-% alone at the best end, followed by Theta and ETS; connected bars show tied groups.
+% ALT-TEXT: Demsar critical-difference diagram for the FAD model pool; naive-1 (1.60)
+% alone at the best end, followed by ETS, LightGBM and Theta; connected bars show tied groups.
 \caption{Critical-difference diagram (FAD): mean ranks of the model pool with
-Nemenyi-connected groups. Naïve-1 leads alone; Theta and ETS head the trained
+Nemenyi-connected groups. Naïve-1 leads alone; ETS, LightGBM and Theta head the trained
 models.}
 \label{fig:cd}
 \end{figure}
@@ -333,11 +344,12 @@ models.}
 \paragraph{Tuned classical baseline.} To guard against beating weak baselines, we
 add an order-selected Auto-ARIMA under a \emph{fair} specification (drift matched
 to the integration order, monthly refits like ARIMA/SARIMA, AICc selection on the
-raw $F$ series). Fairness made it \emph{worse}, not better: mean MASE 0.162 on FAD
-(median 0.125) and 0.114 on DFF (median 0.102). Against it, the global deep model
-keeps a $\approx$21\% mean edge on DFF (BiTCN 0.090 vs.\ 0.114)---but re-anchoring
-to the honest floor dissolves the headline: naïve-1 scores 0.086 on DFF, ahead of
-the deep model, with robust Diebold--Mariano significance in its favor. The
+raw $F$ series): mean MASE 0.212 on FAD (median 0.169) and 0.146 on DFF (median
+0.138). Against it, the global deep model keeps a $\approx$16\% mean edge on DFF (BiTCN
+0.122 vs.\ 0.146)---but re-anchoring to the honest floor shrinks the headline to a
+descriptive near-tie: naïve-1 averages 0.125 on DFF, marginally above the deep model,
+and no registered test separates the two. On FAD the parsimonious leaders stay at 0.167
+(ETS) and 0.171 (Theta), both above the floor. The
 remaining classical-vs-deep comparisons also rest on a small effective sample: the
 $\approx$25 DFF family series collapse to only $\approx$14 distinct series once the
 shared-world-cutoff pseudo-replication is removed (Sec.~\ref{sec:discussion}). We
@@ -367,10 +379,15 @@ $\approx$257~days / MASE~0.63 at twelve months. MASE stays \emph{below~1} at eve
 horizon relative to the in-sample seasonal-naïve scale; because MASE is scaled by
 the in-sample seasonal-naïve error, this does not by itself establish superiority
 over an out-of-sample seasonal-naïve forecast evaluated at the same origins---a
-direct comparison planned with the re-derivation. The retrospective hold-out MASE ($\approx$0.11) and the prospective
-MASE (0.347) differ by $\approx$3$\times$; this gap is expected (repeated one-step vs.\
-genuine one-to-twelve-step extrapolation through retrogression shocks) and is
-disclosed rather than hidden. This multi-horizon regime is also where the one-step
+direct comparison that the causal re-derivation now makes: on 3{,}022 origin-matched
+pairs the deployed forecasts' MAE is 138~days against 329 for an out-of-sample
+seasonal-naïve forecast (ratio 0.42; the model wins 80\% of pairs), from a ratio of 0.09
+at one month to 0.71 at twelve. The retrospective hold-out MASE (one step ahead, per
+series, e.g.\ 0.152 for the deployed FAD recipe over 15 distinct family series) and the
+prospective MASE (0.347 over 2{,}944 forecasts of both tables at one to twelve months)
+measure different quantities, so we do not summarize them as a ratio; the gap between
+them is expected (repeated one-step vs.\ genuine one-to-twelve-step extrapolation
+through retrogression shocks) and is disclosed rather than hidden. This multi-horizon regime is also where the one-step
 random-walk floor of Sec.~\ref{sec:results} stops being decisive: repeating the last
 cutoff degrades as queues move, and the shadow ledger now freezes the naïve-1
 challenger's forecasts monthly so the champion-vs-floor comparison will itself be
@@ -453,9 +470,9 @@ ledger shows smooth degradation while remaining below~1 on the in-sample
 seasonal-naïve MASE scale),
 per-horizon calibrated uncertainty, cross-sectional coherence, and governance that
 tracks the naïve challenger in shadow. The prospective protocol additionally
-exposes a $3\times$ optimism in the retrospective hold-out number---a discrepancy
-that any single-split benchmark hides and that practitioners deploying such systems
-must know.
+exposes how optimistic a retrospective one-step hold-out number is as a proxy for
+multi-month accuracy---a discrepancy that any single-split benchmark hides and that
+practitioners deploying such systems must know.
 
 \paragraph{Does segmenting the panel help?} A natural objection to a floor result is
 that the floor may be an artifact of pooling heterogeneous series. We tested the
