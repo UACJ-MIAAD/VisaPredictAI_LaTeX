@@ -1563,20 +1563,21 @@ descriptores calculados sobre la serie completa con el MASE del conjunto reserva
 campeón para describir \textit{qué} series resultan difíciles de pronosticar. No es una
 selección predictiva de insumos (los modelos consumen los rezagos, el calendario y las
 máscaras de ausencia a través del motor de características, no estos descriptores) ni
-una prueba libre de filtración (los descriptores ven la serie completa). Como
-descripción, el resultado es elocuente: de \feFactSelIn{} características candidatas
-sobre \feFactSelSeries{} series con campaña,
-% La selección se re-deriva con cada campaña (fe_facts.tex): la prosa cubre el caso sin supervivientes.
+una prueba libre de filtración (los descriptores ven la serie completa). Sobre
+\feFactSelSeries{} series con campaña y \feFactSelIn{} descriptores candidatos,
+% La selección se re-deriva con cada campaña (fe_facts.tex): la prosa cubre ambos casos.
 \ifnum\feFactSelRelevant=0
-ninguna sobrevive al control de falso descubrimiento: ningún descriptor genérico explica
-por sí solo qué series resultan difíciles de pronosticar,
+con este protocolo y el control de falso descubrimiento establecido no se detectaron
+asociaciones que superaran el umbral entre los descriptores evaluados y la dificultad de
+pronóstico.
 \else
-solo \feFactSelRelevant{} sobrevive al control de falso descubrimiento
-(\texttt{\feFactSelName}),
+con este protocolo y el control de falso descubrimiento establecido solo
+\feFactSelRelevant{} supera el umbral (\texttt{\feFactSelName}).
 \fi
-evidencia directa de que apilar bibliotecas completas de características (que serían
-cientos, con fuerte redundancia mutua) no aporta: pocos descriptores bien elegidos superan
-a muchos correlacionados \cita{22}.
+Este resultado no demuestra ausencia de señal ni permite comparar el rendimiento predictivo
+de conjuntos de características, porque los modelos no consumen estos descriptores. La
+des-redundancia previa responde a que las bibliotecas de características de series de
+tiempo comparten buena parte de su información \cita{22}.
 
 \paragraph{Nota sobre la ingeniería de características viva.} Igual que el EDA, la
 ingeniería de características y la limpieza mantienen un catálogo versionado. Este reúne
@@ -1737,12 +1738,13 @@ meses y llega a dos años &
 Figura~\ref{fig:eda_brecha} &
 FAD y DFF se entrenan y se evalúan por separado, y sus resultados nunca se comparan entre sí
 como si midieran lo mismo \\
-Apilar bibliotecas de características no aporta: de \feFactSelIn{} descriptores candidatos
-\ifnum\feFactSelRelevant=0 ninguno sobrevive\else solo \feFactSelRelevant{} sobrevive\fi{}
-al control de falso descubrimiento &
+Con este protocolo, de \feFactSelIn{} descriptores candidatos
+\ifnum\feFactSelRelevant=0 ninguno supera\else solo \feFactSelRelevant{} supera\fi{}
+el control de falso descubrimiento como asociación con la dificultad (resultado
+descriptivo, no comparación predictiva) &
 Selección FRESH y mRMR de esta sección &
-Se prefieren pocos insumos bien elegidos (rezagos, calendario y máscaras de ausencia) a
-cientos de descriptores mutuamente redundantes \\
+Los descriptores quedan como caracterización retrospectiva; los modelos siguen
+consumiendo rezagos, calendario y máscaras de ausencia \\
 \bottomrule
 \end{tabular}
 \end{table}
