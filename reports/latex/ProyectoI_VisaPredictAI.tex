@@ -1565,12 +1565,18 @@ selección predictiva de insumos (los modelos consumen los rezagos, el calendari
 máscaras de ausencia a través del motor de características, no estos descriptores) ni
 una prueba libre de filtración (los descriptores ven la serie completa). Como
 descripción, el resultado es elocuente: de \feFactSelIn{} características candidatas
-sobre \feFactSelSeries{} series con campaña, solo \feFactSelRelevant{} sobrevive al
-control de falso descubrimiento (\texttt{\feFactSelName}, un descriptor catch22 de la
-distribución temporal de los avances extremos), evidencia directa de que apilar
-bibliotecas completas de características (que serían cientos, con fuerte redundancia
-mutua) no aporta: pocos descriptores bien elegidos superan a muchos correlacionados
-\cita{22}.
+sobre \feFactSelSeries{} series con campaña,
+% La selección se re-deriva con cada campaña (fe_facts.tex): la prosa cubre el caso sin supervivientes.
+\ifnum\feFactSelRelevant=0
+ninguna sobrevive al control de falso descubrimiento: ningún descriptor genérico explica
+por sí solo qué series resultan difíciles de pronosticar,
+\else
+solo \feFactSelRelevant{} sobrevive al control de falso descubrimiento
+(\texttt{\feFactSelName}),
+\fi
+evidencia directa de que apilar bibliotecas completas de características (que serían
+cientos, con fuerte redundancia mutua) no aporta: pocos descriptores bien elegidos superan
+a muchos correlacionados \cita{22}.
 
 \paragraph{Nota sobre la ingeniería de características viva.} Igual que el EDA, la
 ingeniería de características y la limpieza mantienen un catálogo versionado. Este reúne
@@ -1732,7 +1738,8 @@ Figura~\ref{fig:eda_brecha} &
 FAD y DFF se entrenan y se evalúan por separado, y sus resultados nunca se comparan entre sí
 como si midieran lo mismo \\
 Apilar bibliotecas de características no aporta: de \feFactSelIn{} descriptores candidatos
-solo \feFactSelRelevant{} sobrevive al control de falso descubrimiento &
+\ifnum\feFactSelRelevant=0 ninguno sobrevive\else solo \feFactSelRelevant{} sobrevive\fi{}
+al control de falso descubrimiento &
 Selección FRESH y mRMR de esta sección &
 Se prefieren pocos insumos bien elegidos (rezagos, calendario y máscaras de ausencia) a
 cientos de descriptores mutuamente redundantes \\
