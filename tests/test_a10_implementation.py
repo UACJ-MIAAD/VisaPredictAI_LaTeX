@@ -69,5 +69,21 @@ def test_a10_mantiene_auditoria_y_campana_como_fronteras_explicitas() -> None:
     assert "la finalización del software de la obtención de evidencia experimental nueva" in seccion
     # lo ocurrido después se declara con su orden: auditoría, validación humana, reconciliación, publicación
     assert "La campaña causal se ejecutó después, en octubre de 2026, una vez superada esa auditoría" in seccion
-    assert "validación con revisión humana" in seccion
+    assert "se reconcilió con sus complementos acreditados" in seccion
+    assert "una revisión humana del candidato reconciliado la validó" in seccion
+    assert "sólo entonces se publicó" in seccion
     assert "no se ha ejecutado" not in seccion
+
+
+def test_a10_valida_solo_con_revision_humana_y_audita_antes_de_ejecutar() -> None:
+    """El orden del algoritmo es el del código: dictamen sobre el sello antes de abrir, revisión humana antes de
+    `validated` y autorización antes de `published`."""
+    seccion = _normalizada()
+    inicio = seccion.index(r"\label{alg:cierre_a10}")
+    algoritmo = seccion[inicio : seccion.index(r"\end{algorithmic}", inicio)]
+    assert "falta el dictamen sobre $S_0$" in algoritmo
+    revision = algoritmo.index("Recibir la revisión humana $H$")
+    validada = algoritmo.index(r"Marcar $T$ como \texttt{validated}")
+    publicada = algoritmo.index(r"marcar $T$ como \texttt{published}")
+    assert revision < validada < publicada
+    assert "Solicitar auditoría independiente" not in algoritmo

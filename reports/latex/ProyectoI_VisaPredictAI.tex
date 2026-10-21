@@ -2845,9 +2845,11 @@ cálculo prolongado de la consulta y permite que una persona sin herramientas de
 consuma los resultados mediante el sitio web.
 
 \paragraph{Pseudocódigo del cierre operacional.} El Algoritmo~\ref{alg:cierre_a10} reúne el
-recorrido final. La auditoría independiente aparece como una puerta explícita porque la
-campaña prolongada y la publicación requieren autorización humana separada; omitir esa puerta
-convertiría una preparación local en un resultado experimental sin acreditación suficiente.
+recorrido final. Contiene tres puertas humanas separadas: una auditoría independiente del
+estado sellado antes de ejecutar la campaña, una revisión humana acreditada antes de
+considerarla validada y una autorización explícita antes de publicarla. Omitir cualquiera de
+ellas convertiría una preparación local en un resultado experimental sin acreditación
+suficiente.
 
 \begingroup
 \algrenewcommand\algorithmicrequire{\textbf{Entrada:}}
@@ -2861,10 +2863,11 @@ convertiría una preparación local en un resultado experimental sin acreditaci�
 \caption{Cierre operacional y publicación acreditada}
 \label{alg:cierre_a10}
 \begin{algorithmic}[1]
-\Require Sello registrado $S_0$, registro $\mathcal{M}$, panel $P$ y árbol servido $V$
+\Require Sello registrado $S_0$ con dictamen de auditoría independiente, registro $\mathcal{M}$,
+panel $P$ y árbol servido $V$
 \Ensure $V$ intacto o una nueva versión completa, acreditada y autorizada
 \State Reemitir el preflight vivo $S_1$
-\If{$S_1 \ne S_0$ o el esquema de $S_0$ es inválido}
+\If{$S_1 \ne S_0$, el esquema de $S_0$ es inválido o falta el dictamen sobre $S_0$}
   \State Abortar antes de abrir la transacción
 \EndIf
 \State Abrir la transacción $T$ en estado \texttt{running} y preparar el espacio aislado
@@ -2878,12 +2881,16 @@ convertiría una preparación local en un resultado experimental sin acreditaci�
 \If{la cobertura final no es exacta}
   \State Marcar $T$ como \texttt{failed} y devolver $V$
 \EndIf
-\State Marcar $T$ como \texttt{validated}
-\State Solicitar auditoría independiente del vínculo entre $S_0$, $T$ y las salidas
-\If{la auditoría o la autorización de publicación no existe}
-  \State Conservar la campaña validada sin modificar $V$
+\State Recibir la revisión humana $H$, ligada a $T$, a su cómputo y al árbol candidato $A$
+\If{$H$ no se acredita o su decisión no es aprobatoria}
+  \State Conservar $T$ en \texttt{computed} sin modificar $V$
 \Else
-  \State Promover atómicamente, marcar $T$ como \texttt{published} y exponer la nueva versión
+  \State Marcar $T$ como \texttt{validated}; un candidato nuevo exige otra revisión, que la revalida
+  \If{falta la autorización de publicación o el árbol integrado difiere de $A$}
+    \State Conservar la campaña validada sin modificar $V$
+  \Else
+    \State Bajo el bloqueo de $T$, publicar los objetos, marcar $T$ como \texttt{published} y exponer la nueva versión
+  \EndIf
 \EndIf
 \end{algorithmic}
 \end{algorithm}
@@ -2971,8 +2978,10 @@ sobre el mismo estado que se pretendía ejecutar y, en particular, sobre el vín
 sello comparado al arrancar, la transacción y los artefactos que una publicación posterior
 consumiría. Esa frontera separó la finalización del software de la obtención de evidencia
 experimental nueva. La campaña causal se ejecutó después, en octubre de 2026, una vez superada
-esa auditoría: pasó por la validación con revisión humana, se reconcilió con sus complementos
-(Apéndice~A.8) y se publicó, de modo que sus resultados son los que reporta el capítulo de
+esa auditoría. Su corte publicado siguió el orden del Algoritmo~\ref{alg:cierre_a10}: primero
+se reconcilió con sus complementos acreditados (Apéndice~A.8); después, una revisión humana
+del candidato reconciliado la validó y, cuando el candidato cambió, la revalidó con una
+revisión nueva; sólo entonces se publicó. Sus resultados son los que reporta el capítulo de
 resultados.
 
 
