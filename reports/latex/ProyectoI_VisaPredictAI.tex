@@ -2564,22 +2564,23 @@ cobertura.
 \begin{tikzpicture}[
   font=\footnotesize,
   stepbox/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!8,
-    line width=0.8pt, text width=2.45cm, align=center, minimum height=1.1cm,
+    line width=0.8pt, text width=3.0cm, align=center, minimum height=1.62cm,
+    execute at begin node={\hyphenpenalty=10000\relax},
     inner sep=5pt},
   check/.style={stepbox, draw=regC, fill=regC!12},
   stop/.style={stepbox, draw=regU, fill=regU!9},
   arr/.style={-{Latex[length=2.2mm]}, uacjgray, line width=0.9pt},
   reject/.style={-{Latex[length=2.2mm]}, regU, dashed, line width=0.9pt}]
   \node[check] (pre) at (0,0) {\textbf{Verificación previa}\\Código, panel y entornos};
-  \node[stepbox] (stage) at (3.15,0) {\textbf{Preparación aislada}\\\texttt{campaign\_id}};
-  \node[stepbox] (prod) at (6.30,0) {\textbf{Productores}\\Locales, transporte y globales};
-  \node[check] (receipt) at (9.45,0) {\textbf{Acreditación}\\Claves, \textit{hashes} y semillas};
-  \node[check] (promote) at (12.60,0) {\textbf{Promoción}\\Conjunto completo};
+  \node[stepbox] (stage) at (3.65,0) {\textbf{Preparación aislada}\\\texttt{campaign\_id}};
+  \node[stepbox] (prod) at (7.30,0) {\textbf{Productores}\\Locales, transporte y globales};
+  \node[check] (receipt) at (10.95,0) {\textbf{Acreditación}\\Claves, \textit{hashes} y semillas};
+  \node[check] (promote) at (14.60,0) {\textbf{Promoción}\\Conjunto completo};
   \draw[arr] (pre)--(stage);
   \draw[arr] (stage)--(prod);
   \draw[arr] (prod)--(receipt);
   \draw[arr] (receipt)--(promote);
-  \node[stop] (abort) at (6.30,-2.05) {\textbf{Fallo cerrado}\\Conservar evidencia; no promover};
+  \node[stop] (abort) at (7.30,-2.2) {\textbf{Fallo cerrado}\\Conservar evidencia; no promover};
   \draw[reject] (pre.south) |- (abort.west);
   \draw[reject] (prod.south) -- (abort.north);
   \draw[reject] (receipt.south) |- (abort.east);
@@ -2638,7 +2639,7 @@ sincronizaciones ni promociones.
 \If{la cobertura observada difiere de la derivada del panel y del registro}
   \State Abortar sin tocar el árbol servido
 \EndIf
-\State Promover atómicamente la preparación y registrar el estado validado
+\State Promover atómicamente la preparación y registrar su acreditación
 \end{algorithmic}
 \end{algorithm}
 \endgroup
