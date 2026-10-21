@@ -2894,7 +2894,7 @@ panel $P$ y árbol servido $V$
   \If{falta la autorización de publicación o el árbol integrado difiere de $A$}
     \State Conservar la campaña validada sin modificar $V$
   \Else
-    \State Bajo el bloqueo de $T$, publicar los objetos, marcar $T$ como \texttt{published} y exponer la nueva versión
+    \State Con $T$ bloqueada, publicar, marcar \texttt{published} y exponer la versión
   \EndIf
 \EndIf
 \end{algorithmic}
@@ -3125,11 +3125,11 @@ la Sección~2.3 y, a partir de ahí, recorre la misma reconstrucción y las mism
   \draw[arr] (cron)--(frz);\draw[arr] (frz)--(gt);
   \draw[arr] (gt)--node[lab,above]{sí}(bld);\draw[arr] (bld)--(cm);\draw[arr] (cm)--(ses);
   \draw[arr] (gt.south) to[bend right=28] node[lab,below]{no: no-op} (ses.south);
-  \node[lab, above=1mm of frz.north] {Pipeline de datos S3-driven (semanal)};
+  \node[lab, above=1mm of frz.north] {Pipeline de datos dirigido por S3 (días hábiles)};
 \end{tikzpicture}%
 }
 \caption[Automatización de doble disparador]{Integración continua en cada \texttt{push} (gates de
-estilo, tipos y pruebas) y pipeline de datos semanal dirigido por S3 (congela, reconstruye solo
+estilo, tipos y pruebas) y pipeline de datos dirigido por S3, en días hábiles (congela, reconstruye solo
 si hay boletín nuevo, somete a gate de calidad y emite un correo \textit{heartbeat}).}
 \label{fig:mlops_pipeline}
 \end{figure}

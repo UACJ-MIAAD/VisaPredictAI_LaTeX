@@ -86,7 +86,7 @@ def test_a10_valida_solo_con_revision_humana_y_audita_antes_de_ejecutar() -> Non
     assert "falta el dictamen sobre $S_0$" in algoritmo
     revision = algoritmo.index("Recibir la revisión humana $H$")
     validada = algoritmo.index(r"Marcar $T$ como \texttt{validated}")
-    publicada = algoritmo.index(r"marcar $T$ como \texttt{published}")
+    publicada = algoritmo.index(r"marcar \texttt{published}")
     assert revision < validada < publicada
     assert "Solicitar auditoría independiente" not in algoritmo
 
