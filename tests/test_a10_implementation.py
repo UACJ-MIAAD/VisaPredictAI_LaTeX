@@ -42,7 +42,9 @@ def test_a10_define_estados_y_prohibe_transiciones_por_existencia() -> None:
     for estado in ("running", "computed", "validated", "published", "failed"):
         assert rf"\texttt{{{estado}}}" in seccion
     assert "nunca se interpreta la mera existencia de un archivo" in seccion
-    assert "Sólo una campaña calculada y validada puede publicarse" in seccion
+    assert "Sólo una campaña calculada, validada por revisión humana y autorizada puede publicarse" in seccion
+    assert r"\textbf{validated}\\Revisión humana acreditada" in _seccion_implementacion()
+    assert r"\texttt{validated} exige además una revisión humana acreditada" in seccion
 
 
 def test_a10_preserva_persistencia_transporte_y_clasificacion_multietiqueta() -> None:

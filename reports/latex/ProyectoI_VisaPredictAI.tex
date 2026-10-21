@@ -2761,8 +2761,10 @@ mantiene el árbol sucio y bloquea el arranque.
 \paragraph{Máquina de estados de campaña.} Una campaña avanza por estados explícitos, como
 muestra la Figura~\ref{fig:estados_a10}. \texttt{running} indica que las precondiciones fueron
 aceptadas y que los productores pueden escribir únicamente en preparación;
-\texttt{computed} acredita que terminó el cálculo esperado; \texttt{validated} confirma
-esquema, cobertura, \textit{hashes} y procedencia; y \texttt{published} autoriza sustituir la versión
+\texttt{computed} acredita que terminó el cálculo esperado, con esquema, cobertura,
+\textit{hashes} y procedencia verificados; \texttt{validated} exige además una revisión humana
+acreditada de ese cálculo y del candidato que lo publicará, de modo que un candidato nuevo
+requiere otra revisión que la revalida; y \texttt{published} autoriza sustituir la versión
 servida. Cualquier error conduce a \texttt{failed}; nunca se interpreta la mera existencia de
 un archivo como una transición válida.
 
@@ -2772,28 +2774,28 @@ un archivo como una transición válida.
 \begin{tikzpicture}[
   font=\footnotesize,
   state/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!8,
-    line width=0.9pt, text width=2.35cm, align=center, minimum height=1.05cm,
-    inner sep=5pt},
+    line width=0.9pt, text width=2.8cm, align=center, minimum height=1.62cm,
+    inner sep=5pt, execute at begin node={\hyphenpenalty=10000\relax}},
   accepted/.style={state, draw=regC, fill=regC!12},
   failed/.style={state, draw=regU, fill=regU!9},
   arr/.style={-{Latex[length=2.2mm]}, uacjgray, line width=0.9pt},
   reject/.style={-{Latex[length=2.2mm]}, regU, dashed, line width=0.9pt}]
   \node[state] (run) at (0,0) {\textbf{running}\\Identidad aceptada};
-  \node[state] (computed) at (3.45,0) {\textbf{computed}\\Cálculo completo};
-  \node[accepted] (validated) at (6.90,0) {\textbf{validated}\\Cobertura acreditada};
-  \node[accepted] (published) at (10.35,0) {\textbf{published}\\Versión servida};
-  \node[failed] (failed) at (5.18,-2.0) {\textbf{failed}\\Evidencia conservada};
-  \draw[arr] (run)--node[above, fill=white, inner sep=1pt, font=\scriptsize]{productores}(computed);
-  \draw[arr] (computed)--node[above, fill=white, inner sep=1pt, font=\scriptsize]{recibos}(validated);
-  \draw[arr] (validated)--node[above, fill=white, inner sep=1pt, font=\scriptsize]{promoción}(published);
+  \node[state] (computed) at (4.9,0) {\textbf{computed}\\Cálculo acreditado};
+  \node[accepted] (validated) at (9.8,0) {\textbf{validated}\\Revisión humana acreditada};
+  \node[accepted] (published) at (14.7,0) {\textbf{published}\\Versión servida};
+  \node[failed] (failed) at (4.9,-2.45) {\textbf{failed}\\Evidencia conservada};
+  \draw[arr] (run)--node[above=2pt, font=\scriptsize]{productores}(computed);
+  \draw[arr] (computed)--node[above=2pt, font=\scriptsize]{revisión}(validated);
+  \draw[arr] (validated)--node[above=2pt, font=\scriptsize]{autorización}(published);
   \draw[reject] (run.south) |- (failed.west);
   \draw[reject] (computed.south) -- (failed.north);
   \draw[reject] (validated.south) |- (failed.east);
 \end{tikzpicture}%
 }
 \caption[Máquina de estados de la campaña]{Máquina de estados del tercer avance. Sólo una
-campaña calculada y validada puede publicarse; cualquier fallo conserva la evidencia y la
-versión servida anterior.}
+campaña calculada, validada por revisión humana y autorizada puede publicarse; cualquier fallo
+conserva la evidencia y la versión servida anterior.}
 \label{fig:estados_a10}
 \end{figure}
 
