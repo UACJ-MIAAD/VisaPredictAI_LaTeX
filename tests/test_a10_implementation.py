@@ -63,7 +63,11 @@ def test_a10_consolida_el_protocolo_sin_confundirlo_con_hiperparametros() -> Non
 
 def test_a10_mantiene_auditoria_y_campana_como_fronteras_explicitas() -> None:
     seccion = _normalizada()
-    assert "la nueva campaña prolongada no se ha ejecutado" in seccion
-    assert "la publicación no forma parte de A10" in seccion
+    assert "la campaña prolongada no se había ejecutado" in seccion
+    assert "la publicación quedaba fuera del avance" in seccion
     assert "auditoría final de sólo lectura" in seccion
-    assert "la finalización del software de la obtención de nueva evidencia experimental" in seccion
+    assert "la finalización del software de la obtención de evidencia experimental nueva" in seccion
+    # lo ocurrido después se declara con su orden: auditoría, validación humana, reconciliación, publicación
+    assert "La campaña causal se ejecutó después, en octubre de 2026, una vez superada esa auditoría" in seccion
+    assert "validación con revisión humana" in seccion
+    assert "no se ha ejecutado" not in seccion

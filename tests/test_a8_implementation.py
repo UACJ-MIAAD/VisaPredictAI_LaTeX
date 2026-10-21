@@ -46,6 +46,7 @@ def test_a8_documenta_fallo_cerrado_y_cobertura_derivada() -> None:
 def test_a8_no_presenta_la_campana_pendiente_como_resultado_final() -> None:
     seccion = _seccion_a8()
     assert "El objetivo del avance no es declarar un modelo definitivo" in seccion
-    assert "la regeneración integral de resultados permanece separada" in seccion
+    assert "la regeneración integral de resultados se mantuvo separada y" in seccion
+    assert "sólo se ejecutó después de acreditar los insumos" in re.sub(r"\s+", " ", seccion)
     assert not re.search(r"campaña (?:completa )?(?:ejecutada|publicada)", seccion, re.IGNORECASE)
 

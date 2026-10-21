@@ -2248,9 +2248,9 @@ secciones~1.3.1 y~1.3.2 en una cadena ejecutable de preparación, ajuste, pronó
 evaluación y persistencia. El objetivo del avance no es declarar un modelo definitivo, sino
 demostrar que las familias seleccionadas comparten un protocolo temporal, que sus parámetros
 quedan gobernados y que ningún resultado parcial puede confundirse con una ejecución completa.
-Al cierre de esta entrega, la capa de modelado, sus pruebas iniciales y las puertas de
-aceptación están implementadas; la regeneración integral de resultados permanece separada y
-sólo se ejecutará después de acreditar los insumos, el código y los entornos.
+Al cierre de este primer avance, la capa de modelado, sus pruebas iniciales y las puertas de
+aceptación quedaron implementadas; la regeneración integral de resultados se mantuvo separada y
+sólo se ejecutó después de acreditar los insumos, el código y los entornos.
 
 \paragraph{Del diseño al código.} La implementación toma como entrada el panel mensual
 validado y el almacén DuckDB descritos en la sección~1.3.2 \cita{59}. Una capa de acceso
@@ -2601,7 +2601,7 @@ marcos que acreditó. De esta forma, cinco archivos truncados de manera idéntic
 validarse entre sí por simple semejanza.
 
 \paragraph{Pseudocódigo de orquestación.} El Algoritmo~\ref{alg:orquestacion_a9} complementa
-el recorrido por modelo de A8. Expresa la secuencia implementada alrededor del cálculo y la
+el recorrido por modelo del primer avance. Expresa la secuencia implementada alrededor del cálculo y la
 propiedad central del avance: después del primer fallo no se ejecutan agregaciones,
 sincronizaciones ni promociones.
 
@@ -2641,7 +2641,7 @@ sincronizaciones ni promociones.
 \end{algorithm}
 \endgroup
 
-\paragraph{Configuración añadida en el avance 2.} La configuración numérica de A8 permanece
+\paragraph{Configuración añadida en el avance 2.} La configuración numérica del primer avance permanece
 sin cambios; el incremento introduce parámetros de ejecución y aceptación. La
 Tabla~\ref{tab:parametros_a9} los separa de los hiperparámetros del modelo para impedir que una
 decisión de gobernanza se confunda con una búsqueda estadística.
@@ -2705,21 +2705,23 @@ misma manera. Cada ataque debe producir un fallo antes de que el artefacto llegu
 o publicación. Los controles benignos conservan casos válidos, como un objetivo no observado
 con valor real nulo, para demostrar que la regla no exige datos que el boletín nunca publicó.
 
-\paragraph{Estado al cierre del avance 2.} La integración se encuentra verificada localmente:
-los entornos reproducen sus locks, el linaje de las instantáneas está completo, los puntos de
-entrada importan y los recibos se vuelven a acreditar al consumirlos. La campaña integral no
-forma parte de A9 y no se ha iniciado. Antes de autorizar una ejecución prolongada queda una
-auditoría independiente final sobre el vínculo entre el sello preflight y la transacción que
-posteriormente habilitaría la publicación. Declarar este límite evita presentar una
-preparación técnicamente verde como si ya fuera un resultado experimental nuevo.
+\paragraph{Estado al cierre del avance 2.} Al cerrar este avance, la integración quedó
+verificada localmente: los entornos reproducían sus locks, el linaje de las instantáneas estaba
+completo, los puntos de entrada importaban y los recibos se volvían a acreditar al consumirlos.
+La campaña integral no formaba parte del segundo avance y entonces no se había iniciado; antes
+de autorizar una ejecución prolongada quedaba una auditoría independiente final sobre el
+vínculo entre el sello preflight y la transacción que después habilitaría la publicación.
+Declarar ese límite evitó presentar una preparación técnicamente verde como si ya fuera un
+resultado experimental nuevo.
 
 \paragraph{Cierre de la implementación: operación acreditada.} El tercer avance finaliza
 la sección 1.4.1 al convertir las piezas verificadas en un protocolo operacional completo.
 El objetivo no es añadir otra familia de modelos, sino establecer cuándo una ejecución puede
 considerarse íntegra, cómo se conserva un resultado reutilizable y qué evidencia debe existir
-antes de exponerlo. La Tabla~\ref{tab:avances_a10} resume la evolución: A8 construyó el
-recorrido por modelo; A9 integró productores y consumidores bajo una identidad de campaña; y
-A10 cierra las transiciones, la persistencia, la recuperación y las superficies de consumo.
+antes de exponerlo. La Tabla~\ref{tab:avances_a10} resume la evolución: el primer avance
+construyó el recorrido por modelo; el segundo integró productores y consumidores bajo una
+identidad de campaña; y el tercero cierra las transiciones, la persistencia, la recuperación y
+las superficies de consumo.
 
 \begin{table}[H]
 \centering
@@ -2731,9 +2733,9 @@ sección 1.4.1. Cada avance conserva los contratos del anterior y añade una fro
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{Avance} & \textbf{Problema resuelto} & \textbf{Producto principal} & \textbf{Puerta de aceptación} \\ \midrule
-A8 & Convertir el diseño en cálculo reproducible & Recorrido temporal, estimadores, parámetros y métricas & Pruebas unitarias, causalidad y maestro dorado \\
-A9 & Integrar componentes sin mezclar procedencias & Registro canónico, preparación aislada, transporte y cobertura & Preflight, recibos y conjuntos exactos de claves \\
-A10 & Cerrar el ciclo de vida del resultado & Estados de campaña, persistencia, promoción y consumo & Auditoría del sello, transacción y publicación \\ \bottomrule
+Primero & Convertir el diseño en cálculo reproducible & Recorrido temporal, estimadores, parámetros y métricas & Pruebas unitarias, causalidad y maestro dorado \\
+Segundo & Integrar componentes sin mezclar procedencias & Registro canónico, preparación aislada, transporte y cobertura & Preflight, recibos y conjuntos exactos de claves \\
+Tercero & Cerrar el ciclo de vida del resultado & Estados de campaña, persistencia, promoción y consumo & Auditoría del sello, transacción y publicación \\ \bottomrule
 \end{tabular}
 \end{table}
 
@@ -2962,12 +2964,16 @@ capacidad real, cobertura exacta, preparación aislada, estados explícitos, pro
 y pruebas que atacan tanto piezas como rutas completas. Con ello se satisface el objetivo de
 convertir el diseño en una solución funcional, mantenible y evaluable.
 
-El estado se declara sin anticipar resultados: la implementación está verificada localmente,
-pero la nueva campaña prolongada no se ha ejecutado y la publicación no forma parte de A10.
-Antes de autorizarla se requiere una auditoría final de sólo lectura sobre el mismo estado que
-se pretende ejecutar y, en particular, sobre el vínculo entre el sello comparado al arrancar,
-la transacción y los artefactos que una publicación futura consumiría. Esta frontera separa
-la finalización del software de la obtención de nueva evidencia experimental.
+El estado se declaró sin anticipar resultados: al cierre del tercer avance la implementación
+estaba verificada localmente, pero la campaña prolongada no se había ejecutado y la publicación
+quedaba fuera del avance. Antes de autorizarla se exigió una auditoría final de sólo lectura
+sobre el mismo estado que se pretendía ejecutar y, en particular, sobre el vínculo entre el
+sello comparado al arrancar, la transacción y los artefactos que una publicación posterior
+consumiría. Esa frontera separó la finalización del software de la obtención de evidencia
+experimental nueva. La campaña causal se ejecutó después, en octubre de 2026, una vez superada
+esa auditoría: pasó por la validación con revisión humana, se reconcilió con sus complementos
+(Apéndice~A.8) y se publicó, de modo que sus resultados son los que reporta el capítulo de
+resultados.
 
 
 \subsection{1.4.2 Ajustes al modelo con diferentes configuraciones}
