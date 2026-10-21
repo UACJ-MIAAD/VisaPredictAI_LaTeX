@@ -87,3 +87,17 @@ def test_a10_valida_solo_con_revision_humana_y_audita_antes_de_ejecutar() -> Non
     publicada = algoritmo.index(r"marcar $T$ como \texttt{published}")
     assert revision < validada < publicada
     assert "Solicitar auditoría independiente" not in algoritmo
+
+
+def test_implementacion_introduce_en_espanol_los_terminos_de_operacion() -> None:
+    """J3/J5 (Julia): el término en español va primero y el inglés en cursiva; después, el español."""
+    seccion = _seccion_implementacion()
+    prosa = "\n".join(l for l in seccion.splitlines() if not l.lstrip().startswith("%"))
+    prosa = re.sub(r"\\textit\{[^}]*\}|\\texttt\{[^}]*\}|\\(?:label|ref)\{[^}]*\}", "", prosa)
+    prosa = re.sub(r"\\node\[[^\]]*\] \([^)]*\)|\\draw\[[^\]]*\][^;]*;", "", prosa)
+    for termino in ("preflight", "smoke", "snapshots", "locks", "lock ", "gate de", "hash"):
+        assert termino not in prosa.lower(), termino
+    normal = re.sub(r"\s+", " ", seccion)
+    assert r"verificación previa (\textit{preflight})" in normal
+    assert r"archivos de bloqueo de dependencias (\textit{locks})" in normal
+    assert r"prueba de humo (\textit{smoke test})" in normal

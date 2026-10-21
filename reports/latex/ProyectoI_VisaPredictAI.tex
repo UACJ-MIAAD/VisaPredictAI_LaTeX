@@ -2503,7 +2503,7 @@ concentra en unir los componentes anteriores dentro de una ejecución gobernada.
 ya no es únicamente que cada estimador produzca un valor, sino demostrar que todos los valores
 obligatorios proceden del mismo panel, código, entorno y campaña. Para ello se incorporaron
 cuatro mecanismos: un registro único de modelos, un área de preparación aislada por campaña,
-recibos de cobertura recalculados al leer y un preflight que bloquea la ejecución antes del
+recibos de cobertura recalculados al leer y una verificación previa (\textit{preflight}) que bloquea la ejecución antes del
 primer entrenamiento si la identidad técnica no coincide.
 
 \paragraph{Registro canónico y fuentes de pronóstico.} El catálogo dejó de depender de
@@ -2568,10 +2568,10 @@ cobertura.
   stop/.style={stepbox, draw=regU, fill=regU!9},
   arr/.style={-{Latex[length=2.2mm]}, uacjgray, line width=0.9pt},
   reject/.style={-{Latex[length=2.2mm]}, regU, dashed, line width=0.9pt}]
-  \node[check] (pre) at (0,0) {\textbf{Preflight}\\Código, panel y entornos};
+  \node[check] (pre) at (0,0) {\textbf{Verificación previa}\\Código, panel y entornos};
   \node[stepbox] (stage) at (3.15,0) {\textbf{Preparación aislada}\\\texttt{campaign\_id}};
   \node[stepbox] (prod) at (6.30,0) {\textbf{Productores}\\Locales, transporte y globales};
-  \node[check] (receipt) at (9.45,0) {\textbf{Acreditación}\\Claves, hashes y semillas};
+  \node[check] (receipt) at (9.45,0) {\textbf{Acreditación}\\Claves, \textit{hashes} y semillas};
   \node[check] (promote) at (12.60,0) {\textbf{Promoción}\\Conjunto completo};
   \draw[arr] (pre)--(stage);
   \draw[arr] (stage)--(prod);
@@ -2596,7 +2596,7 @@ semilla debe cubrir exactamente la rejilla de 25 series por 24 meses, es decir, 
 $(\textit{serie},\textit{mes})$. El productor parte de esa rejilla canónica y agrega una
 columna finita por modelo; nunca construye la salida únicamente con las filas que lograron
 pronóstico. El lector vuelve a derivar la rejilla desde el panel, comprueba los valores reales,
-el conjunto exacto de semillas $s_1,\ldots,s_5$ y el hash de cada archivo, y evalúa los mismos
+el conjunto exacto de semillas $s_1,\ldots,s_5$ y el \textit{hash} de cada archivo, y evalúa los mismos
 marcos que acreditó. De esta forma, cinco archivos truncados de manera idéntica no pueden
 validarse entre sí por simple semejanza.
 
@@ -2619,8 +2619,8 @@ sincronizaciones ni promociones.
 \begin{algorithmic}[1]
 \Require Repositorio limpio $R$, panel $P$, entornos sellados $E$ y registro $\mathcal{M}$
 \Ensure Árbol servido anterior o campaña completa acreditada; nunca una mezcla
-\State Ejecutar contratos de locks, linaje y resolución de importaciones
-\State Emitir el preflight $S_0$ y compararlo con la identidad viva antes de calcular
+\State Ejecutar contratos de archivos de bloqueo de dependencias (\textit{locks}), linaje y resolución de importaciones
+\State Emitir la verificación previa $S_0$ y compararla con la identidad viva antes de calcular
 \If{$S_0$ no acredita exactamente $(R,P,E,\mathcal{M})$}
   \State Abortar antes de crear artefactos
 \EndIf
@@ -2632,7 +2632,7 @@ sincronizaciones ni promociones.
   \EndIf
 \EndFor
 \State Acreditar $s_1,\ldots,s_5$, transportar ETS/Theta y exportar los modelos requeridos
-\State Revalidar esquema, claves, hashes, procedencia y ausencia de duplicados
+\State Revalidar esquema, claves, \textit{hashes}, procedencia y ausencia de duplicados
 \If{la cobertura observada difiere de la derivada del panel y del registro}
   \State Abortar sin tocar el árbol servido
 \EndIf
@@ -2672,9 +2672,9 @@ Identidad & Código, panel, entorno y campaña & Bloquea la mezcla de artefactos
 producto de las herramientas de campaña. El módulo de configuración conserva los parámetros
 matemáticos; el registro define el catálogo; el recorrido temporal produce métricas y filas
 de pronóstico; los módulos de transporte y cobertura validan artefactos; y el lanzador sólo
-orquesta esas piezas. Los contratos de entorno comparan los paquetes instalados con los locks,
-el smoke importa los puntos de entrada en procesos limpios y el gate de linaje contrasta cada
-instantánea con su nombre, hash y mes esperado. Esta estructura reduce la dependencia del
+orquesta esas piezas. Los contratos de entorno comparan los paquetes instalados con los archivos de bloqueo,
+la prueba de humo (\textit{smoke test}) importa los puntos de entrada en procesos limpios y la puerta de linaje contrasta cada
+instantánea con su nombre, \textit{hash} y mes esperado. Esta estructura reduce la dependencia del
 conocimiento tácito y permite probar cada frontera de forma aislada.
 
 \begin{table}[H]
@@ -2690,9 +2690,9 @@ integrados durante el segundo avance.}
 Configuración y registro & Definir parámetros, identidad lógica, persistencia y fuente de cada pronóstico. \\
 Recorrido temporal & Ajustar por origen, registrar 24 objetivos y calcular métricas sin fuga. \\
 Transporte estadístico & Conservar y acreditar ETS/Theta desde el recorrido que los produjo. \\
-Cobertura multisemilla & Validar rejilla, verdad, predicciones finitas, semillas y hashes. \\
+Cobertura multisemilla & Validar rejilla, verdad, predicciones finitas, semillas y \textit{hashes}. \\
 Exportador y promotor & Exigir todos los pronósticos y promover sólo los modelos persistibles y globales. \\
-Preflight y manifiesto & Acreditar código, panel, snapshots, locks, entornos y puntos de entrada. \\
+Verificación previa y manifiesto & Acreditar código, panel, instantáneas, archivos de bloqueo, entornos y puntos de entrada. \\
 Lanzador de campaña & Ejecutar en orden, detenerse en el primer fallo y conservar una bitácora por campaña. \\ \bottomrule
 \end{tabular}
 \end{table}
@@ -2706,11 +2706,11 @@ o publicación. Los controles benignos conservan casos válidos, como un objetiv
 con valor real nulo, para demostrar que la regla no exige datos que el boletín nunca publicó.
 
 \paragraph{Estado al cierre del avance 2.} Al cerrar este avance, la integración quedó
-verificada localmente: los entornos reproducían sus locks, el linaje de las instantáneas estaba
+verificada localmente: los entornos reproducían sus archivos de bloqueo, el linaje de las instantáneas estaba
 completo, los puntos de entrada importaban y los recibos se volvían a acreditar al consumirlos.
 La campaña integral no formaba parte del segundo avance y entonces no se había iniciado; antes
 de autorizar una ejecución prolongada quedaba una auditoría independiente final sobre el
-vínculo entre el sello preflight y la transacción que después habilitaría la publicación.
+vínculo entre el sello de la verificación previa y la transacción que después habilitaría la publicación.
 Declarar ese límite evitó presentar una preparación técnicamente verde como si ya fuera un
 resultado experimental nuevo.
 
@@ -2734,21 +2734,21 @@ sección 1.4.1. Cada avance conserva los contratos del anterior y añade una fro
 \rowcolor{uacjblue!15}
 \textbf{Avance} & \textbf{Problema resuelto} & \textbf{Producto principal} & \textbf{Puerta de aceptación} \\ \midrule
 Primero & Convertir el diseño en cálculo reproducible & Recorrido temporal, estimadores, parámetros y métricas & Pruebas unitarias, causalidad y maestro dorado \\
-Segundo & Integrar componentes sin mezclar procedencias & Registro canónico, preparación aislada, transporte y cobertura & Preflight, recibos y conjuntos exactos de claves \\
+Segundo & Integrar componentes sin mezclar procedencias & Registro canónico, preparación aislada, transporte y cobertura & Verificación previa, recibos y conjuntos exactos de claves \\
 Tercero & Cerrar el ciclo de vida del resultado & Estados de campaña, persistencia, promoción y consumo & Auditoría del sello, transacción y publicación \\ \bottomrule
 \end{tabular}
 \end{table}
 
 \paragraph{Identidad operativa y sello de arranque.} Antes de crear un artefacto, el
 lanzador comprueba un repositorio limpio y deriva la identidad desde fuentes vivas: revisión
-del código, suma del panel, inventario de instantáneas, locks, entornos instalados y conjunto
-exacto de puntos de entrada. El preflight materializa esos datos en un sello de esquema
+del código, suma del panel, inventario de instantáneas, archivos de bloqueo, entornos instalados y conjunto
+exacto de puntos de entrada. La verificación previa materializa esos datos en un sello de esquema
 cerrado; no acepta campos adicionales, listas vacías, rutas absolutas o fuera del proyecto,
 duplicados ni valores numéricos no finitos. El identificador de campaña incorpora el inicio
 de la revisión de código y una fecha válida, por lo que un nombre parecido no sustituye la
 identidad comprobada.
 
-El lanzador vuelve a emitir el preflight inmediatamente antes de abrir la transacción y exige
+El lanzador vuelve a emitir la verificación previa inmediatamente antes de abrir la transacción y exige
 igualdad byte a byte con el sello registrado. Esta segunda lectura cierra la ventana entre la
 revisión inicial y el primer productor: si cambió una entrada, un entorno, el panel o la lista
 de módulos, la ejecución termina sin crear resultados. La bitácora se conserva aparte y no
@@ -2759,7 +2759,7 @@ mantiene el árbol sucio y bloquea el arranque.
 muestra la Figura~\ref{fig:estados_a10}. \texttt{running} indica que las precondiciones fueron
 aceptadas y que los productores pueden escribir únicamente en preparación;
 \texttt{computed} acredita que terminó el cálculo esperado; \texttt{validated} confirma
-esquema, cobertura, hashes y procedencia; y \texttt{published} autoriza sustituir la versión
+esquema, cobertura, \textit{hashes} y procedencia; y \texttt{published} autoriza sustituir la versión
 servida. Cualquier error conduce a \texttt{failed}; nunca se interpreta la mera existencia de
 un archivo como una transición válida.
 
@@ -2827,11 +2827,11 @@ diagnosticar y recuperar una campaña sin heredar artefactos dudosos.}
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{Fallo} & \textbf{Detección} & \textbf{Respuesta} & \textbf{Recuperación} \\ \midrule
-Entorno divergente & Inventario instalado distinto del lock & Abortar antes de calcular & Reconstruir el entorno aislado \\
-Linaje inválido & Nombre, mes o hash de instantánea distinto & Rechazar la etapa de datos & Restaurar o adquirir la evidencia correcta \\
+Entorno divergente & Inventario instalado distinto del archivo de bloqueo & Abortar antes de calcular & Reconstruir el entorno aislado \\
+Linaje inválido & Nombre, mes o \textit{hash} de instantánea distinto & Rechazar la etapa de datos & Restaurar o adquirir la evidencia correcta \\
 Salida incompleta & Claves esperadas ausentes & Conservar preparación; no agregar & Corregir el productor y repetir su etapa \\
 Contaminación & Identidades o añadas incompatibles & Etiquetar y aislar el conjunto & Reconstruir desde entradas acreditadas \\
-Mutación posterior & Hash distinto o segunda lectura inconsistente & Invalidar el recibo & Regenerar artefacto y recibo \\
+Mutación posterior & \textit{Hash} distinto o segunda lectura inconsistente & Invalidar el recibo & Regenerar artefacto y recibo \\
 Publicación no vinculada & Sello y transacción sin enlace acreditado & Bloquear la promoción final & Auditar y registrar la identidad común \\ \bottomrule
 \end{tabular}
 \end{table}
@@ -2866,14 +2866,14 @@ suficiente.
 \Require Sello registrado $S_0$ con dictamen de auditoría independiente, registro $\mathcal{M}$,
 panel $P$ y árbol servido $V$
 \Ensure $V$ intacto o una nueva versión completa, acreditada y autorizada
-\State Reemitir el preflight vivo $S_1$
+\State Reemitir la verificación previa viva $S_1$
 \If{$S_1 \ne S_0$, el esquema de $S_0$ es inválido o falta el dictamen sobre $S_0$}
   \State Abortar antes de abrir la transacción
 \EndIf
 \State Abrir la transacción $T$ en estado \texttt{running} y preparar el espacio aislado
 \ForAll{etapa requerida $q$ en el orden declarado}
   \State Ejecutar $q$ y acreditar sus salidas contra $(S_0,P,\mathcal{M},T)$
-  \If{$q$ falla o produce claves, hashes o identidad incompatibles}
+  \If{$q$ falla o produce claves, \textit{hashes} o identidad incompatibles}
     \State Marcar $T$ como \texttt{failed}, conservar evidencia y devolver $V$
   \EndIf
 \EndFor
@@ -2918,7 +2918,7 @@ ETS y Theta & Reajuste en cada paso & Respetar la semántica de los envoltorios 
 Modelos globales & Cinco semillas, $s_1$--$s_5$ & Separar configuración e incertidumbre de inicialización \\
 Escala MASE & Finita y estrictamente positiva & Impedir cocientes sin interpretación métrica \\
 Persistencia SARIMA & Compresión nivel 3 & Reducir tamaño sin perder el estado reutilizable \\
-Identidad & Código, panel, snapshots, locks, entornos y campaña & Evitar semejanzas sin procedencia demostrable \\
+Identidad & Código, panel, instantáneas, archivos de bloqueo, entornos y campaña & Evitar semejanzas sin procedencia demostrable \\
 Promoción & Cobertura exacta y autorización & Prohibir versiones parciales o no auditadas \\ \bottomrule
 \end{tabular}
 \end{table}
@@ -2941,7 +2941,7 @@ implementación. Ninguna capa sustituye a las demás.}
 \rowcolor{uacjblue!15}
 \textbf{Técnica} & \textbf{Propiedad comprobada} & \textbf{Evidencia esperada} \\ \midrule
 Prueba unitaria & Escalas, constructores, esquemas y tipos & Error localizado o control benigno aceptado \\
-Prueba contractual & Claves, hashes, duplicados, cobertura e identidad & Recibo recalculable y diagnóstico completo \\
+Prueba contractual & Claves, \textit{hashes}, duplicados, cobertura e identidad & Recibo recalculable y diagnóstico completo \\
 Prueba de integración & El productor real alimenta al consumidor real & Ruta del lanzador ejercitada sin atajos de fixture \\
 Maestro dorado & Instrumentar no altera las métricas existentes & Campos numéricos invariantes antes y después \\
 Prueba metamórfica & Un dato futuro no modifica una entrada pasada & Igualdad de características en orígenes previos \\
