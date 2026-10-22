@@ -696,10 +696,10 @@ las celdas publicadas, invariantes verificadas y cobertura efectiva de las serie
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{Indicador} & \textbf{Valor} & \textbf{Interpretación} \\ \midrule
-Celdas con régimen asignado & 99.99\,\% & 27{,}610 de \factNObsFmt{}: solo una celda quedó sin dato interpretable \\
-Observaciones con fecha ($e=F$) & \factNObsFFmt{} & 57.7\,\% del panel; único objetivo predictivo \\
-Observaciones \textit{Current} ($e=C$) & 11{,}058 & 40.0\,\%; categoría al corriente, sin fecha que pronosticar \\
-Observaciones \textit{Unavailable} ($e=U$) & 621 & 2.2\,\%; sin números disponibles ese mes \\
+Celdas con régimen asignado & $>99.99$\,\% & 28{,}060 de \factNObsFmt{}: solo una celda quedó sin dato interpretable \\
+Observaciones con fecha ($e=F$) & \factNObsFFmt{} & 57.8\,\% del panel; único objetivo predictivo \\
+Observaciones \textit{Current} ($e=C$) & 11{,}215 & 40.0\,\%; categoría al corriente, sin fecha que pronosticar \\
+Observaciones \textit{Unavailable} ($e=U$) & 625 & 2.2\,\%; sin números disponibles ese mes \\
 Observaciones sin dato (UNK) & 1 & Menos del 0.01\,\%; se conserva el valor crudo \\
 Fechas de prioridad imparseables & 0 & Guarda que detiene la construcción del panel \\
 Fechas de boletín imparseables & 0 & Guarda que detiene la construcción del panel \\
@@ -4840,16 +4840,16 @@ ORDER BY obs_F DESC;
 \footnotesize
 \caption[Resultado de la consulta de resumen]{Salida real de la consulta anterior sobre el
 almac\'en: observaciones entrenables por bloque y tabla. La suma de \texttt{obs\_F}
-(6914+3801+3185+2217) reproduce las \factNObsFFmt{} observaciones entrenables del panel.}
+(6939+3830+3205+2246) reproduce las \factNObsFFmt{} observaciones entrenables del panel.}
 \label{tab:duckdb_query}
 \begin{tabular}{@{}l l r r r@{}}
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{block} & \textbf{tabla} & \textbf{series} & \textbf{obs\_F} & \textbf{pct\_F} \\ \midrule
-family     & FAD & 25 & 6\,914 & 96.5 \\
-employment & FAD & 80 & 3\,801 & 32.6 \\
-family     & DFF & 25 & 3\,185 & 96.5 \\
-employment & DFF & 64 & 2\,217 & 38.2 \\
+family     & FAD & 25 & 6\,939 & 96.5 \\
+employment & FAD & 80 & 3\,830 & 32.7 \\
+family     & DFF & 25 & 3\,205 & 96.4 \\
+employment & DFF & 64 & 2\,246 & 38.4 \\
 \bottomrule
 \end{tabular}
 \end{table}
