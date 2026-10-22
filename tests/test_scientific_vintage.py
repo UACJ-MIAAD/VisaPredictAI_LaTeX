@@ -20,7 +20,7 @@ def test_retrospective_cut_and_execution_month_are_distinct() -> None:
 
 
 def test_abstract_names_the_operational_and_scientific_vintages() -> None:
-    assert re.search(r"octubre\s+de\s+2026", ABSTRACT)
+    assert r"\factDateLast" in ABSTRACT
     assert re.search(r"septiembre\s+de\s+2026", ABSTRACT)
     assert "operativo" in ABSTRACT and "sellados" in ABSTRACT
 
