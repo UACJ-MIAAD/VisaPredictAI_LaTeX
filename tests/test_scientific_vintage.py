@@ -23,3 +23,15 @@ def test_abstract_names_the_operational_and_scientific_vintages() -> None:
     assert re.search(r"octubre\s+de\s+2026", ABSTRACT)
     assert re.search(r"septiembre\s+de\s+2026", ABSTRACT)
     assert "operativo" in ABSTRACT and "sellados" in ABSTRACT
+
+
+if __name__ == "__main__":
+    if not __debug__:
+        raise SystemExit("Scientific vintage guard requires assertions enabled")
+    for check in (
+        test_retrospective_window_does_not_follow_live_census_macros,
+        test_retrospective_cut_and_execution_month_are_distinct,
+        test_abstract_names_the_operational_and_scientific_vintages,
+    ):
+        check()
+    print("Scientific vintage: three checks passed")
