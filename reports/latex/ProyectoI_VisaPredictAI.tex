@@ -1398,7 +1398,7 @@ la asimetría capta el sesgo (las retrogresiones producen colas izquierdas) y la
 curtosis, el peso de las colas (eventos extremos).
 
 Las Tablas~\ref{tab:features_estructura} y~\ref{tab:features_anomalias} reportan estos
-descriptores para las 25 series. Las medidas de estabilidad y \textit{lumpiness}
+descriptores para las 25 series, rederivados hasta octubre de 2026. Las medidas de estabilidad y \textit{lumpiness}
 (varianza de medias y de varianzas por bloque) se calculan en el módulo pero se omiten
 de las tablas por ser dependientes de la escala en días; quedan en el registro
 reproducible.
@@ -1413,31 +1413,31 @@ reproducible.
 \rowcolor{uacjblue!15}
 \textbf{Área} & \textbf{Cat.} & $\mathbf{F_T}$ & $\mathbf{F_S}$ & $\mathbf{H}$ & \textbf{ACF1} & $\mathbf{ACF1_\Delta}$ & $\mathbf{d}$ \\ \midrule
 % --- tab:features_estructura: vp_model.series_characterization (make_tex_tables.py) ---
-CN & F1 & 0.993 & 0.016 & 0.303 & 0.986 & $+0.300$ & 1 \\
-CN & F2A & 0.991 & 0.000 & 0.347 & 0.985 & $+0.145$ & 1 \\
-CN & F2B & 0.998 & 0.040 & 0.304 & 0.988 & $+0.210$ & 1 \\
-CN & F3 & 0.995 & 0.000 & 0.357 & 0.982 & $+0.052$ & 1 \\
-CN & F4 & 0.991 & 0.015 & 0.367 & 0.980 & $-0.119$ & 1 \\
-IN & F1 & 0.989 & 0.006 & 0.310 & 0.988 & $+0.226$ & 1 \\
-IN & F2A & 0.994 & 0.000 & 0.326 & 0.988 & $+0.146$ & 1 \\
-IN & F2B & 0.998 & 0.038 & 0.276 & 0.990 & $+0.199$ & 1 \\
-IN & F3 & 0.997 & 0.000 & 0.341 & 0.985 & $+0.054$ & 1 \\
-IN & F4 & 0.993 & 0.000 & 0.335 & 0.988 & $-0.062$ & 1 \\
-MX & F1 & 0.932 & 0.225 & 0.405 & 0.958 & $+0.043$ & 2 \\
-MX & F2A & 0.994 & 0.012 & 0.312 & 0.989 & $+0.133$ & 1 \\
-MX & F2B & 0.997 & 0.069 & 0.353 & 0.986 & $+0.104$ & 2 \\
-MX & F3 & 0.769 & 0.000 & 0.438 & 0.920 & $-0.142$ & 1 \\
-MX & F4 & 0.945 & 0.000 & 0.408 & 0.972 & $-0.019$ & 1 \\
-PH & F1 & 0.991 & 0.000 & 0.250 & 0.991 & $+0.117$ & 1 \\
-PH & F2A & 0.994 & 0.000 & 0.326 & 0.988 & $+0.146$ & 1 \\
+CN & F1 & 0.993 & 0.013 & 0.307 & 0.986 & $+0.297$ & 1 \\
+CN & F2A & 0.991 & 0.000 & 0.350 & 0.986 & $+0.145$ & 1 \\
+CN & F2B & 0.997 & 0.037 & 0.308 & 0.988 & $+0.197$ & 1 \\
+CN & F3 & 0.992 & 0.000 & 0.364 & 0.982 & $+0.036$ & 1 \\
+CN & F4 & 0.989 & 0.008 & 0.376 & 0.980 & $-0.125$ & 1 \\
+IN & F1 & 0.989 & 0.001 & 0.314 & 0.988 & $+0.225$ & 1 \\
+IN & F2A & 0.994 & 0.000 & 0.329 & 0.988 & $+0.146$ & 1 \\
+IN & F2B & 0.998 & 0.036 & 0.279 & 0.991 & $+0.186$ & 1 \\
+IN & F3 & 0.995 & 0.000 & 0.348 & 0.985 & $+0.039$ & 1 \\
+IN & F4 & 0.993 & 0.000 & 0.336 & 0.988 & $-0.062$ & 1 \\
+MX & F1 & 0.934 & 0.227 & 0.405 & 0.958 & $+0.043$ & 2 \\
+MX & F2A & 0.994 & 0.016 & 0.315 & 0.988 & $+0.133$ & 1 \\
+MX & F2B & 0.997 & 0.068 & 0.355 & 0.984 & $+0.087$ & 2 \\
+MX & F3 & 0.773 & 0.000 & 0.435 & 0.922 & $-0.142$ & 1 \\
+MX & F4 & 0.945 & 0.000 & 0.407 & 0.973 & $-0.019$ & 1 \\
+PH & F1 & 0.991 & 0.000 & 0.250 & 0.991 & $+0.116$ & 1 \\
+PH & F2A & 0.994 & 0.001 & 0.329 & 0.988 & $+0.146$ & 1 \\
 PH & F2B & 0.995 & 0.020 & 0.276 & 0.990 & $+0.157$ & 1 \\
-PH & F3 & 0.967 & 0.080 & 0.330 & 0.981 & $+0.075$ & 1 \\
-PH & F4 & 0.997 & 0.000 & 0.321 & 0.989 & $+0.229$ & 1 \\
-RoW & F1 & 0.991 & 0.023 & 0.304 & 0.987 & $+0.219$ & 1 \\
-RoW & F2A & 0.994 & 0.000 & 0.326 & 0.988 & $+0.146$ & 1 \\
-RoW & F2B & 0.998 & 0.038 & 0.276 & 0.990 & $+0.217$ & 1 \\
-RoW & F3 & 0.997 & 0.000 & 0.341 & 0.985 & $+0.055$ & 1 \\
-RoW & F4 & 0.995 & 0.007 & 0.339 & 0.985 & $-0.125$ & 1 \\
+PH & F3 & 0.968 & 0.080 & 0.331 & 0.981 & $+0.075$ & 1 \\
+PH & F4 & 0.997 & 0.000 & 0.323 & 0.989 & $+0.223$ & 1 \\
+RoW & F1 & 0.991 & 0.013 & 0.308 & 0.987 & $+0.218$ & 1 \\
+RoW & F2A & 0.994 & 0.002 & 0.329 & 0.988 & $+0.146$ & 1 \\
+RoW & F2B & 0.998 & 0.036 & 0.279 & 0.991 & $+0.204$ & 1 \\
+RoW & F3 & 0.995 & 0.000 & 0.348 & 0.985 & $+0.040$ & 1 \\
+RoW & F4 & 0.994 & 0.001 & 0.345 & 0.986 & $-0.132$ & 1 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1452,44 +1452,43 @@ RoW & F4 & 0.995 & 0.007 & 0.339 & 0.985 & $-0.125$ & 1 \\
 \rowcolor{uacjblue!15}
 \textbf{Área} & \textbf{Cat.} & \textbf{Atípicos} & \textbf{LB}\,$p$ & \textbf{Asim.} & \textbf{Curt.} \\ \midrule
 % --- tab:features_anomalias: vp_model.series_characterization (make_tex_tables.py) ---
-CN & F1 & 64 & 0.000 & $-2.43$ & 48.7 \\
-CN & F2A & 69 & 0.000 & $-3.17$ & 28.4 \\
-CN & F2B & 27 & 0.000 & $-2.90$ & 70.2 \\
-CN & F3 & 44 & 0.000 & $+5.85$ & 103.3 \\
-CN & F4 & 45 & 0.000 & $-0.46$ & 43.4 \\
-IN & F1 & 74 & 0.000 & $-4.78$ & 55.9 \\
-IN & F2A & 69 & 0.000 & $-3.38$ & 32.8 \\
-IN & F2B & 32 & 0.000 & $-2.86$ & 75.1 \\
-IN & F3 & 49 & 0.000 & $+6.25$ & 117.8 \\
-IN & F4 & 52 & 0.000 & $-3.10$ & 49.1 \\
-MX & F1 & 78 & 0.000 & $-2.61$ & 99.6 \\
-MX & F2A & 81 & 0.000 & $-5.35$ & 71.8 \\
-MX & F2B & 65 & 0.000 & $+0.66$ & 21.9 \\
-MX & F3 & 90 & 0.000 & $-4.82$ & 79.8 \\
-MX & F4 & 67 & 0.000 & $-3.40$ & 79.4 \\
-PH & F1 & 76 & 0.000 & $-6.25$ & 57.6 \\
-PH & F2A & 66 & 0.000 & $-3.37$ & 32.7 \\
-PH & F2B & 78 & 0.000 & $-4.05$ & 66.8 \\
-PH & F3 & 79 & 0.000 & $+0.89$ & 48.5 \\
-PH & F4 & 60 & 0.000 & $-7.66$ & 107.6 \\
-RoW & F1 & 65 & 0.000 & $-3.73$ & 47.6 \\
-RoW & F2A & 69 & 0.000 & $-3.38$ & 32.8 \\
-RoW & F2B & 28 & 0.000 & $-2.99$ & 78.7 \\
-RoW & F3 & 50 & 0.000 & $+6.25$ & 117.7 \\
-RoW & F4 & 45 & 0.000 & $-0.41$ & 57.2 \\
+CN & F1 & 66 & 0.000 & $-2.43$ & 48.9 \\
+CN & F2A & 70 & 0.000 & $-3.17$ & 28.6 \\
+CN & F2B & 29 & 0.000 & $-2.90$ & 70.3 \\
+CN & F3 & 46 & 0.000 & $+5.86$ & 103.6 \\
+CN & F4 & 46 & 0.000 & $-0.46$ & 43.6 \\
+IN & F1 & 77 & 0.000 & $-4.78$ & 56.0 \\
+IN & F2A & 71 & 0.000 & $-3.38$ & 32.9 \\
+IN & F2B & 31 & 0.000 & $-2.85$ & 75.3 \\
+IN & F3 & 50 & 0.000 & $+6.26$ & 118.1 \\
+IN & F4 & 55 & 0.000 & $-3.11$ & 49.2 \\
+MX & F1 & 75 & 0.000 & $-2.62$ & 99.7 \\
+MX & F2A & 83 & 0.000 & $-5.33$ & 71.5 \\
+MX & F2B & 64 & 0.000 & $+1.15$ & 20.4 \\
+MX & F3 & 86 & 0.000 & $-4.83$ & 80.0 \\
+MX & F4 & 68 & 0.000 & $-3.40$ & 79.7 \\
+PH & F1 & 75 & 0.000 & $-6.24$ & 57.5 \\
+PH & F2A & 67 & 0.000 & $-3.38$ & 32.9 \\
+PH & F2B & 71 & 0.000 & $-4.05$ & 66.7 \\
+PH & F3 & 81 & 0.000 & $+0.88$ & 48.6 \\
+PH & F4 & 60 & 0.000 & $-7.40$ & 103.7 \\
+RoW & F1 & 63 & 0.000 & $-3.73$ & 47.8 \\
+RoW & F2A & 68 & 0.000 & $-3.38$ & 32.9 \\
+RoW & F2B & 30 & 0.000 & $-2.98$ & 78.8 \\
+RoW & F3 & 49 & 0.000 & $+6.26$ & 118.0 \\
+RoW & F4 & 46 & 0.000 & $-0.41$ & 57.3 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 
 \paragraph{Lectura de la Tabla~\ref{tab:features_estructura} (estructura).} El panel
-es notablemente homogéneo: la fuerza de tendencia $F_T$ supera 0.99 en la mayoría de
-las series, con las únicas excepciones de las series mexicanas y filipinas más
-volátiles (MX/F3 con $F_T=0.754$, MX/F1 con $0.928$, PH/F3 con $0.966$). La fuerza de
+presenta tendencia fuerte: la fuerza $F_T$ supera 0.99 en la mayoría de
+las series; entre las menores se encuentran MX/F3 con $F_T=0.773$, MX/F1 con
+$0.934$ y PH/F3 con $0.968$. La fuerza de
 estacionalidad $F_S$ es prácticamente nula en todo el panel ($F_S < 0.23$, con muchas
-series exactamente en 0), lo que confirma que las fechas de prioridad \textbf{no
-tienen un ciclo anual relevante}; este es el hallazgo que explica por qué los términos
-estacionales de SARIMA no mejoran a ARIMA en los resultados. La autocorrelación de
+series exactamente en 0). Esta descripción no demuestra ausencia de estacionalidad
+ni explica por sí sola las diferencias predictivas entre SARIMA y ARIMA. La autocorrelación de
 nivel ACF1 ronda 0.98 a 0.99 (persistencia alta, coherente con la tendencia), y el
 orden de diferenciación es $d=1$ salvo dos series mexicanas que requieren $d=2$. La
 Figura~\ref{fig:eda_features} visualiza esta homogeneidad: todas las series se agrupan
@@ -1507,20 +1506,20 @@ estacionalidad casi nula.}
 \paragraph{Lectura de la Tabla~\ref{tab:features_anomalias} (anomalías y forma).} La
 prueba de Ljung-Box rechaza el ruido blanco en las 25 series ($p < 0.001$ en todas):
 hay estructura temporal que un modelo puede aprovechar. La distribución de los avances
-es marcadamente no gaussiana: la asimetría es casi siempre negativa (las
-retrogresiones generan colas izquierdas) y la curtosis es extrema (entre 22 y 107),
+es marcadamente no gaussiana: la asimetría es mayoritariamente negativa (las
+retrogresiones generan colas izquierdas) y la curtosis es extrema (entre 20.4 y 118.1),
 lo que señala eventos atípicos frecuentes.
 
 \subsubsection{Cambios de régimen frente a anomalías puntuales}
 
-El conteo de la columna ``Atípicos'' (32--87) proviene de un $z$-score robusto por
+El conteo de la columna ``Atípicos'' (29--86) proviene de un $z$-score robusto por
 punto y, por sí solo, confunde dos fenómenos distintos. Un diagnóstico de mayor nivel
 los separa: por un lado, los \textbf{cambios de régimen} (desplazamientos estructurales
 duraderos) se detectan con el algoritmo PELT (\textit{Pruned Exact Linear Time})
 \cita{17} sobre la serie estandarizada; por otro, las \textbf{anomalías puntuales}
 (observaciones aisladas) con un filtro de Hampel sobre el residuo de la STL (mediana y
 MAD locales). Aplicado a México/F3/FAD, el método identifica \textbf{solo 3 cambios de
-régimen} (no 87), mientras que las anomalías puntuales se concentran en la era volátil
+régimen}, una medida distinta de los 86 residuos atípicos, mientras que las anomalías puntuales se concentran en la era volátil
 2002--2008 (Figura~\ref{fig:eda_changepoints}). La consecuencia para el modelado es
 precisa: el grueso de la ``rareza'' de estas series es estructural (regímenes), no
 ruido aislado, por lo que la validación debe usar métricas robustas y los modelos,
