@@ -16,6 +16,7 @@ on:
       - "reports/latex/**"
       - "reports/paper_micai/**"
       - "tools/check_latex_log.sh"
+      - "tests/test_scientific_vintage.py"
       - ".github/workflows/latex.yml"
   # Auditoria 11-jul: el gate tambien debe correr en PRs que toquen los .tex,
   # no solo tras el merge a main.
@@ -24,6 +25,7 @@ on:
       - "reports/latex/**"
       - "reports/paper_micai/**"
       - "tools/check_latex_log.sh"
+      - "tests/test_scientific_vintage.py"
       - ".github/workflows/latex.yml"
   workflow_dispatch:
 
@@ -78,6 +80,7 @@ jobs:
       - name: Gate de logs (refs, citas, labels, overfull)
         run: |
           python3 tools/check_no_emdash.py
+          python3 tests/test_scientific_vintage.py
           bash tools/check_latex_log.sh reports/latex/ProyectoI_VisaPredictAI.log 0 0
           bash tools/check_latex_log.sh reports/latex/AnteproyectoVisaPredictAI.log 0 0
           bash tools/check_latex_log.sh reports/paper_micai/paper.log 3 15
