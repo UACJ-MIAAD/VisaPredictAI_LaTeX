@@ -535,9 +535,12 @@ La Figura~\ref{fig:csv_panel} muestra el resultado de la conversión: el panel e
 \textit{tidy} (largo), donde cada fila es una observación (país, categoría, tabla, mes) con su
 régimen, su fecha de prioridad y la variable objetivo \texttt{days\_since\_base}; las celdas
 $C$ y $U$ se conservan como anotación, sin fecha. Ese panel se materializa en el almacén
-dimensional en estrella de la Figura~\ref{fig:schema_er} (doce tablas: siete dimensiones,
+dimensional cuyo núcleo en estrella muestra la Figura~\ref{fig:schema_er} (doce tablas: siete dimensiones,
 dos tablas de hechos y tres de gobernanza y procedencia, además de vistas/marts), sobre
 el que cualquier consulta es reproducible (Figura~\ref{fig:duckdb}).
+La ampliación de procedencia añade la tabla \texttt{source\_artifact}, que no aparece en
+ese dibujo del núcleo: conserva la identidad y la huella de los archivos fuente y se
+vincula con los hechos mediante la migración de procedencia del almacén.
 
 \begin{figure}[H]
 \centering
@@ -551,9 +554,10 @@ variable objetivo \texttt{days\_since\_base}, definida solo cuando el estado es 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.92\textwidth]{data_schema_er.png}
-\caption[Esquema estrella del almacén]{Modelo dimensional en estrella del almacén DuckDB (capa
+\caption[Núcleo en estrella del almacén]{Núcleo dimensional del almacén DuckDB (capa
 gold): siete dimensiones, dos tablas de hechos (prioridades y rangos de \textit{Diversity Visa})
-y vistas/marts de gobernanza, con restricciones de clave e integridad como contrato de calidad.}
+y vistas/marts. El dibujo precede a la ampliación de procedencia: la tabla
+\texttt{source\_artifact} se documenta en el texto y en el esquema SQL vigente.}
 \label{fig:schema_er}
 \end{figure}
 
