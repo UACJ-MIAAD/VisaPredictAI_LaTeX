@@ -3000,7 +3000,62 @@ compromiso documentado entre costo computacional y validez. La selección de
 hiperparámetros se realiza dentro de cada ventana de entrenamiento, nunca sobre el
 conjunto de prueba, para impedir la fuga de información.
 
-\subsection{1.4.3 Optimización de parámetros y pruebas avanzadas}
+\paragraph{Configuraciones comparadas y alcance de la atribución.}
+Las variantes se organizaron por familia de modelos. En los métodos clásicos se
+contrastaron persistencia, tendencia amortiguada, descomposición y componentes
+autorregresivos; en los árboles se modificaron los rezagos, la profundidad y la
+regularización; en las redes se estudiaron la representación temporal, la capacidad y
+el esquema de entrenamiento. La variable objetivo de los árboles es el avance mensual,
+cuya suma reconstruye la fecha, para evitar que el algoritmo sólo reproduzca el nivel
+creciente del calendario. La configuración se decide antes de consultar el conjunto
+reservado; una mejora de selección no es todavía una mejora de generalización.
+
+La comparación causal vigente conserva una conclusión incómoda: aumentar la complejidad
+no garantiza superar al método de persistencia en el pronóstico a un mes. En FAD, las
+medias de MASE de ETS y Theta son \factEtsFadMean{} y \factThetaFadMean{}, frente a
+\factNaiveOneFadMean{} del naïve-1. Estos agregados deben leerse con la cobertura de cada
+modelo y no equivalen a una prueba pareada sobre una población idéntica. El capítulo de
+resultados presenta los contrastes y sus límites. En DFF, BiTCN alcanza una media
+\factBitcnDffMean{} frente a \factNaiveOneDffMean{} del piso; esa diferencia es
+descriptiva y no demuestra superioridad estadística frente al naïve-1.
+
+Las variantes históricas de representación y relleno se conservaron como diagnóstico.
+La re-derivación causal cambia simultáneamente la preparación y el periodo evaluado;
+por ello, la diferencia respecto de una versión anterior no identifica el efecto aislado
+de una sola decisión. La selección de descriptores tampoco autoriza una conclusión
+predictiva: con el protocolo aplicado, \feFactSelRelevant{} de \feFactSelIn{} candidatos
+superaron el control de falsos descubrimientos sobre \feFactSelSeries{} series, pero
+esos descriptores no constituyen las entradas del repertorio predictivo comparado.
+
+\subsection{1.4.3 Evaluación del modelo}
+
+La evaluación responde dos preguntas distintas: el error retrospectivo de un modelo
+ajustado sin información futura y el comportamiento de los pronósticos congelados
+antes de conocer sus objetivos. No se mezclan sus poblaciones ni sus horizontes.
+MAE expresa el error absoluto en días; RMSE da mayor peso a errores grandes; sMAPE
+aporta una escala relativa y debe interpretarse con cautela en avances cercanos a cero.
+MASE divide el error por una escala calculada únicamente con el entrenamiento
+\cita{44}. Una MASE menor que uno respecto del naïve estacional no prueba, por sí
+misma, que se haya superado el pronóstico naïve-1 fuera de muestra: esa comparación
+requiere los mismos pares observados y el contraste correspondiente.
+
+Las métricas puntuales se calculan sólo donde el boletín publica una fecha. Los estados
+\texttt{C} y \texttt{U} conservan su semántica y no se puntúan como fechas reales ni
+como clases predichas. Precisión, exhaustividad y F1 no son las métricas primarias de
+esta tarea de pronóstico temporal. Para la incertidumbre se informa cobertura empírica,
+amplitud de los intervalos y CRPS \cita{49}, con el protocolo y la procedencia de las
+muestras. Una cobertura elevada por intervalos excesivamente anchos tampoco basta para
+declarar útil una configuración.
+
+El registro por horizonte contiene \factProspNScoredFmt{} pronósticos puntuados,
+con MAE de \factProspMaeDays{} días y MASE de \factProspMase{} sobre la escala estacional.
+Son agregados de ambas tablas y varios horizontes, no el resultado del campeón FAD a un
+paso. La cobertura empírica al 95\,\% es \factProspCovNineFive{}; se distingue el
+conjunto usado para calibrar de los pares reservados para evaluar. Los contrastes de
+Diebold--Mariano y los procedimientos de comparación múltiple complementan el tamaño
+del efecto, sin convertir falta de significancia en equivalencia \cita{45}.
+
+\subsection{1.4.4 Optimización de parámetros y pruebas avanzadas}
 
 Los árboles de potenciación de gradiente se optimizan con \textit{Optuna} \cita{42}
 (muestreo TPE, \textit{Tree-structured Parzen Estimator}, multivariante, semilla fija, con
@@ -3041,7 +3096,7 @@ largos. La evaluación de la cobertura empírica se reporta en §2.2 y el detall
 el Apéndice~A.8.
 
 % ------------------------------------------------------------
-\subsection{1.4.4 Infraestructura y operaciones (MLOps)}
+\subsection{1.4.5 Infraestructura y operaciones (MLOps)}
 
 El proyecto se sostiene sobre una infraestructura de \textit{MLOps} que automatiza la
 adquisición de datos, garantiza la calidad y hace cada resultado reproducible y trazable. Tres
@@ -3181,8 +3236,18 @@ observaciones con fecha: el error absoluto medio (MAE), la raíz del error cuadr
 medio (RMSE), el error porcentual absoluto medio simétrico (sMAPE) y el error
 absoluto medio escalado (MASE \cita{44}), este último referido al naïve estacional
 ($m=12$) y reportado en paralelo en su variante escalada por el naïve-1 ($m=1$).
-Un valor de MASE menor que uno indica que el modelo mejora a la línea base ingenua
-correspondiente.
+Una MASE menor que uno indica un error inferior a la escala de referencia calculada
+con el entrenamiento; no sustituye la comparación fuera de muestra con el naïve-1.
+La aceptación final considera además el tamaño del efecto, la significancia, la
+cobertura de series y las condiciones pre-registradas de promoción.
+
+El cierre no utiliza el conjunto reservado para escoger retrospectivamente una
+configuración ganadora. El repertorio, sus hiperparámetros y el protocolo quedan
+fijados antes de puntuarlo. La comparación por modelo se conserva por identidad de
+serie y tabla; los fallos de convergencia se declaran como omisiones, sin sustituirlos
+por resultados de otro modelo ni eliminar silenciosamente los casos difíciles.
+Las cifras finales se presentan en el capítulo de resultados desde sus exportaciones
+versionadas, con el periodo y la población de cada estimador.
 
 \subsection{1.5.2 Validación de generalización y estabilidad del sistema}
 
@@ -3191,6 +3256,20 @@ modelo vio durante el ajuste ni la selección. La Figura~\ref{fig:holdout} compa
 pronóstico de un modelo parsimonioso representativo (ETS amortiguado) contra los valores
 reales para México/F3/FAD: el pronóstico sigue la trayectoria real y converge hacia el
 final del horizonte.
+
+La estabilidad se examinó mediante repeticiones con semillas controladas, comparación
+de familias, evaluación multi-horizonte y particiones por estabilidad construidas
+antes de la evaluación. La segmentación no produjo ningún enrutador que superara el
+gate en los tres horizontes: las \cohortFactRouterCeldas{} celdas conservan
+\cohortFactRouterGana{} ganadoras. Este resultado exploratorio no demuestra que toda
+segmentación futura sea inútil; acota lo observado con esta regla y estos datos.
+
+La reproducibilidad del CRPS se comprobó repitiendo la producción con el mismo flujo
+de semillas y las mismas entradas. La igualdad de bytes acredita repetibilidad del
+cálculo, pero no elimina ni cuantifica el error de aproximación de las muestras.
+Tampoco las pruebas de software acreditan por sí solas generalización estadística:
+los contratos, las pruebas adversariales y la consistencia cruzada verifican la
+integridad del sistema; la evidencia prospectiva requiere nuevas observaciones reales.
 
 \begin{figure}[H]
 \centering
@@ -3206,6 +3285,21 @@ los valores reales sobre el conjunto reservado de 24 meses, México/F3/FAD.}
 \chapter{Resultados}
 
 \section{2.1 Diseño de experimentos}
+
+Las variables independientes del diseño son la familia de modelo, la configuración
+de entrenamiento, la tabla, la cohorte y el horizonte; las dependientes son los errores
+puntuales, la cobertura y los contrastes derivados. La unidad de comparación es la
+serie en un origen temporal con una observación válida. Los modelos que comparten
+esa observación se comparan de forma pareada. La separación entrenamiento, selección,
+confirmación y conjunto reservado evita reutilizar el objetivo final como criterio de
+ajuste. No se aplica una partición aleatoria convencional a meses correlacionados.
+
+Se distinguen el barrido exploratorio, la selección de configuraciones y la prueba
+final de la campaña causal. Los experimentos por cohorte constituyen otro bloque,
+con su propio pre-registro y control de comparaciones; sus corridas no aumentan el
+número de series independientes. Cada bloque conserva datos, semilla, parámetros,
+versión del código y salidas para poder repetirse y auditarse. Las matrices y tablas
+siguientes presentan sus resultados con la población correspondiente.
 
 El experimento somete a los \textbf{\factNModels{} modelos} al mismo protocolo de validación
 walk-forward sobre las \textbf{25 series FAD de preferencia familiar} de las cinco
