@@ -210,7 +210,9 @@ mediante validación temporal \textit{walk-forward} sin fuga de información sob
 de prueba reservado de 24 meses, un repertorio de \factNModels{} modelos, desde líneas base ingenuas
 (incluido el paseo aleatorio) y modelos estadísticos (ARIMA, SARIMA, ETS amortiguado, Theta)
 hasta árboles de potenciación del gradiente y redes profundas, con \textbf{versiones
-globales} de las redes entrenadas sobre todo el panel a la vez. El sistema se entrena
+globales} de las redes entrenadas conjuntamente sobre las series del piloto de cada tabla.
+El censo operativo de octubre de 2026 incorpora un boletín posterior; la comparación
+retrospectiva conserva los pronósticos sellados del corte de septiembre de 2026. El sistema se entrena
 exclusivamente sobre las observaciones con fecha específica y cuantifica la incertidumbre con
 intervalos de predicción al 95\,\% calibrados por horizonte, con cobertura empírica medida y
 declarada. El hallazgo central es un piso exigente: en un panel donde el
@@ -255,7 +257,7 @@ la validación del modelo a partir del Anteproyecto, siguiendo las fases de la
 metodología \textit{Cross-Industry Standard Process for Data Mining} (CRISP-DM)
 \cita{1}: comprensión y preparación de los datos, modelado y evaluación.
 
-El sistema opera como un regresor temporal único entrenado exclusivamente sobre
+El sistema formula un objetivo de regresión temporal y se entrena exclusivamente sobre
 las observaciones con fecha publicada (estado $e=F$). Las celdas con régimen
 \textit{Current} ($C$) o \textit{Unavailable} ($U$) se conservan como anotación
 descriptiva, pero no son objetivo predictivo: el sistema no promete anticipar los
@@ -3322,14 +3324,16 @@ ambas tablas entre sí.
 \paragraph{Vigencia de las cifras retrospectivas.} Las métricas retrospectivas de este
 capítulo proceden de la campaña de re-derivación causal de octubre de 2026, que recalculó el
 repertorio completo con la corrección causal del relleno de huecos (relleno LOCF y máscaras de
-ausencia, §1.2.2) sobre el panel vigente de \factNMonths{} meses (hasta \factDateLast{}), con el
+ausencia, §1.2.2) sobre el panel del corte de septiembre de 2026, con el
 conjunto reservado en los 24 meses finales. Sustituyen a las cifras provisionales de versiones
 anteriores, derivadas con interpolación lineal bidireccional (cuyo extremo futuro alcanzaba a los
 orígenes que caen dentro de un hueco) y con un panel más corto. Por eso varias cifras cambian
 respecto de esas versiones: el conjunto reservado cubre otro tramo de la cola y el relleno ya no
 usa información posterior al origen. Los complementos que cerraron los huecos de la campaña
 (procedencia de la campaña por cohorte, cobertura de referencia y CRPS) se integraron mediante un
-recibo de reconciliación verificable (Apéndice~A.8).
+recibo de reconciliación verificable (Apéndice~A.8). El censo operativo posterior
+incorpora octubre de 2026 y actualiza sus descriptores, pero no amplía esa ventana
+retrospectiva ni representa otra ejecución de la campaña.
 
 Las cuatro métricas reportadas se definen como sigue. Sean $y_t$ el valor observado y
 $\hat{y}_t$ el pronóstico a un paso en el mes $t$ del conjunto de prueba de $h$ meses, y
