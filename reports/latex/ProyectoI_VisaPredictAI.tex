@@ -1491,15 +1491,15 @@ series exactamente en 0). Esta descripción no demuestra ausencia de estacionali
 ni explica por sí sola las diferencias predictivas entre SARIMA y ARIMA. La autocorrelación de
 nivel ACF1 ronda 0.98 a 0.99 (persistencia alta, coherente con la tendencia), y el
 orden de diferenciación es $d=1$ salvo dos series mexicanas que requieren $d=2$. La
-Figura~\ref{fig:eda_features} visualiza esta homogeneidad: todas las series se agrupan
-en la esquina de tendencia fuerte y estacionalidad casi nula.
+Figura~\ref{fig:eda_features} visualiza las diferencias entre series en estos dos
+descriptores, con predominio de tendencia frente a estacionalidad.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{eda_features_FAD_family.png}
 \caption[Espacio de características]{Cada serie como un punto en el plano fuerza de
-tendencia-fuerza de estacionalidad. El panel es homogéneo: tendencia fuerte y
-estacionalidad casi nula.}
+tendencia-fuerza de estacionalidad. En esta representación predomina la tendencia
+frente a la estacionalidad.}
 \label{fig:eda_features}
 \end{figure}
 
@@ -1519,11 +1519,11 @@ duraderos) se detectan con el algoritmo PELT (\textit{Pruned Exact Linear Time})
 \cita{17} sobre la serie estandarizada; por otro, las \textbf{anomalías puntuales}
 (observaciones aisladas) con un filtro de Hampel sobre el residuo de la STL (mediana y
 MAD locales). Aplicado a México/F3/FAD, el método identifica \textbf{solo 3 cambios de
-régimen}, una medida distinta de los 86 residuos atípicos, mientras que las anomalías puntuales se concentran en la era volátil
-2002--2008 (Figura~\ref{fig:eda_changepoints}). La consecuencia para el modelado es
-precisa: el grueso de la ``rareza'' de estas series es estructural (regímenes), no
-ruido aislado, por lo que la validación debe usar métricas robustas y los modelos,
-tolerar retrogresiones sostenidas.
+régimen}, una medida distinta de los 86 residuos atípicos. Las anomalías puntuales
+aparecen tanto en 2002--2008 como en fechas posteriores
+(Figura~\ref{fig:eda_changepoints}). Los diagnósticos distinguen fenómenos, pero no
+atribuyen por sí solos los residuos atípicos a cambios de régimen. Su efecto
+predictivo debe contrastarse mediante validación temporal y métricas robustas.
 
 \begin{figure}[H]
 \centering
@@ -1543,7 +1543,7 @@ subconjunto de alto rendimiento seleccionado entre más de siete mil descriptore
 México/F3/FAD el exponente de Hurst supera 1 (fuera del rango canónico $[0,1]$),
 por lo que se reporta como diagnóstico descriptivo y no como prueba de memoria larga;
 véase la lectura de este diagnóstico más adelante en esta sección.
-las entropías de permutación y de muestra son bajas ($\approx 0.13$--$0.17$, señal de
+Las entropías de permutación y de muestra son bajas ($\approx 0.13$--$0.17$, señal de
 regularidad descriptiva, sin garantizar precisión fuera de muestra); la $\lambda$ de
 Box-Cox queda cerca de 1, sin que ese valor por sí solo demuestre varianza constante;
 y Zivot-Andrews rechaza la raíz unitaria
