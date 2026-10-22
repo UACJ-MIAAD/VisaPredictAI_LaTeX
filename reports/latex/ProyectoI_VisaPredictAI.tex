@@ -630,7 +630,7 @@ artefacto verificable de cada etapa del proceso de obtención y conversión.}
 \rowcolor{uacjblue!15}
 \textbf{Etapa} & \textbf{Herramienta} & \textbf{Conversión de formato} & \textbf{Artefacto resultante} \\ \midrule
 Descubrimiento & Python: \texttt{requests} y \texttt{beautifulsoup4} & Índice HTML a lista de enlaces & Lista de enlaces mensuales, contrastada con un piso de 290 \\
-Congelado & \texttt{requests}, con reintentos y escritura atómica & Página en vivo a instantánea inmutable & \texttt{data/snapshots/}: 298 archivos HTML (33~MB), replicados en la nube \\
+Congelado & \texttt{requests} o captura asistida, con escritura atómica & Página o PDF oficial a instantánea inmutable & \texttt{data/snapshots/}: 301 archivos HTML, incluido octubre de 2026 con su PDF de origen \\
 Extracción & \texttt{beautifulsoup4} y \texttt{pandas} & HTML congelado a tablas por bloque & 11 archivos CSV crudos en \texttt{data/raw/} \\
 Conversión & \texttt{pandas} & CSV por país a panel largo \textit{tidy} & \texttt{visa\_panel\_long.csv}: \factNObsFmt{} filas por 9 variables (1.6~MB) \\
 Almacenamiento & DuckDB y Parquet & Panel \textit{tidy} a almacén dimensional & \texttt{visapredict.duckdb} (12 tablas y 6 vistas, 13~MB) y el archivo columnar equivalente (98~KB) \\
@@ -657,14 +657,14 @@ conversión, por artefacto y por bloque del panel.}
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{Indicador} & \textbf{Valor} & \textbf{Nota} \\ \midrule
-Instantáneas HTML congeladas & 300 & 33~MB; \factNMonths{} meses únicos, más una ruta alterna y un anuncio especial de julio de 2007 \\
-Meses cubiertos por el panel & \factNMonths{} & De diciembre de 2001 a septiembre de 2026, sin meses faltantes \\
+Instantáneas HTML congeladas & 301 & \factNMonths{} meses únicos, más una ruta alterna y un anuncio especial de julio de 2007 \\
+Meses cubiertos por el panel & \factNMonths{} & De diciembre de 2001 a octubre de 2026, sin meses faltantes \\
 Series estructurales & \factNSeriesStructural{} & Combinaciones observadas de 5 áreas de cargabilidad, 21 categorías y 2 tablas \\
 Registros del panel largo & \factNObsFmt{} & Nueve variables por registro \\
-Registros de la tabla FAD & 18{,}813 & \factNMonths{} meses (diciembre de 2001 a septiembre de 2026) \\
-Registros de la tabla DFF & 9{,}098 & 132 meses (la tabla existe desde octubre de 2015) \\
-Bloque de preferencia por empleo & 17{,}446 & 16 categorías (EB-1 a EB-5 con subcategorías) \\
-Bloque de preferencia familiar & 10{,}465 & 5 categorías (F1, F2A, F2B, F3 y F4) \\
+Registros de la tabla FAD & 18{,}888 & \factNMonths{} meses (diciembre de 2001 a octubre de 2026) \\
+Registros de la tabla DFF & 9{,}173 & 133 meses (la tabla existe desde octubre de 2015) \\
+Bloque de preferencia por empleo & 17{,}546 & 16 categorías (EB-1 a EB-5 con subcategorías) \\
+Bloque de preferencia familiar & 10{,}515 & 5 categorías (F1, F2A, F2B, F3 y F4) \\
 Rangos de \textit{Diversity Visa} & \factDvNRowsFmt{} & Hecho separado del almacén; no es objetivo predictivo \\
 \bottomrule
 \end{tabular}
@@ -1003,10 +1003,10 @@ retrogresiones. Derivado del censo automático del EDA.}
 \textbf{Bloque} & \textbf{Tabla} & \textbf{Series} & \textbf{Obs.~$F$} & \textbf{\%~$F$} &
 \textbf{Avance med.~(d)} & \textbf{\%~congelado} & \textbf{Retros} \\
 \midrule
-Familiar & FAD & 25 & 6\,914 & 96\,\% & 21 & 28\,\% & 126 \\
-Familiar & DFF & 25 & 3\,185 & 97\,\% & 0 & 66\,\% & 2 \\
-Empleo & FAD & 80 & 3\,801 & 33\,\% & 0 & 38\,\% & 199 \\
-Empleo & DFF & 64 & 2\,217 & 38\,\% & 0 & 77\,\% & 55 \\
+Familiar & FAD & 25 & 6\,939 & 97\,\% & 21 & 28\,\% & 126 \\
+Familiar & DFF & 25 & 3\,205 & 96\,\% & 0 & 66\,\% & 2 \\
+Empleo & FAD & 80 & 3\,830 & 33\,\% & 9 & 39\,\% & 203 \\
+Empleo & DFF & 64 & 2\,246 & 38\,\% & 0 & 78\,\% & 58 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1552,7 +1552,7 @@ hacerlo por defecto.
 
 \subsubsection{Caracterización retrospectiva de la dificultad por serie}
 
-Con muestras de 132--\factNMonths{} observaciones por serie, cada grado de libertad cuenta, por
+Con muestras de 133--\factNMonths{} observaciones por serie, cada grado de libertad cuenta, por
 lo que el conjunto unido de características de caracterización (catch22 y descriptores
 de pronóstico y de diagnóstico) se somete a un análisis formal de relevancia en dos pasos.
 Primero, un filtro de relevancia univariada con corrección de multiplicidad de Benjamini-Yekutieli
@@ -3099,7 +3099,8 @@ el Apéndice~A.8.
 \subsection{1.4.5 Infraestructura y operaciones (MLOps)}
 
 El proyecto se sostiene sobre una infraestructura de \textit{MLOps} que automatiza la
-adquisición de datos, garantiza la calidad y hace cada resultado reproducible y trazable. Tres
+validación y el procesamiento, con captura asistida cuando la fuente bloquea el acceso,
+y conserva la trazabilidad de cada resultado. Tres
 piezas la articulan: una arquitectura de datos en medallón, una automatización de doble
 disparador y un sistema de seguimiento y versionado de experimentos.
 
@@ -5047,7 +5048,7 @@ con su dominio y el valor que toman en una observación real (México, F3, FAD, 
 \texttt{block}           & Texto   & Bloque de preferencia: \texttt{family} o \texttt{employment} & \texttt{family} \\
 \texttt{category}        & Texto   & 21 códigos canónicos (F1--F4 y EB1--EB5 con subcategorías) & \texttt{F3} \\
 \texttt{table}           & Texto   & Tipo de tabla: \texttt{FAD} o \texttt{DFF} & \texttt{FAD} \\
-\texttt{bulletin\_date}  & Fecha   & Primer día del mes del boletín, de 2001-12 a 2026-09 & \texttt{2026-09-01} \\
+\texttt{bulletin\_date}  & Fecha   & Primer día del mes del boletín, de 2001-12 a 2026-10 & \texttt{2026-07-01} \\
 \texttt{status}          & Texto   & Régimen $e$: \texttt{F}, \texttt{C}, \texttt{U} o \texttt{UNK} & \texttt{F} \\
 \texttt{priority\_date}  & Fecha   & Fecha de prioridad publicada; definida solo si \texttt{status = F} & \texttt{2001-06-01} \\
 \texttt{days\_since\_base} & Entero & Variable dependiente $y_{p,c,b,t}$: días desde $t_0 = $ 1975-01-01; definida solo si \texttt{status = F} & \texttt{9648} \\
@@ -5084,17 +5085,17 @@ aportan entre 38 y 39 series cada una, para un total de \factNSeriesStructural{}
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{Bloque} & \textbf{Categoría} & \textbf{Obs.} & \textbf{Bloque} & \textbf{Categoría} & \textbf{Obs.} \\ \midrule
-Familiar & F1  & 2{,}093 & Empleo & EB5            & 480 \\
-Familiar & F2A & 2{,}093 & Empleo & EB5\_TEA       & 729 \\
-Familiar & F2B & 2{,}093 & Empleo & EB5\_PILOT     & 105 \\
-Familiar & F3  & 2{,}093 & Empleo & EB5\_RC        & 805 \\
-Familiar & F4  & 2{,}093 & Empleo & EB5\_NONRC     & 790 \\
-Empleo & EB1        & 2{,}064 & Empleo & EB5\_UNRESERVED & 530 \\
-Empleo & EB2        & 2{,}064 & Empleo & EB5\_RURAL      & 530 \\
-Empleo & EB3        & 2{,}064 & Empleo & EB5\_HIGHUNEMP  & 530 \\
-Empleo & EB3\_OW    & 2{,}064 & Empleo & EB5\_INFRA      & 530 \\
-Empleo & EB4        & 2{,}064 & \multicolumn{2}{l}{\textbf{Total familiar}} & \textbf{10{,}465} \\
-Empleo & EB4\_RW    & 2{,}057 & \multicolumn{2}{l}{\textbf{Total empleo}}   & \textbf{17{,}446} \\
+Familiar & F1  & 2{,}103 & Empleo & EB5            & 480 \\
+Familiar & F2A & 2{,}103 & Empleo & EB5\_TEA       & 729 \\
+Familiar & F2B & 2{,}103 & Empleo & EB5\_PILOT     & 105 \\
+Familiar & F3  & 2{,}103 & Empleo & EB5\_RC        & 805 \\
+Familiar & F4  & 2{,}103 & Empleo & EB5\_NONRC     & 790 \\
+Empleo & EB1        & 2{,}074 & Empleo & EB5\_UNRESERVED & 540 \\
+Empleo & EB2        & 2{,}074 & Empleo & EB5\_RURAL      & 540 \\
+Empleo & EB3        & 2{,}074 & Empleo & EB5\_HIGHUNEMP  & 540 \\
+Empleo & EB3\_OW    & 2{,}074 & Empleo & EB5\_INFRA      & 540 \\
+Empleo & EB4        & 2{,}074 & \multicolumn{2}{l}{\textbf{Total familiar}} & \textbf{10{,}515} \\
+Empleo & EB4\_RW    & 2{,}067 & \multicolumn{2}{l}{\textbf{Total empleo}}   & \textbf{17{,}546} \\
 Empleo & EB4\_TRANS & 40      & \multicolumn{2}{l}{\textbf{Total panel}}    & \textbf{\factNObsFmt{}} \\
 \bottomrule
 \end{tabular}
@@ -5104,15 +5105,16 @@ Empleo & EB4\_TRANS & 40      & \multicolumn{2}{l}{\textbf{Total panel}}    & \t
 
 Cada construcción del panel escribe un registro de limpieza determinista, versionado junto
 al código, que documenta qué produjo esa añada y qué guardas se evaluaron. El registro del
-corte de septiembre de 2026, que es el que sustenta todas las cifras de este documento, es el
-siguiente:
+corte operativo de octubre de 2026 es el siguiente. El panel y los pronósticos operativos
+se actualizan mensualmente; las comparaciones retrospectivas conservan el corte causal
+de septiembre usado por la campaña, sin recalcularse al incorporar otro boletín:
 
 \begin{verbatim}
 {
- "vintage": "2026-09",
- "n_rows": 27911,
+ "vintage": "2026-10",
+ "n_rows": 28061,
  "n_series": 194,
- "rows_by_status": {"F": 16117, "C": 11168, "U": 625, "UNK": 1},
+ "rows_by_status": {"F": 16220, "C": 11215, "U": 625, "UNK": 1},
  "dup_collapsed": 0,
  "bulletin_date_unparseable": 0,
  "f_priority_date_unparseable": 0,
