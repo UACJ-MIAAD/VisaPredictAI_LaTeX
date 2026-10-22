@@ -1540,18 +1540,19 @@ fluctuación sin tendencia), la entropía de permutación y de muestra, la $\lam
 óptima de Box-Cox y la prueba de Zivot-Andrews (raíz unitaria con un quiebre endógeno),
 además del conjunto canónico de 22 características \textit{catch22} \cita{18}, un
 subconjunto de alto rendimiento seleccionado entre más de siete mil descriptores. En
-México/F3/FAD el exponente de Hurst supera 1 (un valor fuera del rango canónico $[0,1]$ que
-señala no estacionariedad pura, no memoria larga; véase la lectura de este diagnóstico más
-adelante en esta sección);
+México/F3/FAD el exponente de Hurst supera 1 (fuera del rango canónico $[0,1]$),
+por lo que se reporta como diagnóstico descriptivo y no como prueba de memoria larga;
+véase la lectura de este diagnóstico más adelante en esta sección.
 las entropías de permutación y de muestra son bajas ($\approx 0.13$--$0.17$, señal de
-una dinámica muy regular y por tanto predecible); la $\lambda$ de Box-Cox queda cerca
-de 1 (no se requiere transformar la varianza); y Zivot-Andrews rechaza la raíz unitaria
+regularidad descriptiva, sin garantizar precisión fuera de muestra); la $\lambda$ de
+Box-Cox queda cerca de 1, sin que ese valor por sí solo demuestre varianza constante;
+y Zivot-Andrews rechaza la raíz unitaria
 tras una diferencia ($p < 0.001$), reforzando la elección $d=1$. Finalmente, la prueba
 BDS de Brock-Dechert-Scheinkman-LeBaron \cita{19} (cuya hipótesis nula es que la serie
 diferenciada es independiente e idénticamente distribuida) se rechaza con fuerza
-($p < 0.001$), lo que evidencia dependencia no lineal y justifica de forma cuantitativa
-incluir modelos no lineales (LSTM, DeepAR, XGBoost) en la comparación, en lugar de
-hacerlo por defecto.
+($p < 0.001$). El rechazo de independencia e idéntica distribución no identifica
+por sí solo una dependencia no lineal ni demuestra superioridad de LSTM, DeepAR o
+XGBoost. Su comparación predictiva se decide con el protocolo temporal de evaluación.
 
 \subsubsection{Caracterización retrospectiva de la dificultad por serie}
 
