@@ -71,15 +71,17 @@ def test_a7_reconcilia_una_vista_extremo_a_extremo_distinta_del_flujo_de_modelad
     assert "detalla exclusivamente el flujo interno de modelado" in texto
 
 
-def test_a7_remapea_nueve_fuentes_y_anade_seis_sin_renumerar() -> None:
+def test_las_citas_siguen_el_orden_ieee_de_primera_aparicion() -> None:
     texto = _texto()
-    inicio = texto.index(r"\subsection{1.3.2 ")
-    fin = texto.index(r"\section{1.4 Desarrollo}", inicio)
-    citadas = {int(valor) for valor in re.findall(r"\\cita\{(\d+)\}", texto[inicio:fin])}
-    assert citadas == {7, 8, 9, 30, 31, 32, 57, 58, 59, 60, 61, 62, 63, 64, 65}
-    assert [int(valor) for valor in re.findall(r"\\item\\label\{bib:(6[0-5])\}", texto)] == list(
-        range(60, 66)
-    )
+    cuerpo = texto[: texto.index(r"\chapter{Referencias}")]
+    cuerpo = "\n".join(re.sub(r"(?<!\\)%.*", "", linea) for linea in cuerpo.splitlines())
+    vistas: list[int] = []
+    for cita in re.finditer(r"\\cita\{(\d+)\}(?:\\textendash\\cita\{(\d+)\})?", cuerpo):
+        inicio = int(cita.group(1))
+        for numero in range(inicio, int(cita.group(2) or inicio) + 1):
+            if numero not in vistas:
+                vistas.append(numero)
+    assert vistas == list(range(1, len(vistas) + 1))
 
 
 def test_referencias_del_maestro_son_contiguas_y_todas_se_usan() -> None:

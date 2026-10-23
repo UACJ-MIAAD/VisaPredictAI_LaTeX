@@ -2149,9 +2149,9 @@ boletín en un panel largo con frecuencia mensual. \texttt{pandas} realiza la
 normalización y las transformaciones tabulares \cita{9}; las reglas de calidad verifican
 claves, dominio, fechas, duplicados y continuidad antes de aceptar el panel. El archivo CSV
 constituye la interfaz abierta, mientras DuckDB organiza la misma información en un esquema
-dimensional con vistas para análisis y modelado \cita{59}. DVC registra las dependencias y
+dimensional con vistas para análisis y modelado \cita{42}. DVC registra las dependencias y
 los productos de cada etapa, y Git conserva el código y los punteros de versión
-\cita{57}. Esta separación permite reconstruir un resultado sin confundir el dato fuente,
+\cita{43}. Esta separación permite reconstruir un resultado sin confundir el dato fuente,
 la transformación y el producto derivado.
 
 \paragraph{Construcción de características.} El módulo de preprocesamiento recibe una serie
@@ -2159,16 +2159,16 @@ mensual y produce exclusivamente información disponible en cada origen de pron�
 rezagos del nivel y del avance, variables cíclicas del calendario, máscaras de régimen y
 características descriptivas seleccionadas. \texttt{NumPy}, \texttt{SciPy} y
 \texttt{statsmodels} apoyan los cálculos numéricos y estadísticos
-\cita{60}\cita{61}. Los parámetros de escalamiento se estiman sólo con el tramo de
+\cita{44}\cita{45}. Los parámetros de escalamiento se estiman sólo con el tramo de
 entrenamiento y las pruebas de causalidad impiden que una observación futura modifique una
 fila anterior.
 
 \paragraph{Capa de modelado.} Los \factNModels{} modelos se exponen tras una interfaz común
-(\texttt{fit}/\texttt{predict}) mediante la biblioteca \textit{Darts} \cita{62}, lo que
+(\texttt{fit}/\texttt{predict}) mediante la biblioteca \textit{Darts} \cita{46}, lo que
 permite una comparación justa y reúsa el motor de validación temporal y la generación de
 bandas probabilísticas sin reimplementarlos. PyTorch sustenta las redes neuronales
-\cita{63}, y \texttt{scikit-learn} aporta interfaces y utilidades para aprendizaje
-automático \cita{64}. XGBoost, LightGBM y CatBoost implementan los regresores sobre avances
+\cita{47}, y \texttt{scikit-learn} aporta interfaces y utilidades para aprendizaje
+automático \cita{48}. XGBoost, LightGBM y CatBoost implementan los regresores sobre avances
 \cita{30}\cita{31}\cita{32}. Los modelos locales se ajustan por serie y los globales
 aprenden de varias series, pero ambos consumen la misma representación causal. Las piezas de
 código propio son la cascada ARIMA-LSTM (un envoltorio que ajusta un ARIMA, calcula sus
@@ -2222,11 +2222,11 @@ aceptación de VisaPredict AI.}
 \end{table}
 
 \paragraph{Seguimiento, calidad y reproducibilidad.} Cada ejecución registra sus parámetros
-y métricas en un formato ligero que puede sincronizarse con MLflow \cita{58}. Las pruebas
+y métricas en un formato ligero que puede sincronizarse con MLflow \cita{49}. Las pruebas
 automatizadas cubren código, contratos de datos, causalidad, coherencia entre artefactos y
 compilación documental. Ruff verifica estilo, mypy comprueba tipos y pytest ejecuta la
 batería funcional; GitHub Actions reproduce estas verificaciones antes de integrar cambios
-\cita{65}. Ningún paso de publicación se interpreta como exitoso por la sola existencia de
+\cita{50}. Ningún paso de publicación se interpreta como exitoso por la sola existencia de
 un archivo: su procedencia y su cobertura deben corresponder a la misma versión.
 
 \paragraph{Escalabilidad, seguridad y disponibilidad.} La escala actual permite ejecutar el
@@ -2261,7 +2261,7 @@ aceptación quedaron implementadas; la regeneración integral de resultados se m
 sólo se ejecutó después de acreditar los insumos, el código y los entornos.
 
 \paragraph{Del diseño al código.} La implementación toma como entrada el panel mensual
-validado y el almacén DuckDB descritos en la sección~1.3.2 \cita{59}. Una capa de acceso
+validado y el almacén DuckDB descritos en la sección~1.3.2 \cita{42}. Una capa de acceso
 recupera cada serie por tabla, país o área de cargabilidad y categoría; otra construye una
 representación mensual causal; un registro canónico asigna a cada identificador lógico su
 familia, fuente de pronóstico y política de persistencia; y un motor de recorrido temporal
@@ -2317,10 +2317,10 @@ porque esta representación permite extrapolar cambios sin presentar como predic
 el máximo histórico aprendido. XGBoost, LightGBM y CatBoost implementan esta familia
 \cita{30}\cita{31}\cita{32}.
 
-\paragraph{Familias implementadas.} La interfaz común de Darts \cita{62} coordina el ajuste
+\paragraph{Familias implementadas.} La interfaz común de Darts \cita{46} coordina el ajuste
 y el pronóstico de las técnicas estadísticas y de varias redes; PyTorch sustenta los modelos
-profundos \cita{63}; y \texttt{scikit-learn} aporta transformadores y contratos de estimación
-\cita{64}. El catálogo mantiene cuatro funciones complementarias: líneas base ingenuas y con
+profundos \cita{47}; y \texttt{scikit-learn} aporta transformadores y contratos de estimación
+\cita{48}. El catálogo mantiene cuatro funciones complementarias: líneas base ingenuas y con
 deriva para fijar un piso; modelos estadísticos como ARIMA, SARIMA, ETS, Theta y Kalman;
 regresores de árboles sobre diferencias; y redes locales o globales para representar patrones
 no lineales. Chronos se incorpora como modelo fundacional en modo de transferencia sin ajuste
@@ -2431,7 +2431,7 @@ Escala MASE & finita y positiva & Una escala degenerada queda indefinida y bloqu
 \end{table}
 
 \paragraph{Optimización sin fuga.} Los hiperparámetros de los árboles se buscan con Optuna
-\cita{42}, mediante un muestreador TPE con semilla fija y almacenamiento persistente. La
+\cita{51}, mediante un muestreador TPE con semilla fija y almacenamiento persistente. La
 región anterior al conjunto reservado se divide, a su vez, en entrenamiento, 24 meses de
 \textit{val-tuning} y 12 meses de val-confirmación. El buscador observa sólo la primera cola;
 la segunda decide si la configuración se acepta y el conjunto reservado nunca interviene en
@@ -2442,11 +2442,11 @@ de la variabilidad debida a la inicialización.
 \paragraph{Herramientas de implementación.} La solución se desarrolla en Python 3.14 con
 perfiles de dependencias fijados. DuckDB y pandas proporcionan acceso tabular; NumPy, SciPy y
 \texttt{statsmodels} cubren cálculo numérico y estimación estadística
-\cita{9}\cita{60}\cita{61}; Darts, PyTorch y \texttt{scikit-learn} articulan los estimadores;
+\cita{9}\cita{44}\cita{45}; Darts, PyTorch y \texttt{scikit-learn} articulan los estimadores;
 y las bibliotecas especializadas implementan los árboles. Git conserva el código y DVC liga
-los datos y artefactos voluminosos a sus versiones \cita{57}. MLflow recibe el registro de
-experimentos \cita{58}, mientras pytest, Ruff y mypy verifican comportamiento, estilo y tipos.
-GitHub Actions reproduce estas puertas antes de integrar cambios \cita{65}.
+los datos y artefactos voluminosos a sus versiones \cita{43}. MLflow recibe el registro de
+experimentos \cita{49}, mientras pytest, Ruff y mypy verifican comportamiento, estilo y tipos.
+GitHub Actions reproduce estas puertas antes de integrar cambios \cita{50}.
 
 \begin{table}[H]
 \centering
@@ -2560,8 +2560,8 @@ valores no finitos antes de incorporar las predicciones al archivo final.
 escena limpia y acreditada, crea un espacio de preparación identificado, ejecuta productores
 y consumidores sobre esa misma identidad y sólo promueve el conjunto completo. Si una etapa
 falla, la preparación se conserva para diagnóstico y el árbol anterior permanece intacto.
-DVC conserva los punteros de datos voluminosos \cita{57} y el registro experimental puede
-sincronizarse con MLflow \cita{58}, pero ninguna de esas operaciones sustituye la puerta de
+DVC conserva los punteros de datos voluminosos \cita{43} y el registro experimental puede
+sincronizarse con MLflow \cita{49}, pero ninguna de esas operaciones sustituye la puerta de
 cobertura.
 
 \begin{figure}[H]
@@ -3041,7 +3041,7 @@ antes de conocer sus objetivos. No se mezclan sus poblaciones ni sus horizontes.
 MAE expresa el error absoluto en días; RMSE da mayor peso a errores grandes; sMAPE
 aporta una escala relativa y debe interpretarse con cautela en avances cercanos a cero.
 MASE divide el error por una escala calculada únicamente con el entrenamiento
-\cita{44}. Una MASE menor que uno respecto del naïve estacional no prueba, por sí
+\cita{52}. Una MASE menor que uno respecto del naïve estacional no prueba, por sí
 misma, que se haya superado el pronóstico naïve-1 fuera de muestra: esa comparación
 requiere los mismos pares observados y el contraste correspondiente.
 
@@ -3049,7 +3049,7 @@ Las métricas puntuales se calculan sólo donde el boletín publica una fecha. L
 \texttt{C} y \texttt{U} conservan su semántica y no se puntúan como fechas reales ni
 como clases predichas. Precisión, exhaustividad y F1 no son las métricas primarias de
 esta tarea de pronóstico temporal. Para la incertidumbre se informa cobertura empírica,
-amplitud de los intervalos y CRPS \cita{49}, con el protocolo y la procedencia de las
+amplitud de los intervalos y CRPS \cita{53}, con el protocolo y la procedencia de las
 muestras. Una cobertura elevada por intervalos excesivamente anchos tampoco basta para
 declarar útil una configuración.
 
@@ -3059,11 +3059,11 @@ Son agregados de ambas tablas y varios horizontes, no el resultado del campeón 
 paso. La cobertura empírica al 95\,\% es \factProspCovNineFive{}; se distingue el
 conjunto usado para calibrar de los pares reservados para evaluar. Los contrastes de
 Diebold--Mariano y los procedimientos de comparación múltiple complementan el tamaño
-del efecto, sin convertir falta de significancia en equivalencia \cita{45}.
+del efecto, sin convertir falta de significancia en equivalencia \cita{54}.
 
 \subsection{1.4.4 Optimización de parámetros y pruebas avanzadas}
 
-Los árboles de potenciación de gradiente se optimizan con \textit{Optuna} \cita{42}
+Los árboles de potenciación de gradiente se optimizan con \textit{Optuna} \cita{51}
 (muestreo TPE, \textit{Tree-structured Parzen Estimator}, multivariante, semilla fija, con
 poda por mediana y almacenamiento persistente de los estudios) bajo un protocolo
 \textit{anidado y libre de fuga} con \textbf{tres particiones}: la región de selección se
@@ -3091,7 +3091,7 @@ su distribución predictiva, de la que se leen los cuantiles 2.5\,\% y 97.5\,\%.
 es el conforme dividido, un método no paramétrico y agnóstico al modelo que fija el
 semiancho a partir del cuantil de los errores absolutos de calibración (calculados solo
 sobre meses con fecha publicada), con cobertura garantizada bajo intercambiabilidad
-\cita{43}; al no depender del modelo, sirve de red de seguridad uniforme para los 24. El
+\cita{55}; al no depender del modelo, sirve de red de seguridad uniforme para los 24. El
 tercero es el que \textbf{despliega el demostrador}: bandas cuyo semiancho por horizonte
 $h=1,\dots,12$ se calibra con el \textit{cuantil empírico} de los errores realmente
 observados en el registro de evaluación por horizonte (§2.2), separadas por tabla y
@@ -3241,7 +3241,7 @@ sobre S3 y el código con Git, todo orquestado por un único guion.}
 El desempeño se mide con cuatro métricas estándar evaluadas solo sobre las
 observaciones con fecha: el error absoluto medio (MAE), la raíz del error cuadrático
 medio (RMSE), el error porcentual absoluto medio simétrico (sMAPE) y el error
-absoluto medio escalado (MASE \cita{44}), este último referido al naïve estacional
+absoluto medio escalado (MASE \cita{52}), este último referido al naïve estacional
 ($m=12$) y reportado en paralelo en su variante escalada por el naïve-1 ($m=1$).
 Una MASE menor que uno indica un error inferior a la escala de referencia calculada
 con el entrenamiento; no sustituye la comparación fuera de muestra con el naïve-1.
@@ -3496,9 +3496,9 @@ país-categoría-tabla) se sostiene en la métrica de selección (el ganador se 
 árboles y familia estadística), pero el conjunto reservado la matiza: la heterogeneidad
 real está en \textit{cuánto} pierde cada modelo frente al piso ingenuo en cada serie, no
 en quién gana. La significancia de las diferencias se contrasta con la prueba de
-Diebold-Mariano \cita{45} (una única comparación pre-registrada por tabla) y, dado el tamaño del pool, con el conjunto de
-confianza de modelos (Model Confidence Set) \cita{46} y el ranking de Friedman-Nemenyi
-\cita{47} sobre las 25 series, fijados de antemano.
+Diebold-Mariano \cita{54} (una única comparación pre-registrada por tabla) y, dado el tamaño del pool, con el conjunto de
+confianza de modelos (Model Confidence Set) \cita{56} y el ranking de Friedman-Nemenyi
+\cita{57} sobre las 25 series, fijados de antemano.
 
 \paragraph{Resultados sobre la tabla DFF.} Como FAD y DFF se evalúan por separado, el
 mismo protocolo (los \factNModels{} modelos) se aplicó a las 25 series DFF de preferencia familiar
@@ -3583,7 +3583,7 @@ sus mismas series, ETS y naïve-1 tienen menor error que ARIMA y SARIMA en ambas
 La significancia de estas diferencias se formaliza con la prueba de Friedman sobre los
 rangos de los modelos en las series (25 en FAD; 14 distintas en DFF tras descontar las
 pseudo-réplicas del corte mundial), seguida de la prueba posterior de Nemenyi
-\cita{47}. El \textbf{diagrama de diferencia crítica} (Figura~\ref{fig:cd}) resume el
+\cita{57}. El \textbf{diagrama de diferencia crítica} (Figura~\ref{fig:cd}) resume el
 resultado: la prueba de Friedman rechaza la hipótesis de igualdad ($p<0.001$) en ambas
 tablas, y la barra de diferencia crítica (CD) une los modelos cuyo rango promedio no se
 distingue estadísticamente. \textbf{El naïve-1 obtiene el mejor rango promedio} en FAD
@@ -3606,7 +3606,7 @@ estadísticamente significativa en su rango. (a) FAD; (b) DFF.}
 \end{figure}
 
 \paragraph{Efecto de la optimización de hiperparámetros.} Los tres árboles de
-potenciación de gradiente se optimizaron con \textit{Optuna} \cita{42} bajo el protocolo
+potenciación de gradiente se optimizaron con \textit{Optuna} \cita{51} bajo el protocolo
 de tres particiones de §1.4.3, y la aceptación se decidió en la cola de
 \textit{val-confirmación} (una ventana que ni el buscador ni la configuración incumbente
 vieron), no sobre el conjunto reservado, que queda solo para el número publicado.
@@ -3632,7 +3632,7 @@ encima del piso del naïve-1 ($\factNaiveOneFadMean$). La capacidad adicional bi
 modelo complejo; no lo hace superar al simple, y a ninguno lo lleva bajo el piso ingenuo.
 
 \paragraph{Combinación de modelos y distribución predictiva.} Se evaluaron, también sin
-fuga, estrategias de conjunto \cita{48} implementadas en sus formas fuertes: la
+fuga, estrategias de conjunto \cita{58} implementadas en sus formas fuertes: la
 \textbf{mediana de los mejores $K$ modelos por serie} (elegidos por error de selección,
 $K\in\{2,3,5\}$), un \textit{stacking} global con un único vector de pesos por tabla
 regularizado en el simplex, y un selector de modelo por características de serie
@@ -3648,7 +3648,7 @@ las series distintas, el propio naïve-1 resulta elegido como miembro de la comb
 óptima en el $33$\,\% de las combinaciones serie$\times K$ de FAD y en el $93$\,\% de
 las de DFF (los conjuntos compiten \textit{incorporando} al paseo aleatorio,
 no venciéndolo). En cuanto a la \textit{distribución predictiva completa}, medida con el
-CRPS (\textit{Continuous Ranked Probability Score}) \cita{49}, la receta campeona
+CRPS (\textit{Continuous Ranked Probability Score}) \cita{53}, la receta campeona
 desplegada (que promedia los cuantiles nativos de sus miembros y la banda conforme de los
 que no muestrean) obtiene un CRPS de $\factCrpsFad$ días en FAD y $\factCrpsDff$ en DFF, mejor que
 cualquiera de los clásicos con muestreo nativo por separado en FAD (ARIMA $65.0$, SARIMA
@@ -3658,14 +3658,14 @@ criterio informativo.
 \paragraph{Entrenamiento global y aprendizaje profundo.} La pregunta de si el
 aprendizaje profundo puede aportar se completa con la práctica moderna de entrenar un
 \textbf{modelo global} sobre todas las series apiladas, de modo que cada serie corta tome
-señal prestada del resto \cita{48}. Como el modelo global exige series continuas, los meses en
+señal prestada del resto \cita{58}. Como el modelo global exige series continuas, los meses en
 régimen \textit{Current} (en los que, por definición, el cutoff es el mes en curso) se
 codifican con la fecha del propio boletín, en lugar de interpolar linealmente a través del
 periodo. Así las veinticinco series conservan su historia completa con valores
 \textbf{reales} (incluida la dinámica de retrogresión \textit{Current}$\rightarrow$fecha)
 sin fabricar datos, y la evaluación permanece sobre fechas específicas (F). Se entrenó así un
 \textbf{barrido de ocho arquitecturas recientes}
-(N-HiTS, PatchTST\cita{50}, TiDE, BiTCN\cita{51}, TimesNet\cita{52}, TimeMixer\cita{53}, KAN\cita{54}, DeepAR), sobre el nivel,
+(N-HiTS, PatchTST\cita{59}, TiDE, BiTCN\cita{60}, TimesNet\cita{61}, TimeMixer\cita{62}, KAN\cita{63}, DeepAR), sobre el nivel,
 la primera diferencia (con reintegración a un paso) y variantes con agrupamiento y normalización
 por serie, cada una en campañas \textbf{multi-semilla} y con optimización de hiperparámetros a nivel
 de arquitectura. Por su costo de cómputo, el barrido se ejecutó sobre una \textbf{GPU en la nube}
@@ -3766,7 +3766,7 @@ debajo del $95$\,\% nominal (una sub-cobertura esperable con series cortas, que 
 documenta con transparencia en lugar de declararse exacta).
 
 \paragraph{Calibración adaptativa de la cobertura.} La sub-cobertura anterior se corrigió
-con \textit{inferencia conforme adaptativa} (Adaptive Conformal Inference) \cita{55}, que ajusta el
+con \textit{inferencia conforme adaptativa} (Adaptive Conformal Inference) \cita{64}, que ajusta el
 nivel de error en línea tras cada origen de pronóstico en lugar de fijarlo de antemano,
 con su tasa de adaptación elegida solo sobre el tramo de calibración. Con
 esta calibración (sin fuga de información, sobre el mismo ganador profundo) la cobertura empírica del
@@ -3794,7 +3794,7 @@ los modelos clásicos, incluido el DeepAR entrenado localmente.}
 \paragraph{¿Queda margen en la exactitud puntual? La frontera está confirmada.} Para
 acotar el techo de error alcanzable se evaluó además, fuera del marco comparativo
 principal, un segundo \textit{foundation model} preentrenado (TabPFN-TS)
-\cita{56} en modo zero-shot sobre el panel. Sus pronósticos se congelaron el 19 de junio sobre
+\cita{65} en modo zero-shot sobre el panel. Sus pronósticos se congelaron el 19 de junio sobre
 la ventana reservada de entonces y no formaron parte de la campaña causal, de modo que su error
 no es comparable con las cifras de este capítulo y no se reporta como resultado vigente. Que
 ninguno de los \factNModels{} modelos, conjuntos y sondas adicionales re-derivados logre batir
@@ -4547,62 +4547,62 @@ neural network model,'' \textit{Neurocomputing}, vol. 50, pp. 159--175, 2003.
 \item\label{bib:39} C. Challu, K. G. Olivares, B. N. Oreshkin, F. Garza, M. Mergenthaler-Canseco, y A. Dubrawski, ``NHITS: Neural hierarchical interpolation for time series forecasting,'' en \textit{Proc. AAAI Conf. Artificial Intelligence}, vol. 37, n.\textsuperscript{o} 6, pp. 6989--6997, 2023.
 \item\label{bib:40} B. Lim, S. Ö. Ar{\i}k, N. Loeff, y T. Pfister, ``Temporal fusion transformers for interpretable multi-horizon time series forecasting,'' \textit{International Journal of Forecasting}, vol. 37, n.\textsuperscript{o} 4, pp. 1748--1764, 2021.
 \item\label{bib:41} A. F. Ansari \textit{et al.}, ``Chronos: Learning the language of time series,'' \textit{Transactions on Machine Learning Research}, 2024, arXiv:2403.07815.
-\item\label{bib:42} T. Akiba, S. Sano, T. Yanase, T. Ohta, y M. Koyama, ``Optuna: A
-next-generation hyperparameter optimization framework,'' en \textit{Proc. 25th ACM
-SIGKDD}, 2019, pp. 2623--2631.
-\item\label{bib:43} V. Vovk, A. Gammerman, y G. Shafer, \textit{Algorithmic Learning
-in a Random World}. Nueva York: Springer, 2005.
-\item\label{bib:44} R. J. Hyndman y A. B. Koehler, ``Another look at measures of
-forecast accuracy,'' \textit{International Journal of Forecasting}, vol. 22,
-n.\textsuperscript{o} 4, pp. 679--688, 2006.
-\item\label{bib:45} F. X. Diebold y R. S. Mariano, ``Comparing predictive
-accuracy,'' \textit{Journal of Business \& Economic Statistics}, vol. 13,
-n.\textsuperscript{o} 3, pp. 253--263, 1995.
-\item\label{bib:46} P. R. Hansen, A. Lunde, y J. M. Nason, ``The model confidence
-set,'' \textit{Econometrica}, vol. 79, n.\textsuperscript{o} 2, pp. 453--497, 2011.
-\item\label{bib:47} J. Dem\v{s}ar, ``Statistical comparisons of classifiers over
-multiple data sets,'' \textit{Journal of Machine Learning Research}, vol. 7,
-pp. 1--30, 2006.
-\item\label{bib:48} S. Makridakis, E. Spiliotis, y V. Assimakopoulos, ``The M4
-competition: 100,000 time series and 61 forecasting methods,'' \textit{International
-Journal of Forecasting}, vol. 36, n.\textsuperscript{o} 1, pp. 54--74, 2020.
-\item\label{bib:49} T. Gneiting y A. E. Raftery, ``Strictly proper scoring rules,
-prediction, and estimation,'' \textit{Journal of the American Statistical Association},
-vol. 102, n.\textsuperscript{o} 477, pp. 359--378, 2007.
-\item\label{bib:50} Y. Nie, N. H. Nguyen, P. Sinthong, y J. Kalagnanam, ``A time series is worth 64 words: Long-term forecasting with transformers,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2023, arXiv:2211.14730.
-\item\label{bib:51} O. Sprangers, S. Schelter, y M. de Rijke, ``Parameter-efficient deep probabilistic forecasting,'' \textit{International Journal of Forecasting}, vol. 39, n.\textsuperscript{o} 1, pp. 332--345, 2023.
-\item\label{bib:52} H. Wu, T. Hu, Y. Liu, H. Zhou, J. Wang, y M. Long, ``TimesNet: Temporal 2D-variation modeling for general time series analysis,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2023, arXiv:2210.02186.
-\item\label{bib:53} S. Wang \textit{et al.}, ``TimeMixer: Decomposable multiscale mixing for time series forecasting,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2024, arXiv:2405.14616.
-\item\label{bib:54} Z. Liu \textit{et al.}, ``KAN: Kolmogorov-Arnold networks,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2025, arXiv:2404.19756.
-\item\label{bib:55} I. Gibbs y E. Cand\`es, ``Adaptive conformal inference under
-distribution shift,'' en \textit{Advances in Neural Information Processing Systems
-(NeurIPS)}, vol. 34, pp. 1660--1672, 2021.
-\item\label{bib:56} S. Hoo, S. M\"uller, D. Salinas, y F. Hutter, ``The tabular
-foundation model TabPFN outperforms specialized time series forecasting models,''
-\textit{arXiv:2501.02945}, 2025.
-\item\label{bib:57} R. Kuprieiev \textit{et al.}, ``DVC: Data Version Control, Git
-for data \& models,'' Iterative, software de c\'odigo abierto, 2024. [En l\'inea]. Disponible: \url{https://dvc.org}
-\item\label{bib:58} M. Zaharia \textit{et al.}, ``Accelerating the machine learning
-lifecycle with MLflow,'' \textit{IEEE Data Engineering Bulletin}, vol. 41, n.\textsuperscript{o} 4,
-pp. 39--45, 2018.
-\item\label{bib:59} M. Raasveldt y H. M\"uhleisen, ``DuckDB: An embeddable analytical
+\item\label{bib:42} M. Raasveldt y H. M\"uhleisen, ``DuckDB: An embeddable analytical
 database,'' en \textit{Proc.\ ACM SIGMOD Int.\ Conf.\ on Management of Data}, 2019, pp.\ 1981--1984.
-\item\label{bib:60} S. Seabold y J. Perktold, ``statsmodels: Econometric and statistical
+\item\label{bib:43} R. Kuprieiev \textit{et al.}, ``DVC: Data Version Control, Git
+for data \& models,'' Iterative, software de c\'odigo abierto, 2024. [En l\'inea]. Disponible: \url{https://dvc.org}
+\item\label{bib:44} S. Seabold y J. Perktold, ``statsmodels: Econometric and statistical
 modeling with Python,'' en \textit{Proc.\ 9th Python in Science Conf.\ (SciPy)}, 2010,
 pp. 92--96.
-\item\label{bib:61} P. Virtanen \textit{et al.}, ``SciPy 1.0: Fundamental algorithms for
+\item\label{bib:45} P. Virtanen \textit{et al.}, ``SciPy 1.0: Fundamental algorithms for
 scientific computing in Python,'' \textit{Nature Methods}, vol. 17, n.\textsuperscript{o} 3,
 pp. 261--272, 2020.
-\item\label{bib:62} J. Herzen \textit{et al.}, ``Darts: User-friendly modern machine
+\item\label{bib:46} J. Herzen \textit{et al.}, ``Darts: User-friendly modern machine
 learning for time series,'' \textit{Journal of Machine Learning Research}, vol. 23,
 n.\textsuperscript{o} 124, pp. 1--6, 2022.
-\item\label{bib:63} A. Paszke \textit{et al.}, ``PyTorch: An imperative style,
+\item\label{bib:47} A. Paszke \textit{et al.}, ``PyTorch: An imperative style,
 high-performance deep learning library,'' en \textit{Advances in Neural Information
 Processing Systems}, vol. 32, 2019, pp. 8024--8035.
-\item\label{bib:64} F. Pedregosa \textit{et al.}, ``Scikit-learn: Machine learning in
+\item\label{bib:48} F. Pedregosa \textit{et al.}, ``Scikit-learn: Machine learning in
 Python,'' \textit{Journal of Machine Learning Research}, vol. 12, pp. 2825--2830, 2011.
-\item\label{bib:65} GitHub, ``GitHub Actions documentation,'' 2026. [En línea].
+\item\label{bib:49} M. Zaharia \textit{et al.}, ``Accelerating the machine learning
+lifecycle with MLflow,'' \textit{IEEE Data Engineering Bulletin}, vol. 41, n.\textsuperscript{o} 4,
+pp. 39--45, 2018.
+\item\label{bib:50} GitHub, ``GitHub Actions documentation,'' 2026. [En línea].
 Disponible en: \url{https://docs.github.com/actions}
+\item\label{bib:51} T. Akiba, S. Sano, T. Yanase, T. Ohta, y M. Koyama, ``Optuna: A
+next-generation hyperparameter optimization framework,'' en \textit{Proc. 25th ACM
+SIGKDD}, 2019, pp. 2623--2631.
+\item\label{bib:52} R. J. Hyndman y A. B. Koehler, ``Another look at measures of
+forecast accuracy,'' \textit{International Journal of Forecasting}, vol. 22,
+n.\textsuperscript{o} 4, pp. 679--688, 2006.
+\item\label{bib:53} T. Gneiting y A. E. Raftery, ``Strictly proper scoring rules,
+prediction, and estimation,'' \textit{Journal of the American Statistical Association},
+vol. 102, n.\textsuperscript{o} 477, pp. 359--378, 2007.
+\item\label{bib:54} F. X. Diebold y R. S. Mariano, ``Comparing predictive
+accuracy,'' \textit{Journal of Business \& Economic Statistics}, vol. 13,
+n.\textsuperscript{o} 3, pp. 253--263, 1995.
+\item\label{bib:55} V. Vovk, A. Gammerman, y G. Shafer, \textit{Algorithmic Learning
+in a Random World}. Nueva York: Springer, 2005.
+\item\label{bib:56} P. R. Hansen, A. Lunde, y J. M. Nason, ``The model confidence
+set,'' \textit{Econometrica}, vol. 79, n.\textsuperscript{o} 2, pp. 453--497, 2011.
+\item\label{bib:57} J. Dem\v{s}ar, ``Statistical comparisons of classifiers over
+multiple data sets,'' \textit{Journal of Machine Learning Research}, vol. 7,
+pp. 1--30, 2006.
+\item\label{bib:58} S. Makridakis, E. Spiliotis, y V. Assimakopoulos, ``The M4
+competition: 100,000 time series and 61 forecasting methods,'' \textit{International
+Journal of Forecasting}, vol. 36, n.\textsuperscript{o} 1, pp. 54--74, 2020.
+\item\label{bib:59} Y. Nie, N. H. Nguyen, P. Sinthong, y J. Kalagnanam, ``A time series is worth 64 words: Long-term forecasting with transformers,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2023, arXiv:2211.14730.
+\item\label{bib:60} O. Sprangers, S. Schelter, y M. de Rijke, ``Parameter-efficient deep probabilistic forecasting,'' \textit{International Journal of Forecasting}, vol. 39, n.\textsuperscript{o} 1, pp. 332--345, 2023.
+\item\label{bib:61} H. Wu, T. Hu, Y. Liu, H. Zhou, J. Wang, y M. Long, ``TimesNet: Temporal 2D-variation modeling for general time series analysis,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2023, arXiv:2210.02186.
+\item\label{bib:62} S. Wang \textit{et al.}, ``TimeMixer: Decomposable multiscale mixing for time series forecasting,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2024, arXiv:2405.14616.
+\item\label{bib:63} Z. Liu \textit{et al.}, ``KAN: Kolmogorov-Arnold networks,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2025, arXiv:2404.19756.
+\item\label{bib:64} I. Gibbs y E. Cand\`es, ``Adaptive conformal inference under
+distribution shift,'' en \textit{Advances in Neural Information Processing Systems
+(NeurIPS)}, vol. 34, pp. 1660--1672, 2021.
+\item\label{bib:65} S. Hoo, S. M\"uller, D. Salinas, y F. Hutter, ``The tabular
+foundation model TabPFN outperforms specialized time series forecasting models,''
+\textit{arXiv:2501.02945}, 2025.
 \end{enumerate}
 
 % ============================================================
