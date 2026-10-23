@@ -52,6 +52,7 @@
 \renewcommand{\thealgorithm}{\arabic{algorithm}}
 \renewcommand{\algorithmicrequire}{\textbf{Entrada:}}
 \renewcommand{\algorithmicensure}{\textbf{Salida:}}
+\renewcommand{\algorithmicfor}{\textbf{para}}   % cierra \EndFor como «fin para»
 
 % --- Interlineado y espaciado (idéntico al Anteproyecto) ---
 \setstretch{1.10}
@@ -205,7 +206,7 @@ prioridad publicadas mensualmente en el \textit{Visa Bulletin} del Departamento 
 de Estados Unidos, formuladas como un panel multiserie indexado por país o área de
 cargabilidad, categoría migratoria y tipo de tabla (\textit{Final Action Dates} y
 \textit{Dates for Filing}). Siguiendo la metodología CRISP-DM, se construyó una base de
-datos histórica (diciembre de 2001--2026; \factNSeriesStructural{} series, \factNObsFmt{} observaciones) y se comparó,
+datos histórica (de diciembre de 2001 en adelante; \factNSeriesStructural{} series, \factNObsFmt{} observaciones) y se comparó,
 mediante validación temporal \textit{walk-forward} sin fuga de información sobre un conjunto
 de prueba reservado de 24 meses, un repertorio de \factNModels{} modelos, desde líneas base ingenuas
 (incluido el paseo aleatorio) y modelos estadísticos (ARIMA, SARIMA, ETS amortiguado, Theta)
@@ -835,7 +836,7 @@ valor:
 \begin{itemize}[leftmargin=*]
 \item \textbf{Preservación del régimen.} Las versiones tempranas aplanaban ``C'' a la fecha del
 boletín y ``U'' a \texttt{NaN}, perdiendo la información del régimen. Aquí $e$ se guarda en una
-columna explícita, lo que permite la idea \textit{disruptiva} de codificar los meses
+columna explícita, lo que permite codificar los meses
 \textit{Current} con la fecha del propio boletín cuando se entrena de forma global, sin
 contaminar la evaluación, que permanece sobre celdas $F$.
 \item \textbf{Parseo robusto de fechas.} El año de dos dígitos del formato \texttt{\%d\%b\%y}
@@ -1270,7 +1271,7 @@ esencial: \factStationarityDifference{} series exigen diferenciación, \factStat
 discrepan) y \textbf{ninguna} es estacionaria en nivel: el panel es integrado de
 orden~1 sin excepciones. La Tabla~\ref{tab:eda_estacionariedad} reporta el censo para
 las 25 series piloto; la prueba de Ljung-Box rechaza además el ruido blanco en la
-gran mayoría de los incrementos, confirmando estructura temporal aprovechable tras la
+mayoría de los incrementos, confirmando estructura temporal aprovechable tras la
 diferenciación. (El censo aplica Ljung-Box a rezago 12 sobre los incrementos
 observados, sin regularizar la malla mensual; el catálogo de características de más
 adelante en esta sección usa 24 rezagos sobre la serie regularizada, donde el rechazo es
@@ -3618,7 +3619,7 @@ tras descontar la pseudo-replicación del corte mundial.}
 
 \paragraph{Efecto de la optimización de hiperparámetros.} Los tres árboles de
 potenciación de gradiente se optimizaron con \textit{Optuna} \cita{51} bajo el protocolo
-de tres particiones de §1.4.3, y la aceptación se decidió en la cola de
+de tres particiones de §1.4.4, y la aceptación se decidió en la cola de
 \textit{val-confirmación} (una ventana que ni el buscador ni la configuración incumbente
 vieron), no sobre el conjunto reservado, que queda solo para el número publicado.
 Siguiendo la propia regla del protocolo, el efecto se reporta con \textbf{media, mediana y
@@ -4364,7 +4365,7 @@ categorías de empleo y la integración del archivo histórico 1992--2001.
                     itemsep=2pt, parsep=0pt, topsep=0pt]
     \item[ACF] (\textit{Autocorrelation Function})\hspace{0.3em}Función que cuantifica la correlación entre observaciones separadas por distintos rezagos temporales; herramienta central en la identificación de modelos ARIMA.
 
-    \item[ACI] (\textit{Adaptive Conformal Inference})\hspace{0.3em}Variante de la predicción conforme que ajusta el nivel de error en línea tras cada origen de pronóstico para clavar la cobertura nominal bajo cambios de distribución.
+    \item[ACI] (\textit{Adaptive Conformal Inference})\hspace{0.3em}Variante de la predicción conforme que ajusta el nivel de error en línea tras cada origen de pronóstico para acercarse a la cobertura nominal bajo cambios de distribución, sin garantizarla.
 
     \item[Adam] (\textit{Adaptive Moment Estimation})\hspace{0.3em}Algoritmo de optimización de gradiente estocástico que combina momento y tasas de aprendizaje adaptativas por parámetro; estándar \textit{de facto} en entrenamiento de redes profundas.
 
@@ -4572,7 +4573,7 @@ system,'' en \textit{Proc. 22nd ACM SIGKDD}, 2016, pp. 785--794.
 pp. 1181--1191, 2020.
 \item\label{bib:35} G. P. Zhang, ``Time series forecasting using a hybrid ARIMA and
 neural network model,'' \textit{Neurocomputing}, vol. 50, pp. 159--175, 2003.
-\item\label{bib:36} A. Zeng, M. Chen, L. Zhang, y Q. Xu, ``Are transformers effective for time series forecasting?,'' en \textit{Proc. AAAI Conf. Artificial Intelligence}, vol. 37, n.\textsuperscript{o} 9, pp. 11121 a 11128, 2023.
+\item\label{bib:36} A. Zeng, M. Chen, L. Zhang, y Q. Xu, ``Are transformers effective for time series forecasting?,'' en \textit{Proc. AAAI Conf. Artificial Intelligence}, vol. 37, n.\textsuperscript{o} 9, pp. 11121--11128, 2023.
 \item\label{bib:37} A. Das, W. Kong, A. Leach, S. Mathur, R. Sen, y R. Yu, ``Long-term forecasting with TiDE: Time-series dense encoder,'' \textit{Transactions on Machine Learning Research}, 2023, arXiv:2304.08424.
 \item\label{bib:38} B. N. Oreshkin, D. Carpov, N. Chapados, y Y. Bengio, ``N-BEATS: Neural basis expansion analysis for interpretable time series forecasting,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2020, arXiv:1905.10437.
 \item\label{bib:39} C. Challu, K. G. Olivares, B. N. Oreshkin, F. Garza, M. Mergenthaler-Canseco, y A. Dubrawski, ``NHITS: Neural hierarchical interpolation for time series forecasting,'' en \textit{Proc. AAAI Conf. Artificial Intelligence}, vol. 37, n.\textsuperscript{o} 6, pp. 6989--6997, 2023.
@@ -4581,7 +4582,7 @@ neural network model,'' \textit{Neurocomputing}, vol. 50, pp. 159--175, 2003.
 \item\label{bib:42} M. Raasveldt y H. M\"uhleisen, ``DuckDB: An embeddable analytical
 database,'' en \textit{Proc.\ ACM SIGMOD Int.\ Conf.\ on Management of Data}, 2019, pp.\ 1981--1984.
 \item\label{bib:43} R. Kuprieiev \textit{et al.}, ``DVC: Data Version Control, Git
-for data \& models,'' Iterative, software de c\'odigo abierto, 2024. [En l\'inea]. Disponible: \url{https://dvc.org}
+for data \& models,'' Iterative, software de c\'odigo abierto, 2024. [En l\'inea]. Disponible en: \url{https://dvc.org}
 \item\label{bib:44} S. Seabold y J. Perktold, ``statsmodels: Econometric and statistical
 modeling with Python,'' en \textit{Proc.\ 9th Python in Science Conf.\ (SciPy)}, 2010,
 pp. 92--96.
@@ -4633,7 +4634,7 @@ distribution shift,'' en \textit{Advances in Neural Information Processing Syste
 (NeurIPS)}, vol. 34, pp. 1660--1672, 2021.
 \item\label{bib:65} S. Hoo, S. M\"uller, D. Salinas, y F. Hutter, ``The tabular
 foundation model TabPFN outperforms specialized time series forecasting models,''
-\textit{arXiv:2501.02945}, 2025.
+arXiv:2501.02945, 2025.
 \end{enumerate}
 
 % ============================================================
@@ -4653,10 +4654,10 @@ fijadas: \textit{darts}, \textit{PyTorch}, \textit{XGBoost}, \textit{Prophet},
 fija: \texttt{make db} regenera la base de datos; \texttt{make eda} las figuras
 exploratorias; \texttt{make compare} ejecuta la comparación walk-forward; y
 \texttt{make report} produce la tabla y la figura de resultados. Cada corrida
-escribe sus métricas en \texttt{reports/model\_comparison.csv} y registra su
+escribe sus métricas en \texttt{reports/eval/model\_comparison\_\{FAD,DFF\}*.csv} y registra su
 procedencia completa (identificador de corrida, \textit{commit} de Git, semilla,
 versiones de librerías e hiperparámetros) en un registro append-only
-(\texttt{reports/experiment\_runs.jsonl}), de modo que cualquier resultado de este
+(\texttt{reports/eval/experiment\_runs.jsonl}), de modo que cualquier resultado de este
 documento puede atarse al código exacto que lo generó y reconstruirse. La capa de
 modelado se prueba en integración continua con un piso de cobertura propio.
 
@@ -4979,7 +4980,7 @@ ejecuta el monitor de \textit{drift} (que compara ahora mezclas equivalentes de
 horizontes) y, si todo pasa, redepliega el demostrador. El registro prospectivo es
 inmutable: la a\~nada 2026-07 corresponde al congelado del 3 de julio con el m\'etodo de
 bandas previo, de modo que la primera a\~nada calificada con las bandas por cuantil por
-horizonte ser\'a la de 2026-08. Cada corte publicable queda adem\'as identificado por un
+horizonte fue la de 2026-08. Cada corte publicable queda adem\'as identificado por un
 manifiesto de \textit{release} con suma de verificaci\'on SHA-256 por artefacto. Los
 descriptores del panel de este documento corresponden a la a\~nada \factPanelVintage{}
 (hash \factPanelHashShort); las m\'etricas retrospectivas, a la ventana causal del corte de
