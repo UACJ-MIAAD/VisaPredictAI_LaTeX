@@ -1010,10 +1010,11 @@ retrogresiones. Derivado del censo automático del EDA.}
 \textbf{Bloque} & \textbf{Tabla} & \textbf{Series} & \textbf{Obs.~$F$} & \textbf{\%~$F$} &
 \textbf{Avance med.~(d)} & \textbf{\%~congelado} & \textbf{Retros} \\
 \midrule
+% --- tab:eda_descriptiva: censo vintage 2026-10 (make_tex_tables.py) ---
 Familiar & FAD & 25 & 6\,939 & 97\,\% & 21 & 28\,\% & 126 \\
 Familiar & DFF & 25 & 3\,205 & 96\,\% & 0 & 66\,\% & 2 \\
-Empleo & FAD & 80 & 3\,830 & 33\,\% & 9 & 39\,\% & 203 \\
-Empleo & DFF & 64 & 2\,246 & 38\,\% & 0 & 78\,\% & 58 \\
+Empleo & FAD & 80 & 3\,830 & 33\,\% & 0 & 38\,\% & 203 \\
+Empleo & DFF & 64 & 2\,246 & 38\,\% & 0 & 76\,\% & 58 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1289,31 +1290,32 @@ acuerdo ADF+KPSS. Las 49 series evaluables restantes comparten el veredicto domi
 \textbf{Serie} & \textbf{ADF} & \textbf{KPSS} & \textbf{DF-GLS} & \textbf{Ljung-Box} &
 \textbf{Veredicto} \\
 \midrule
+% --- tab:eda_estacionariedad: censo vintage 2026-10 (make_tex_tables.py) ---
 México F1 & 1.00 & $<$0.01 & 1.00 & $<$0.001 & diferenciar \\
-México F2A & 0.98 & $<$0.01 & 0.01 & 0.025 & diferenciar \\
-México F2B & 1.00 & $<$0.01 & 1.00 & 0.055 & diferenciar \\
+México F2A & 0.98 & $<$0.01 & 0.01 & 0.029 & diferenciar \\
+México F2B & 1.00 & $<$0.01 & 1.00 & 0.021 & diferenciar \\
 México F3 & 0.99 & $<$0.01 & 0.78 & $<$0.001 & diferenciar \\
-México F4 & 0.54 & $<$0.01 & 0.02 & 0.002 & diferenciar \\
+México F4 & 0.53 & $<$0.01 & 0.02 & 0.002 & diferenciar \\
 India F1 & 0.98 & $<$0.01 & 0.06 & $<$0.001 & diferenciar \\
 India F2A & 0.99 & $<$0.01 & 0.03 & 0.003 & diferenciar \\
-India F2B & 0.88 & $<$0.01 & 0.28 & 0.002 & diferenciar \\
-India F3 & 1.00 & $<$0.01 & 0.55 & 0.975 & diferenciar \\
-India F4 & 0.00 & $<$0.01 & 0.98 & 0.022 & mixto \\
-China F1 & 0.99 & $<$0.01 & 0.26 & $<$0.001 & diferenciar \\
+India F2B & 0.84 & $<$0.01 & 0.33 & 0.002 & diferenciar \\
+India F3 & 1.00 & $<$0.01 & 0.49 & 0.981 & diferenciar \\
+India F4 & 0.00 & $<$0.01 & 0.98 & 0.021 & mixto \\
+China F1 & 0.99 & $<$0.01 & 0.24 & $<$0.001 & diferenciar \\
 China F2A & 1.00 & $<$0.01 & 0.10 & 0.008 & diferenciar \\
-China F2B & 0.86 & $<$0.01 & 0.40 & 0.001 & diferenciar \\
-China F3 & 1.00 & $<$0.01 & 0.70 & 0.981 & diferenciar \\
-China F4 & 0.79 & $<$0.01 & 0.57 & 0.912 & diferenciar \\
-Filipinas F1 & 0.85 & $<$0.01 & 0.10 & 0.201 & diferenciar \\
+China F2B & 0.80 & $<$0.01 & 0.48 & 0.001 & diferenciar \\
+China F3 & 1.00 & $<$0.01 & 0.64 & 0.986 & diferenciar \\
+China F4 & 0.82 & $<$0.01 & 0.57 & 0.891 & diferenciar \\
+Filipinas F1 & 0.87 & $<$0.01 & 0.09 & 0.198 & diferenciar \\
 Filipinas F2A & 0.99 & $<$0.01 & 0.08 & 0.002 & diferenciar \\
-Filipinas F2B & 0.90 & $<$0.01 & 0.14 & 0.002 & diferenciar \\
-Filipinas F3 & 0.99 & $<$0.01 & 0.53 & $<$0.001 & diferenciar \\
-Filipinas F4 & 0.99 & $<$0.01 & 0.31 & 0.001 & diferenciar \\
+Filipinas F2B & 0.91 & $<$0.01 & 0.13 & 0.002 & diferenciar \\
+Filipinas F3 & 0.99 & $<$0.01 & 0.56 & $<$0.001 & diferenciar \\
+Filipinas F4 & 0.99 & $<$0.01 & 0.65 & 0.003 & diferenciar \\
 Resto del mundo F1 & 0.98 & $<$0.01 & 0.07 & $<$0.001 & diferenciar \\
 Resto del mundo F2A & 0.99 & $<$0.01 & 0.07 & 0.002 & diferenciar \\
-Resto del mundo F2B & 0.94 & $<$0.01 & 0.33 & $<$0.001 & diferenciar \\
-Resto del mundo F3 & 1.00 & $<$0.01 & 0.74 & 0.957 & diferenciar \\
-Resto del mundo F4 & 0.73 & $<$0.01 & 0.69 & 0.869 & diferenciar \\
+Resto del mundo F2B & 0.91 & $<$0.01 & 0.39 & $<$0.001 & diferenciar \\
+Resto del mundo F3 & 1.00 & $<$0.01 & 0.67 & 0.968 & diferenciar \\
+Resto del mundo F4 & 0.77 & $<$0.01 & 0.67 & 0.839 & diferenciar \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1322,9 +1324,9 @@ Resto del mundo F4 & 0.73 & $<$0.01 & 0.69 & 0.869 & diferenciar \\
 
 El censo panorámico (Tabla~\ref{tab:eda_descriptiva} y
 Figura~\ref{fig:eda_completitud}) revela por qué el bloque de empleo requiere un
-tratamiento distinto: solo el $32$--$38$\,\% de sus celdas tiene fecha publicada
+tratamiento distinto: solo el $33$--$38$\,\% de sus celdas tiene fecha publicada
 (las categorías EB transitan con frecuencia a \textit{Current} o
-\textit{Unavailable}) y, cuando la hay, el congelamiento domina ($39$--$77$\,\% de
+\textit{Unavailable}) y, cuando la hay, el congelamiento domina ($38$--$76$\,\% de
 los meses sin movimiento, con avance mediano de cero días). Sus retrogresiones son
 además más frecuentes que las familiares (261 episodios contra 128) y de gran
 magnitud (Figura~\ref{fig:eda_retros}). Estas propiedades justifican la cobertura
