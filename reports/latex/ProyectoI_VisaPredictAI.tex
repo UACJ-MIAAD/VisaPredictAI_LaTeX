@@ -52,6 +52,7 @@
 \renewcommand{\thealgorithm}{\arabic{algorithm}}
 \renewcommand{\algorithmicrequire}{\textbf{Entrada:}}
 \renewcommand{\algorithmicensure}{\textbf{Salida:}}
+\renewcommand{\algorithmicfor}{\textbf{para}}   % cierra \EndFor como «fin para»
 
 % --- Interlineado y espaciado (idéntico al Anteproyecto) ---
 \setstretch{1.10}
@@ -205,7 +206,7 @@ prioridad publicadas mensualmente en el \textit{Visa Bulletin} del Departamento 
 de Estados Unidos, formuladas como un panel multiserie indexado por país o área de
 cargabilidad, categoría migratoria y tipo de tabla (\textit{Final Action Dates} y
 \textit{Dates for Filing}). Siguiendo la metodología CRISP-DM, se construyó una base de
-datos histórica (diciembre de 2001--2026; \factNSeriesStructural{} series, \factNObsFmt{} observaciones) y se comparó,
+datos histórica (de diciembre de 2001 en adelante; \factNSeriesStructural{} series, \factNObsFmt{} observaciones) y se comparó,
 mediante validación temporal \textit{walk-forward} sin fuga de información sobre un conjunto
 de prueba reservado de 24 meses, un repertorio de \factNModels{} modelos, desde líneas base ingenuas
 (incluido el paseo aleatorio) y modelos estadísticos (ARIMA, SARIMA, ETS amortiguado, Theta)
@@ -214,8 +215,8 @@ globales} de las redes entrenadas conjuntamente sobre las series del piloto de c
 El censo operativo se actualiza hasta \factDateLast{}; la comparación
 retrospectiva conserva los pronósticos sellados del corte de septiembre de 2026. El sistema se entrena
 exclusivamente sobre las observaciones con fecha específica y cuantifica la incertidumbre con
-intervalos de predicción al 95\,\% calibrados por horizonte, con cobertura empírica medida y
-declarada. El hallazgo central es un piso exigente: en un panel donde el
+intervalos de predicción al 95\,\% ajustados por horizonte, cuya cobertura empírica se mide
+y se declara (\factProspCovNineFive{} en el registro por horizonte, frente al 95\,\% nominal). El hallazgo central es un piso exigente: en un panel donde el
 $\factPctFrozen$\,\% de los avances mensuales es nulo (colas congeladas), repetir el último
 corte publicado (naïve-1) resulta el rival a vencer en el pronóstico a un paso, y
 \textbf{ningún modelo puntual lo supera con significancia estadística}. El valor del sistema
@@ -804,7 +805,7 @@ Figura~\ref{fig:cleansing} muestra la lógica que clasifica cada celda en uno de
   \node[dec, below=17mm of d2] (d3) {¿Es \texttt{U}?};
   \node[reg, draw=uacjblue, fill=uacjblue!12, right=1.4cm of d1] (oF)
     {\textbf{\textcolor{uacjblue}{F}: fecha de prioridad.} Parseo \texttt{\%d\%b\%y} con
-    guard de siglo; $y=$ días desde $t_0{=}$1975. \textbf{Único objetivo predictivo.}};
+    guarda de siglo; $y=$ días desde $t_0{=}$1975. \textbf{Único objetivo predictivo.}};
   \node[reg, draw=regC, fill=regC!12, right=1.4cm of d2] (oC)
     {\textbf{\textcolor{regC}{C}: \textit{Current}.} Sin fecha; en el entrenamiento global se
     codifica como el mes del boletín.};
@@ -835,13 +836,14 @@ valor:
 \begin{itemize}[leftmargin=*]
 \item \textbf{Preservación del régimen.} Las versiones tempranas aplanaban ``C'' a la fecha del
 boletín y ``U'' a \texttt{NaN}, perdiendo la información del régimen. Aquí $e$ se guarda en una
-columna explícita, lo que permite la idea \textit{disruptiva} de codificar los meses
+columna explícita, lo que permite codificar los meses
 \textit{Current} con la fecha del propio boletín cuando se entrena de forma global, sin
 contaminar la evaluación, que permanece sobre celdas $F$.
 \item \textbf{Parseo robusto de fechas.} El año de dos dígitos del formato \texttt{\%d\%b\%y}
-introduce una ambigüedad de siglo. Como una fecha de prioridad nunca es muy posterior a su
-boletín, un año que cae en el futuro (un ``\texttt{15}'' interpretado como 2015 cuando debía ser
-1915) se corrige restando un siglo.
+introduce una ambigüedad de siglo. Como una fecha de prioridad nunca es posterior a su
+boletín, un año que cayera en el futuro se corregiría restando un siglo. Es una salvaguarda
+latente: la guarda de época rechaza cualquier fecha anterior a 1975 y la prioridad más antigua
+del panel es de 1979, de modo que en el archivo actual no se activa.
 \item \textbf{Corrección de erratas de la fuente.} El portal acumula erratas tipográficas en dos
 décadas (por ejemplo ``\texttt{4rd}'' por F4 en marzo de 2003), que se normalizan para no
 descartar celdas válidas.
@@ -869,7 +871,7 @@ régimen $F$ produce \texttt{days\_since\_base}; los regímenes $C$, $U$ y UNK q
 \texttt{C}                & C   & - \textit{(mes del boletín, global)} & - \\
 \texttt{U}                & U   & -                                 & - \\
 \textit{(vacía)}          & UNK & -                                 & - \\
-\texttt{15JUL99}          & F   & 1999-07-15 \textit{(guard de siglo)} & 8{,}961 \\
+\texttt{15JUL99}          & F   & 1999-07-15 & 8{,}961 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1009,10 +1011,11 @@ retrogresiones. Derivado del censo automático del EDA.}
 \textbf{Bloque} & \textbf{Tabla} & \textbf{Series} & \textbf{Obs.~$F$} & \textbf{\%~$F$} &
 \textbf{Avance med.~(d)} & \textbf{\%~congelado} & \textbf{Retros} \\
 \midrule
+% --- tab:eda_descriptiva: censo vintage 2026-10 (make_tex_tables.py) ---
 Familiar & FAD & 25 & 6\,939 & 97\,\% & 21 & 28\,\% & 126 \\
 Familiar & DFF & 25 & 3\,205 & 96\,\% & 0 & 66\,\% & 2 \\
-Empleo & FAD & 80 & 3\,830 & 33\,\% & 9 & 39\,\% & 203 \\
-Empleo & DFF & 64 & 2\,246 & 38\,\% & 0 & 78\,\% & 58 \\
+Empleo & FAD & 80 & 3\,830 & 33\,\% & 0 & 38\,\% & 203 \\
+Empleo & DFF & 64 & 2\,246 & 38\,\% & 0 & 76\,\% & 58 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1035,7 +1038,7 @@ México y Filipinas exhiben retrocesos pronunciados (retrogresiones) concentrado
 entre 2002 y 2008, evidencia directa de la heterogeneidad por país-categoría.
 
 Antes de la dinámica temporal conviene dimensionar la \textit{escala} del fenómeno. La
-Figura~\ref{fig:backlog_f4} ordena, en el boletín más reciente, el atraso vigente de la cola
+Figura~\ref{fig:backlog_f4} ordena, en el boletín de julio de 2026, el atraso vigente de la cola
 F4 (hermanos de ciudadanos) por área de cargabilidad: una petición presentada en México
 acumula más de veinticinco años de espera y ninguna de las cinco áreas baja de diecisiete,
 lo que ilustra tanto la magnitud del rezago como su marcada heterogeneidad entre países.
@@ -1071,7 +1074,7 @@ creciente con pendientes heterogéneas y retrocesos ocasionales.}
 caracteriza la variable dependiente y su primera diferencia: la fecha de prioridad se
 extiende a lo largo de cuatro décadas, y el \textbf{avance mensual} se concentra en valores
 pequeños y positivos (mediana cercana a un mes) con una cola derecha de saltos grandes y una
-cola izquierda de retrogresiones ($1.3$\,\% de los meses).
+cola izquierda de retrogresiones ($1.8$\,\% en el bloque familiar FAD).
 
 \begin{figure}[H]
 \centering
@@ -1141,7 +1144,7 @@ México y Filipinas.}
 \end{figure}
 
 A escala del panel completo, el censo registra \factNRetroEvents{} episodios de retrogresión (el
-$\factPctRetro$\,\% de los avances observados, frente al $1.3$\,\% del bloque familiar FAD).
+$\factPctRetro$\,\% de los avances observados, frente al $1.8$\,\% del bloque familiar FAD).
 La Figura~\ref{fig:eda_retros} los sitúa todos en el tiempo: la mayoría son
 correcciones menores, pero unos pocos son abruptos, con retrocesos de hasta $12.8$
 años en un solo mes. Esta cola extrema es precisamente lo que el sistema
@@ -1217,7 +1220,7 @@ la cola izquierda corresponde a las retrogresiones.}
 conviene dimensionar su distancia. La Figura~\ref{fig:eda_brecha} compara, serie por
 serie, el atraso vigente según cada tabla en el boletín más reciente: el calendario
 de presentación (DFF) antecede sistemáticamente a la acción final (FAD), con una
-brecha mediana cercana a seis meses y un máximo de dos años (Filipinas F1). La
+brecha mediana cercana a un año y un máximo de 4.2 años (China, EB-5 no reservada). La
 brecha no es constante entre series, lo que confirma que las dos tablas son procesos
 relacionados pero no intercambiables.
 
@@ -1268,7 +1271,7 @@ esencial: \factStationarityDifference{} series exigen diferenciación, \factStat
 discrepan) y \textbf{ninguna} es estacionaria en nivel: el panel es integrado de
 orden~1 sin excepciones. La Tabla~\ref{tab:eda_estacionariedad} reporta el censo para
 las 25 series piloto; la prueba de Ljung-Box rechaza además el ruido blanco en la
-gran mayoría de los incrementos, confirmando estructura temporal aprovechable tras la
+mayoría de los incrementos, confirmando estructura temporal aprovechable tras la
 diferenciación. (El censo aplica Ljung-Box a rezago 12 sobre los incrementos
 observados, sin regularizar la malla mensual; el catálogo de características de más
 adelante en esta sección usa 24 rezagos sobre la serie regularizada, donde el rechazo es
@@ -1288,31 +1291,32 @@ acuerdo ADF+KPSS. Las 49 series evaluables restantes comparten el veredicto domi
 \textbf{Serie} & \textbf{ADF} & \textbf{KPSS} & \textbf{DF-GLS} & \textbf{Ljung-Box} &
 \textbf{Veredicto} \\
 \midrule
+% --- tab:eda_estacionariedad: censo vintage 2026-10 (make_tex_tables.py) ---
 México F1 & 1.00 & $<$0.01 & 1.00 & $<$0.001 & diferenciar \\
-México F2A & 0.98 & $<$0.01 & 0.01 & 0.025 & diferenciar \\
-México F2B & 1.00 & $<$0.01 & 1.00 & 0.055 & diferenciar \\
+México F2A & 0.98 & $<$0.01 & 0.01 & 0.029 & diferenciar \\
+México F2B & 1.00 & $<$0.01 & 1.00 & 0.021 & diferenciar \\
 México F3 & 0.99 & $<$0.01 & 0.78 & $<$0.001 & diferenciar \\
-México F4 & 0.54 & $<$0.01 & 0.02 & 0.002 & diferenciar \\
+México F4 & 0.53 & $<$0.01 & 0.02 & 0.002 & diferenciar \\
 India F1 & 0.98 & $<$0.01 & 0.06 & $<$0.001 & diferenciar \\
 India F2A & 0.99 & $<$0.01 & 0.03 & 0.003 & diferenciar \\
-India F2B & 0.88 & $<$0.01 & 0.28 & 0.002 & diferenciar \\
-India F3 & 1.00 & $<$0.01 & 0.55 & 0.975 & diferenciar \\
-India F4 & 0.00 & $<$0.01 & 0.98 & 0.022 & mixto \\
-China F1 & 0.99 & $<$0.01 & 0.26 & $<$0.001 & diferenciar \\
+India F2B & 0.84 & $<$0.01 & 0.33 & 0.002 & diferenciar \\
+India F3 & 1.00 & $<$0.01 & 0.49 & 0.981 & diferenciar \\
+India F4 & 0.00 & $<$0.01 & 0.98 & 0.021 & mixto \\
+China F1 & 0.99 & $<$0.01 & 0.24 & $<$0.001 & diferenciar \\
 China F2A & 1.00 & $<$0.01 & 0.10 & 0.008 & diferenciar \\
-China F2B & 0.86 & $<$0.01 & 0.40 & 0.001 & diferenciar \\
-China F3 & 1.00 & $<$0.01 & 0.70 & 0.981 & diferenciar \\
-China F4 & 0.79 & $<$0.01 & 0.57 & 0.912 & diferenciar \\
-Filipinas F1 & 0.85 & $<$0.01 & 0.10 & 0.201 & diferenciar \\
+China F2B & 0.80 & $<$0.01 & 0.48 & 0.001 & diferenciar \\
+China F3 & 1.00 & $<$0.01 & 0.64 & 0.986 & diferenciar \\
+China F4 & 0.82 & $<$0.01 & 0.57 & 0.891 & diferenciar \\
+Filipinas F1 & 0.87 & $<$0.01 & 0.09 & 0.198 & diferenciar \\
 Filipinas F2A & 0.99 & $<$0.01 & 0.08 & 0.002 & diferenciar \\
-Filipinas F2B & 0.90 & $<$0.01 & 0.14 & 0.002 & diferenciar \\
-Filipinas F3 & 0.99 & $<$0.01 & 0.53 & $<$0.001 & diferenciar \\
-Filipinas F4 & 0.99 & $<$0.01 & 0.31 & 0.001 & diferenciar \\
+Filipinas F2B & 0.91 & $<$0.01 & 0.13 & 0.002 & diferenciar \\
+Filipinas F3 & 0.99 & $<$0.01 & 0.56 & $<$0.001 & diferenciar \\
+Filipinas F4 & 0.99 & $<$0.01 & 0.65 & 0.003 & diferenciar \\
 Resto del mundo F1 & 0.98 & $<$0.01 & 0.07 & $<$0.001 & diferenciar \\
 Resto del mundo F2A & 0.99 & $<$0.01 & 0.07 & 0.002 & diferenciar \\
-Resto del mundo F2B & 0.94 & $<$0.01 & 0.33 & $<$0.001 & diferenciar \\
-Resto del mundo F3 & 1.00 & $<$0.01 & 0.74 & 0.957 & diferenciar \\
-Resto del mundo F4 & 0.73 & $<$0.01 & 0.69 & 0.869 & diferenciar \\
+Resto del mundo F2B & 0.91 & $<$0.01 & 0.39 & $<$0.001 & diferenciar \\
+Resto del mundo F3 & 1.00 & $<$0.01 & 0.67 & 0.968 & diferenciar \\
+Resto del mundo F4 & 0.77 & $<$0.01 & 0.67 & 0.839 & diferenciar \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1321,11 +1325,11 @@ Resto del mundo F4 & 0.73 & $<$0.01 & 0.69 & 0.869 & diferenciar \\
 
 El censo panorámico (Tabla~\ref{tab:eda_descriptiva} y
 Figura~\ref{fig:eda_completitud}) revela por qué el bloque de empleo requiere un
-tratamiento distinto: solo el $32$--$38$\,\% de sus celdas tiene fecha publicada
+tratamiento distinto: solo el $33$--$38$\,\% de sus celdas tiene fecha publicada
 (las categorías EB transitan con frecuencia a \textit{Current} o
-\textit{Unavailable}) y, cuando la hay, el congelamiento domina ($39$--$77$\,\% de
+\textit{Unavailable}) y, cuando la hay, el congelamiento domina ($38$--$76$\,\% de
 los meses sin movimiento, con avance mediano de cero días). Sus retrogresiones son
-además más frecuentes que las familiares (254 episodios contra 128) y de gran
+además más frecuentes que las familiares (261 episodios contra 128) y de gran
 magnitud (Figura~\ref{fig:eda_retros}). Estas propiedades justifican la cobertura
 escalonada: el bloque EB participa del almacén y del censo desde el primer día, y su
 evaluación predictiva se restringe a las series que superan el umbral de
@@ -1413,7 +1417,7 @@ reproducible.
 \begin{tabular}{llcccccc}
 \toprule
 \rowcolor{uacjblue!15}
-\textbf{Área} & \textbf{Cat.} & $\mathbf{F_T}$ & $\mathbf{F_S}$ & $\mathbf{H}$ & \textbf{ACF1} & $\mathbf{ACF1_\Delta}$ & $\mathbf{d}$ \\ \midrule
+\textbf{Área} & \textbf{Cat.} & $\mathbf{F_T}$ & $\mathbf{F_S}$ & $\mathbf{H}$ & \textbf{ACF1} & $\mathbf{ACF1}_{\Delta}$ & $\mathbf{d}$ \\ \midrule
 % --- tab:features_estructura: vp_model.series_characterization (make_tex_tables.py) ---
 CN & F1 & 0.993 & 0.013 & 0.307 & 0.986 & $+0.297$ & 1 \\
 CN & F2A & 0.991 & 0.000 & 0.350 & 0.986 & $+0.145$ & 1 \\
@@ -1567,7 +1571,8 @@ Segundo, una des-redundancia por correlación de Spearman, en el espíritu de la
 de mínima redundancia y máxima relevancia (mRMR) \cita{21}, que conserva una sola
 característica representativa de cada grupo colineal. Es importante acotar qué es este
 análisis: una \textbf{caracterización retrospectiva de la dificultad}, que relaciona
-descriptores calculados sobre la serie completa con el MASE del conjunto reservado del modelo
+descriptores calculados sobre la serie completa con el error absoluto medio escalado
+(\textit{Mean Absolute Scaled Error}, MASE) del conjunto reservado del modelo
 campeón para describir \textit{qué} series resultan difíciles de pronosticar. No es una
 selección predictiva de insumos (los modelos consumen los rezagos, el calendario y las
 máscaras de ausencia a través del motor de características, no estos descriptores) ni
@@ -1700,8 +1705,8 @@ las 25 series piloto &
 Tabla~\ref{tab:features_anomalias}, Figura~\ref{fig:eda_acf} &
 Los modelos autorregresivos tienen señal que capturar; el orden se orienta con las funciones
 de autocorrelación de la serie diferenciada \\
-La distribución de los avances es asimétrica y de cola pesada (asimetría negativa en 23 de
-las 25 series, curtosis de hasta 107) &
+La distribución de los avances es asimétrica y de cola pesada (asimetría negativa en 20 de
+las 25 series, curtosis de hasta 118) &
 Figuras~\ref{fig:eda_dist}, \ref{fig:eda_violin_c} y~\ref{fig:eda_ridge} &
 Se descarta el supuesto gaussiano: la evaluación usa métricas robustas y los intervalos de
 predicción se construyen por cuantiles empíricos, no por desviación estándar \\
@@ -1727,22 +1732,22 @@ Figuras~\ref{fig:eda_retros} y~\ref{fig:eda_len} &
 Los cambios de régimen quedan fuera de lo que el sistema promete predecir, pero la validación
 debe demostrar que el modelo los tolera sin degradarse \\
 Los atípicos son mayoritariamente estructurales: en México/F3 hay 3 cambios de régimen frente
-a 87 observaciones marcadas como atípicas &
+a 86 observaciones marcadas como atípicas &
 Figura~\ref{fig:eda_changepoints} &
 No se recortan ni se imputan como si fueran ruido; se conservan y se emplea validación
 progresiva con ventanas móviles, que respeta el orden temporal \\
-Hay dependencia no lineal en la serie diferenciada: la prueba BDS rechaza la independencia
-($p<0.001$) &
+La prueba BDS rechaza que la serie diferenciada sea independiente e idénticamente distribuida
+($p<0.001$); por sí sola no prueba no linealidad &
 Diagnósticos avanzados de esta sección &
-Se justifica de forma cuantitativa incluir modelos no lineales en la comparación, en lugar de
-incorporarlos por moda \\
+Se incluyen modelos no lineales para contrastar esa posibilidad de forma empírica, con el mismo
+protocolo temporal que los lineales \\
 El co-movimiento entre áreas es contemporáneo: en todas las parejas la mejor correlación
 cruzada ocurre en el retardo cero &
 Figuras~\ref{fig:eda_cross} y~\ref{fig:eda_leadlag} &
 Ningún área sirve como indicador adelantado de otra; se descarta esa clase de regresor y se
 conserva la opción de modelos globales que compartan información dentro del grupo mundial \\
-Las dos tablas no son intercambiables: la brecha entre DFF y FAD tiene mediana cercana a seis
-meses y llega a dos años &
+Las dos tablas no son intercambiables: la brecha entre DFF y FAD tiene mediana cercana a un
+año y llega a 4.2 años &
 Figura~\ref{fig:eda_brecha} &
 FAD y DFF se entrenan y se evalúan por separado, y sus resultados nunca se comparan entre sí
 como si midieran lo mismo \\
@@ -1963,7 +1968,8 @@ datos. Los árboles se formulan sobre la \textit{primera diferencia} (predicen e
 incremento mensual y lo reintegran), condición necesaria para que puedan extrapolar la
 tendencia en lugar de saturarse en el máximo observado. Se incluye además un
 \textit{foundation model} preentrenado (Chronos) evaluado en modo zero-shot, sin
-ajustarse a estos datos.
+ajustarse a estos datos. La Tabla~\ref{tab:modelos_a6} resume las líneas base y las familias
+del catálogo.
 
 \begin{table}[H]
 \centering
@@ -2035,7 +2041,7 @@ reproduce ni la trayectoria escalonada ni los saltos abruptos de las colas migra
 \cita{30}\textendash\cita{32}.} Aprenden relaciones no lineales entre rezagos y regresores de calendario. Su
 limitación (no extrapolan más allá del máximo visto en el entrenamiento) se resuelve
 formulándolos sobre la \textbf{primera diferencia}: predicen el avance mensual y lo reintegran.
-Con sus hiperparámetros optimizados (§1.4.3) encabezan incluso la métrica de selección en FAD
+Con sus hiperparámetros optimizados (§1.4.4) encabezan incluso la métrica de selección en FAD
 (LightGBM, CatBoost y XGBoost, $0.107$), pero su error en el conjunto reservado ($0.172$--$0.176$)
 queda por encima del piso del naïve-1 ($\factNaiveOneFadMean$): la capacidad bien regulada acerca, no
 destrona.
@@ -2149,9 +2155,9 @@ boletín en un panel largo con frecuencia mensual. \texttt{pandas} realiza la
 normalización y las transformaciones tabulares \cita{9}; las reglas de calidad verifican
 claves, dominio, fechas, duplicados y continuidad antes de aceptar el panel. El archivo CSV
 constituye la interfaz abierta, mientras DuckDB organiza la misma información en un esquema
-dimensional con vistas para análisis y modelado \cita{59}. DVC registra las dependencias y
+dimensional con vistas para análisis y modelado \cita{42}. DVC registra las dependencias y
 los productos de cada etapa, y Git conserva el código y los punteros de versión
-\cita{57}. Esta separación permite reconstruir un resultado sin confundir el dato fuente,
+\cita{43}. Esta separación permite reconstruir un resultado sin confundir el dato fuente,
 la transformación y el producto derivado.
 
 \paragraph{Construcción de características.} El módulo de preprocesamiento recibe una serie
@@ -2159,16 +2165,16 @@ mensual y produce exclusivamente información disponible en cada origen de pron�
 rezagos del nivel y del avance, variables cíclicas del calendario, máscaras de régimen y
 características descriptivas seleccionadas. \texttt{NumPy}, \texttt{SciPy} y
 \texttt{statsmodels} apoyan los cálculos numéricos y estadísticos
-\cita{60}\cita{61}. Los parámetros de escalamiento se estiman sólo con el tramo de
+\cita{44}\cita{45}. Los parámetros de escalamiento se estiman sólo con el tramo de
 entrenamiento y las pruebas de causalidad impiden que una observación futura modifique una
 fila anterior.
 
 \paragraph{Capa de modelado.} Los \factNModels{} modelos se exponen tras una interfaz común
-(\texttt{fit}/\texttt{predict}) mediante la biblioteca \textit{Darts} \cita{62}, lo que
+(\texttt{fit}/\texttt{predict}) mediante la biblioteca \textit{Darts} \cita{46}, lo que
 permite una comparación justa y reúsa el motor de validación temporal y la generación de
 bandas probabilísticas sin reimplementarlos. PyTorch sustenta las redes neuronales
-\cita{63}, y \texttt{scikit-learn} aporta interfaces y utilidades para aprendizaje
-automático \cita{64}. XGBoost, LightGBM y CatBoost implementan los regresores sobre avances
+\cita{47}, y \texttt{scikit-learn} aporta interfaces y utilidades para aprendizaje
+automático \cita{48}. XGBoost, LightGBM y CatBoost implementan los regresores sobre avances
 \cita{30}\cita{31}\cita{32}. Los modelos locales se ajustan por serie y los globales
 aprenden de varias series, pero ambos consumen la misma representación causal. Las piezas de
 código propio son la cascada ARIMA-LSTM (un envoltorio que ajusta un ARIMA, calcula sus
@@ -2222,11 +2228,11 @@ aceptación de VisaPredict AI.}
 \end{table}
 
 \paragraph{Seguimiento, calidad y reproducibilidad.} Cada ejecución registra sus parámetros
-y métricas en un formato ligero que puede sincronizarse con MLflow \cita{58}. Las pruebas
+y métricas en un formato ligero que puede sincronizarse con MLflow \cita{49}. Las pruebas
 automatizadas cubren código, contratos de datos, causalidad, coherencia entre artefactos y
 compilación documental. Ruff verifica estilo, mypy comprueba tipos y pytest ejecuta la
 batería funcional; GitHub Actions reproduce estas verificaciones antes de integrar cambios
-\cita{65}. Ningún paso de publicación se interpreta como exitoso por la sola existencia de
+\cita{50}. Ningún paso de publicación se interpreta como exitoso por la sola existencia de
 un archivo: su procedencia y su cobertura deben corresponder a la misma versión.
 
 \paragraph{Escalabilidad, seguridad y disponibilidad.} La escala actual permite ejecutar el
@@ -2261,7 +2267,7 @@ aceptación quedaron implementadas; la regeneración integral de resultados se m
 sólo se ejecutó después de acreditar los insumos, el código y los entornos.
 
 \paragraph{Del diseño al código.} La implementación toma como entrada el panel mensual
-validado y el almacén DuckDB descritos en la sección~1.3.2 \cita{59}. Una capa de acceso
+validado y el almacén DuckDB descritos en la sección~1.3.2 \cita{42}. Una capa de acceso
 recupera cada serie por tabla, país o área de cargabilidad y categoría; otra construye una
 representación mensual causal; un registro canónico asigna a cada identificador lógico su
 familia, fuente de pronóstico y política de persistencia; y un motor de recorrido temporal
@@ -2317,10 +2323,10 @@ porque esta representación permite extrapolar cambios sin presentar como predic
 el máximo histórico aprendido. XGBoost, LightGBM y CatBoost implementan esta familia
 \cita{30}\cita{31}\cita{32}.
 
-\paragraph{Familias implementadas.} La interfaz común de Darts \cita{62} coordina el ajuste
+\paragraph{Familias implementadas.} La interfaz común de Darts \cita{46} coordina el ajuste
 y el pronóstico de las técnicas estadísticas y de varias redes; PyTorch sustenta los modelos
-profundos \cita{63}; y \texttt{scikit-learn} aporta transformadores y contratos de estimación
-\cita{64}. El catálogo mantiene cuatro funciones complementarias: líneas base ingenuas y con
+profundos \cita{47}; y \texttt{scikit-learn} aporta transformadores y contratos de estimación
+\cita{48}. El catálogo mantiene cuatro funciones complementarias: líneas base ingenuas y con
 deriva para fijar un piso; modelos estadísticos como ARIMA, SARIMA, ETS, Theta y Kalman;
 regresores de árboles sobre diferencias; y redes locales o globales para representar patrones
 no lineales. Chronos se incorpora como modelo fundacional en modo de transferencia sin ajuste
@@ -2431,7 +2437,7 @@ Escala MASE & finita y positiva & Una escala degenerada queda indefinida y bloqu
 \end{table}
 
 \paragraph{Optimización sin fuga.} Los hiperparámetros de los árboles se buscan con Optuna
-\cita{42}, mediante un muestreador TPE con semilla fija y almacenamiento persistente. La
+\cita{51}, mediante un muestreador TPE con semilla fija y almacenamiento persistente. La
 región anterior al conjunto reservado se divide, a su vez, en entrenamiento, 24 meses de
 \textit{val-tuning} y 12 meses de val-confirmación. El buscador observa sólo la primera cola;
 la segunda decide si la configuración se acepta y el conjunto reservado nunca interviene en
@@ -2442,11 +2448,12 @@ de la variabilidad debida a la inicialización.
 \paragraph{Herramientas de implementación.} La solución se desarrolla en Python 3.14 con
 perfiles de dependencias fijados. DuckDB y pandas proporcionan acceso tabular; NumPy, SciPy y
 \texttt{statsmodels} cubren cálculo numérico y estimación estadística
-\cita{9}\cita{60}\cita{61}; Darts, PyTorch y \texttt{scikit-learn} articulan los estimadores;
+\cita{9}\cita{44}\cita{45}; Darts, PyTorch y \texttt{scikit-learn} articulan los estimadores;
 y las bibliotecas especializadas implementan los árboles. Git conserva el código y DVC liga
-los datos y artefactos voluminosos a sus versiones \cita{57}. MLflow recibe el registro de
-experimentos \cita{58}, mientras pytest, Ruff y mypy verifican comportamiento, estilo y tipos.
-GitHub Actions reproduce estas puertas antes de integrar cambios \cita{65}.
+los datos y artefactos voluminosos a sus versiones \cita{43}. MLflow recibe el registro de
+experimentos \cita{49}, mientras pytest, Ruff y mypy verifican comportamiento, estilo y tipos.
+GitHub Actions reproduce estas puertas antes de integrar cambios \cita{50}. La
+Tabla~\ref{tab:herramientas_a8} resume cada herramienta y su responsabilidad.
 
 \begin{table}[H]
 \centering
@@ -2560,8 +2567,8 @@ valores no finitos antes de incorporar las predicciones al archivo final.
 escena limpia y acreditada, crea un espacio de preparación identificado, ejecuta productores
 y consumidores sobre esa misma identidad y sólo promueve el conjunto completo. Si una etapa
 falla, la preparación se conserva para diagnóstico y el árbol anterior permanece intacto.
-DVC conserva los punteros de datos voluminosos \cita{57} y el registro experimental puede
-sincronizarse con MLflow \cita{58}, pero ninguna de esas operaciones sustituye la puerta de
+DVC conserva los punteros de datos voluminosos \cita{43} y el registro experimental puede
+sincronizarse con MLflow \cita{49}, pero ninguna de esas operaciones sustituye la puerta de
 cobertura.
 
 \begin{figure}[H]
@@ -2684,7 +2691,8 @@ de pronóstico; los módulos de transporte y cobertura validan artefactos; y el 
 orquesta esas piezas. Los contratos de entorno comparan los paquetes instalados con los archivos de bloqueo,
 la prueba de humo (\textit{smoke test}) importa los puntos de entrada en procesos limpios y la puerta de linaje contrasta cada
 instantánea con su nombre, \textit{hash} y mes esperado. Esta estructura reduce la dependencia del
-conocimiento tácito y permite probar cada frontera de forma aislada.
+conocimiento tácito y permite probar cada frontera de forma aislada. La
+Tabla~\ref{tab:modulos_a9} resume las responsabilidades de los módulos principales.
 
 \begin{table}[H]
 \centering
@@ -3041,7 +3049,7 @@ antes de conocer sus objetivos. No se mezclan sus poblaciones ni sus horizontes.
 MAE expresa el error absoluto en días; RMSE da mayor peso a errores grandes; sMAPE
 aporta una escala relativa y debe interpretarse con cautela en avances cercanos a cero.
 MASE divide el error por una escala calculada únicamente con el entrenamiento
-\cita{44}. Una MASE menor que uno respecto del naïve estacional no prueba, por sí
+\cita{52}. Una MASE menor que uno respecto del naïve estacional no prueba, por sí
 misma, que se haya superado el pronóstico naïve-1 fuera de muestra: esa comparación
 requiere los mismos pares observados y el contraste correspondiente.
 
@@ -3049,7 +3057,7 @@ Las métricas puntuales se calculan sólo donde el boletín publica una fecha. L
 \texttt{C} y \texttt{U} conservan su semántica y no se puntúan como fechas reales ni
 como clases predichas. Precisión, exhaustividad y F1 no son las métricas primarias de
 esta tarea de pronóstico temporal. Para la incertidumbre se informa cobertura empírica,
-amplitud de los intervalos y CRPS \cita{49}, con el protocolo y la procedencia de las
+amplitud de los intervalos y CRPS \cita{53}, con el protocolo y la procedencia de las
 muestras. Una cobertura elevada por intervalos excesivamente anchos tampoco basta para
 declarar útil una configuración.
 
@@ -3059,11 +3067,11 @@ Son agregados de ambas tablas y varios horizontes, no el resultado del campeón 
 paso. La cobertura empírica al 95\,\% es \factProspCovNineFive{}; se distingue el
 conjunto usado para calibrar de los pares reservados para evaluar. Los contrastes de
 Diebold--Mariano y los procedimientos de comparación múltiple complementan el tamaño
-del efecto, sin convertir falta de significancia en equivalencia \cita{45}.
+del efecto, sin convertir falta de significancia en equivalencia \cita{54}.
 
 \subsection{1.4.4 Optimización de parámetros y pruebas avanzadas}
 
-Los árboles de potenciación de gradiente se optimizan con \textit{Optuna} \cita{42}
+Los árboles de potenciación de gradiente se optimizan con \textit{Optuna} \cita{51}
 (muestreo TPE, \textit{Tree-structured Parzen Estimator}, multivariante, semilla fija, con
 poda por mediana y almacenamiento persistente de los estudios) bajo un protocolo
 \textit{anidado y libre de fuga} con \textbf{tres particiones}: la región de selección se
@@ -3091,7 +3099,7 @@ su distribución predictiva, de la que se leen los cuantiles 2.5\,\% y 97.5\,\%.
 es el conforme dividido, un método no paramétrico y agnóstico al modelo que fija el
 semiancho a partir del cuantil de los errores absolutos de calibración (calculados solo
 sobre meses con fecha publicada), con cobertura garantizada bajo intercambiabilidad
-\cita{43}; al no depender del modelo, sirve de red de seguridad uniforme para los 24. El
+\cita{55}; al no depender del modelo, sirve de red de seguridad uniforme para los 24. El
 tercero es el que \textbf{despliega el demostrador}: bandas cuyo semiancho por horizonte
 $h=1,\dots,12$ se calibra con el \textit{cuantil empírico} de los errores realmente
 observados en el registro de evaluación por horizonte (§2.2), separadas por tabla y
@@ -3241,7 +3249,7 @@ sobre S3 y el código con Git, todo orquestado por un único guion.}
 El desempeño se mide con cuatro métricas estándar evaluadas solo sobre las
 observaciones con fecha: el error absoluto medio (MAE), la raíz del error cuadrático
 medio (RMSE), el error porcentual absoluto medio simétrico (sMAPE) y el error
-absoluto medio escalado (MASE \cita{44}), este último referido al naïve estacional
+absoluto medio escalado (MASE \cita{52}), este último referido al naïve estacional
 ($m=12$) y reportado en paralelo en su variante escalada por el naïve-1 ($m=1$).
 Una MASE menor que uno indica un error inferior a la escala de referencia calculada
 con el entrenamiento; no sustituye la comparación fuera de muestra con el naïve-1.
@@ -3357,7 +3365,8 @@ un porcentaje acotado y simétrico, libre de escala pero inestable cuando los va
 cero. La \textbf{MASE} se adopta como \textbf{métrica principal}: escala el error por el del naïve
 estacional calculado \textit{solo} sobre el tramo de entrenamiento, por lo que es libre de escala
 (y por tanto comparable entre las 25 series), robusta a los ceros e interpretable: un valor menor
-que $1$ significa superar a la línea base ingenua. Es, así, la métrica idónea para promediar el
+que $1$ significa un error menor que la escala del naïve estacional calculada en el
+entrenamiento, lo que no implica superar al naïve-1 fuera de muestra. Es, así, la métrica idónea para promediar el
 desempeño sobre un panel de series heterogéneas.
 
 \paragraph{Selección del modelo y modelo de producción.} La \textbf{metodología} de evaluación no
@@ -3451,7 +3460,9 @@ NLinear y ARIMA, con 3 cada uno, y LLT, DLinear y Theta, con 1 cada uno).
 validación walk-forward sobre las 25 series FAD de preferencia familiar, ordenado por MASE
 de selección (la primera fila en negritas). MASE escalada por el naïve estacional; menor es
 mejor. En el conjunto reservado ningún modelo entrenado supera al naïve-1 ($\factNaiveOneFadMean$).
-Chronos es zero-shot (sin entrenar).}
+Chronos es zero-shot (sin entrenar). ARIMA y SARIMA se promedian solo sobre las series en que
+convergieron (24 y 20 de 25, Figura~\ref{fig:ranking}), por lo que sus cifras no son comparables con
+las demás filas.}
 \label{tab:comparacion_modelos}
 \begin{tabular}{lcccc}
 \toprule
@@ -3496,9 +3507,9 @@ país-categoría-tabla) se sostiene en la métrica de selección (el ganador se 
 árboles y familia estadística), pero el conjunto reservado la matiza: la heterogeneidad
 real está en \textit{cuánto} pierde cada modelo frente al piso ingenuo en cada serie, no
 en quién gana. La significancia de las diferencias se contrasta con la prueba de
-Diebold-Mariano \cita{45} (una única comparación pre-registrada por tabla) y, dado el tamaño del pool, con el conjunto de
-confianza de modelos (Model Confidence Set) \cita{46} y el ranking de Friedman-Nemenyi
-\cita{47} sobre las 25 series, fijados de antemano.
+Diebold-Mariano \cita{54} (una única comparación pre-registrada por tabla) y, dado el tamaño del pool, con el conjunto de
+confianza de modelos (Model Confidence Set) \cita{56} y el ranking de Friedman-Nemenyi
+\cita{57} sobre las 25 series, fijados de antemano.
 
 \paragraph{Resultados sobre la tabla DFF.} Como FAD y DFF se evalúan por separado, el
 mismo protocolo (los \factNModels{} modelos) se aplicó a las 25 series DFF de preferencia familiar
@@ -3583,7 +3594,7 @@ sus mismas series, ETS y naïve-1 tienen menor error que ARIMA y SARIMA en ambas
 La significancia de estas diferencias se formaliza con la prueba de Friedman sobre los
 rangos de los modelos en las series (25 en FAD; 14 distintas en DFF tras descontar las
 pseudo-réplicas del corte mundial), seguida de la prueba posterior de Nemenyi
-\cita{47}. El \textbf{diagrama de diferencia crítica} (Figura~\ref{fig:cd}) resume el
+\cita{57}. El \textbf{diagrama de diferencia crítica} (Figura~\ref{fig:cd}) resume el
 resultado: la prueba de Friedman rechaza la hipótesis de igualdad ($p<0.001$) en ambas
 tablas, y la barra de diferencia crítica (CD) une los modelos cuyo rango promedio no se
 distingue estadísticamente. \textbf{El naïve-1 obtiene el mejor rango promedio} en FAD
@@ -3593,21 +3604,25 @@ $90$\,\% \textbf{retiene únicamente al naïve-1 en FAD}: ningún modelo entrena
 estadísticamente indistinguible del mejor una vez que la línea base ingenua entra al pool. En
 DFF retiene al \textbf{naïve-1 y a ETS amortiguado}: con las 14 series distintas de esa tabla,
 la evidencia no basta para separar a ETS del paseo aleatorio, aunque este conserva el mejor
-rango promedio. Es el resultado que ancla la narrativa del capítulo.
+rango promedio. La asimetría es deliberada pero tiene un costo: en FAD, Friedman y el conjunto de
+confianza usan las 25 series aunque varias de India, China y el resto del mundo comparten fechas;
+sobre las 15 series distintas, la comparación campeón-retador mantiene la ventaja del naïve-1
+(Holm $p=0.00042$). Es el resultado que ancla la narrativa del capítulo.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.92\textwidth]{results_cd_diagram.pdf}
 \caption[Diagrama de diferencia crítica (Friedman-Nemenyi)]{Rango promedio de cada modelo
-(menor es mejor) sobre las 25 series, con la barra de diferencia crítica (CD) de la prueba de
-Nemenyi al $95$\,\%. Los modelos unidos por una barra horizontal no presentan una diferencia
-estadísticamente significativa en su rango. (a) FAD; (b) DFF.}
+(menor es mejor), con la barra de diferencia crítica (CD) de la prueba de Nemenyi al $95$\,\%.
+Los modelos unidos por una barra horizontal no presentan una diferencia estadísticamente
+significativa en su rango. (a) FAD, sobre las 25 series; (b) DFF, sobre las 14 series distintas
+tras descontar la pseudo-replicación del corte mundial.}
 \label{fig:cd}
 \end{figure}
 
 \paragraph{Efecto de la optimización de hiperparámetros.} Los tres árboles de
-potenciación de gradiente se optimizaron con \textit{Optuna} \cita{42} bajo el protocolo
-de tres particiones de §1.4.3, y la aceptación se decidió en la cola de
+potenciación de gradiente se optimizaron con \textit{Optuna} \cita{51} bajo el protocolo
+de tres particiones de §1.4.4, y la aceptación se decidió en la cola de
 \textit{val-confirmación} (una ventana que ni el buscador ni la configuración incumbente
 vieron), no sobre el conjunto reservado, que queda solo para el número publicado.
 Siguiendo la propia regla del protocolo, el efecto se reporta con \textbf{media, mediana y
@@ -3632,7 +3647,7 @@ encima del piso del naïve-1 ($\factNaiveOneFadMean$). La capacidad adicional bi
 modelo complejo; no lo hace superar al simple, y a ninguno lo lleva bajo el piso ingenuo.
 
 \paragraph{Combinación de modelos y distribución predictiva.} Se evaluaron, también sin
-fuga, estrategias de conjunto \cita{48} implementadas en sus formas fuertes: la
+fuga, estrategias de conjunto \cita{58} implementadas en sus formas fuertes: la
 \textbf{mediana de los mejores $K$ modelos por serie} (elegidos por error de selección,
 $K\in\{2,3,5\}$), un \textit{stacking} global con un único vector de pesos por tabla
 regularizado en el simplex, y un selector de modelo por características de serie
@@ -3648,7 +3663,7 @@ las series distintas, el propio naïve-1 resulta elegido como miembro de la comb
 óptima en el $33$\,\% de las combinaciones serie$\times K$ de FAD y en el $93$\,\% de
 las de DFF (los conjuntos compiten \textit{incorporando} al paseo aleatorio,
 no venciéndolo). En cuanto a la \textit{distribución predictiva completa}, medida con el
-CRPS (\textit{Continuous Ranked Probability Score}) \cita{49}, la receta campeona
+CRPS (\textit{Continuous Ranked Probability Score}) \cita{53}, la receta campeona
 desplegada (que promedia los cuantiles nativos de sus miembros y la banda conforme de los
 que no muestrean) obtiene un CRPS de $\factCrpsFad$ días en FAD y $\factCrpsDff$ en DFF, mejor que
 cualquiera de los clásicos con muestreo nativo por separado en FAD (ARIMA $65.0$, SARIMA
@@ -3658,14 +3673,14 @@ criterio informativo.
 \paragraph{Entrenamiento global y aprendizaje profundo.} La pregunta de si el
 aprendizaje profundo puede aportar se completa con la práctica moderna de entrenar un
 \textbf{modelo global} sobre todas las series apiladas, de modo que cada serie corta tome
-señal prestada del resto \cita{48}. Como el modelo global exige series continuas, los meses en
+señal prestada del resto \cita{58}. Como el modelo global exige series continuas, los meses en
 régimen \textit{Current} (en los que, por definición, el cutoff es el mes en curso) se
 codifican con la fecha del propio boletín, en lugar de interpolar linealmente a través del
 periodo. Así las veinticinco series conservan su historia completa con valores
 \textbf{reales} (incluida la dinámica de retrogresión \textit{Current}$\rightarrow$fecha)
 sin fabricar datos, y la evaluación permanece sobre fechas específicas (F). Se entrenó así un
 \textbf{barrido de ocho arquitecturas recientes}
-(N-HiTS, PatchTST\cita{50}, TiDE, BiTCN\cita{51}, TimesNet\cita{52}, TimeMixer\cita{53}, KAN\cita{54}, DeepAR), sobre el nivel,
+(N-HiTS, PatchTST\cita{59}, TiDE, BiTCN\cita{60}, TimesNet\cita{61}, TimeMixer\cita{62}, KAN\cita{63}, DeepAR), sobre el nivel,
 la primera diferencia (con reintegración a un paso) y variantes con agrupamiento y normalización
 por serie, cada una en campañas \textbf{multi-semilla} y con optimización de hiperparámetros a nivel
 de arquitectura. Por su costo de cómputo, el barrido se ejecutó sobre una \textbf{GPU en la nube}
@@ -3694,7 +3709,9 @@ mejor profundo con el mejor modelo parsimonioso de cada tabla sobre las series d
 FAD y 14 en DFF tras descontar la pseudo-replicación del corte mundial): en FAD ese rival es el
 naïve-1 y la prueba lo favorece frente a AutoBiTCN con \textbf{significancia robusta} ($p=0.0003$,
 estable al cambiar el profundo comparado por PatchTST, $p=0.0015$); en DFF el rival es ARIMA y la
-ventaja de BiTCN \textbf{no es significativa} ($p=0.065$, y $p=0.52$ con PatchTST). Cuando el aprendizaje profundo compite, su
+ventaja de BiTCN \textbf{no es significativa} ($p=0.065$, y $p=0.52$ con PatchTST). Ese rival
+pre-registrado tiene un límite: la media de ARIMA en DFF se calcula solo sobre las series donde
+converge, y el contraste de BiTCN con el naïve-1 en esa tabla queda sin prueba formal. Cuando el aprendizaje profundo compite, su
 desempeño \textbf{no viene de la capacidad del modelo sino de cómo se entrena}: de forma
 global (todas las series a la vez), sobre la primera diferencia, con normalización por
 serie y con sus hiperparámetros ajustados sin fuga. Una excepción notable es DeepAR
@@ -3705,8 +3722,8 @@ fuera del catálogo un potenciador de gradiente \textit{global} sobre el panel a
 variables estáticas y de dominio, un modelo \textit{hurdle} que separa la probabilidad de
 movimiento de su magnitud, y las variantes automáticas de la familia de suavizamiento
 (AutoETS, AutoTheta, AutoCES): ninguno rompió el piso ingenuo, lo que consolida el
-veredicto. La Figura~\ref{fig:hero} presenta el caso más elocuente: el pronóstico a
-24 meses para México/F1/FAD (la cola familiar que más avanzó en el periodo: casi dos años de
+veredicto. La Figura~\ref{fig:hero} presenta el caso más elocuente: los pronósticos a un
+paso emitidos a lo largo de los 24 meses reservados para México/F1/FAD (la cola familiar que más avanzó en el periodo: casi dos años de
 fecha de prioridad ganados en un solo boletín, el de noviembre de 2024, y cinco en todo el lapso),
 donde el modelo sigue los saltos y \textbf{ensancha su banda de incertidumbre donde la trayectoria
 se vuelve impredecible}, para volver a afilarla cuando la fecha se estabiliza. La Figura~\ref{fig:forecast} extiende la lectura a la
@@ -3715,8 +3732,9 @@ serie de mayor cobertura de cada tabla.
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{results_hero_forecast.pdf}
-\caption[Pronóstico a 24 meses con banda de incertidumbre (México/F1/FAD)]{Pronóstico del
-modelo profundo global (BiTCN) para México/F1/FAD sobre el lapso reservado de 24 meses,
+\caption[Pronóstico a un paso sobre el lapso reservado (México/F1/FAD)]{Pronósticos a un
+paso del modelo profundo global (BiTCN) para México/F1/FAD, emitidos en cada uno de los 24 meses
+del lapso reservado (no un pronóstico a 24 meses),
 comparado con las fechas de prioridad reales (estado F). La banda anidada representa los
 intervalos de predicción al 50, 80 y 95\,\%: se abre en los saltos de la cola y se cierra al
 estabilizarse, una incertidumbre honesta y resuelta en el tiempo. La
@@ -3737,8 +3755,8 @@ desviación $0.005$ (intervalo $[0.155,\,0.168]$), por debajo del par ETS-Theta
 naïve-1 ($\factNaiveOneFadMean$), pero su media queda por encima y la prueba de Diebold-Mariano
 favorece al paseo aleatorio. La variación entre corridas a semilla fija refleja el
 nondeterminismo del acelerador, acotado por el propio intervalo. La lectura honesta, por
-tanto, es que el aprendizaje profundo global, bien especificado y optimizado, \textbf{es
-hoy el mejor modelo entrenado del repertorio en FAD y compite en DFF, sin superar con
+tanto, es que el aprendizaje profundo global, bien especificado y optimizado, \textbf{compite con los mejores modelos entrenados en FAD (AutoBiTCN y AutoTiDE empatan en
+$\factAutobitcnFadMean$, con una ventaja descriptiva sobre ETS) y en DFF, sin superar con
 significancia al paseo aleatorio en el pronóstico a un paso en ninguna de las dos tablas}.
 
 \begin{figure}[H]
@@ -3755,18 +3773,21 @@ una diferencia descriptiva que ninguna prueba registrada contrasta.}
 \label{fig:multiseed}
 \end{figure}
 
-\textit{Dimensión probabilística.} La aportación del profundo global sí es clara en la
-distribución predictiva. Dotado de intervalos conformes al $95$\,\% (calibrados sin fuga
+\textit{Dimensión probabilística.} En la distribución predictiva el profundo global mejora a
+los modelos clásicos individuales, no a la receta campeona. Dotado de intervalos conformes al $95$\,\% (calibrados sin fuga
 sobre el pasado de cada origen de pronóstico, con 36 ventanas de calibración y tres
 semillas, lo que elimina el techo estructural de cobertura de la versión inicial), BiTCN
-produce una distribución \textbf{más afilada que la de los modelos clásicos}: su CRPS es
+produce una distribución más afilada que la de los clásicos individuales: su CRPS es
 de $27.2$ días en DFF y $47.5$ en FAD, frente a los $62$--$65$ de DeepAR, ARIMA y SARIMA en FAD.
+La receta campeona desplegada (mediana de Theta, ETS y SARIMA en FAD; SARIMA en DFF) obtiene
+$\factCrpsFad$ días en FAD, menos que BiTCN, y $\factCrpsDff$ en DFF. Estas comparaciones de CRPS
+son descriptivas: no se acompañan de intervalos por serie ni de una prueba pareada.
 La cobertura empírica base de esos intervalos es de $0.84$ (DFF) y $0.85$ (FAD), por
 debajo del $95$\,\% nominal (una sub-cobertura esperable con series cortas, que se
 documenta con transparencia en lugar de declararse exacta).
 
 \paragraph{Calibración adaptativa de la cobertura.} La sub-cobertura anterior se corrigió
-con \textit{inferencia conforme adaptativa} (Adaptive Conformal Inference) \cita{55}, que ajusta el
+con \textit{inferencia conforme adaptativa} (Adaptive Conformal Inference) \cita{64}, que ajusta el
 nivel de error en línea tras cada origen de pronóstico en lugar de fijarlo de antemano,
 con su tasa de adaptación elegida solo sobre el tramo de calibración. Con
 esta calibración (sin fuga de información, sobre el mismo ganador profundo) la cobertura empírica del
@@ -3786,28 +3807,30 @@ una cobertura medida y declarada.
 empírica del intervalo de predicción al 95\,\% antes de calibrar (base) y tras la
 calibración conforme por división (split) y adaptativa (ACI); la inferencia adaptativa
 es la que más se acerca al nivel nominal en ambas tablas, sin alcanzarlo. (b) CRPS por modelo en FAD (menor es mejor): la
-distribución predictiva del ganador profundo (BiTCN) es marcadamente más afilada que la de
-los modelos clásicos, incluido el DeepAR entrenado localmente.}
+distribución predictiva del ganador profundo (BiTCN) es más afilada que la de los modelos
+clásicos individuales graficados, incluido el DeepAR entrenado localmente; la receta campeona,
+que no aparece en el panel, obtiene $\factCrpsFad$ días. Comparación descriptiva.}
 \label{fig:coverage}
 \end{figure}
 
-\paragraph{¿Queda margen en la exactitud puntual? La frontera está confirmada.} Para
+\paragraph{¿Queda margen en la exactitud puntual?} Para
 acotar el techo de error alcanzable se evaluó además, fuera del marco comparativo
 principal, un segundo \textit{foundation model} preentrenado (TabPFN-TS)
-\cita{56} en modo zero-shot sobre el panel. Sus pronósticos se congelaron el 19 de junio sobre
+\cita{65} en modo zero-shot sobre el panel. Sus pronósticos se congelaron el 19 de junio sobre
 la ventana reservada de entonces y no formaron parte de la campaña causal, de modo que su error
 no es comparable con las cifras de este capítulo y no se reporta como resultado vigente. Que
 ninguno de los \factNModels{} modelos, conjuntos y sondas adicionales re-derivados logre batir
-con significancia a un paseo aleatorio en el pronóstico a un paso es la evidencia más clara de
-que el sistema ya opera en la frontera
-del error irreducible: las retrogresiones (saltos abruptos por agotamiento de cuotas)
-son, por naturaleza, impredecibles, y el avance mensual restante es, la mayoría de los
-meses, cero. El margen real de mejora no está en la exactitud puntual a un paso, sino en
-los horizontes largos, en la calibración de la incertidumbre (donde la inferencia
-conforme adaptativa sí aporta) y en la coherencia transversal de los pronósticos.
+con significancia a un paseo aleatorio en el pronóstico a un paso indica que, con los modelos y
+datos evaluados, no se encontró una mejora significativa a un paso; no demuestra que el error sea
+irreducible. Las retrogresiones (saltos abruptos por agotamiento de cuotas) son difíciles de
+anticipar con la información del panel, y el avance mensual restante es, la mayoría de los
+meses, cero. El margen de mejora que este trabajo puede documentar no está en la exactitud
+puntual a un paso, sino en la calibración de la incertidumbre (donde la inferencia conforme
+adaptativa sí aporta) y en la coherencia transversal de los pronósticos; la ventaja a horizontes
+largos frente al naïve-1 sigue pendiente de contraste (limitación~iv).
 
-\paragraph{La evidencia por horizonte: el registro de evaluación prospectiva.} Que el valor
-del sistema viva en los horizontes largos no es una declaración, sino un resultado medido. La
+\paragraph{La evidencia por horizonte: el registro de evaluación prospectiva.} El registro
+mide cómo crece el error del sistema con el horizonte. La
 Tabla~\ref{tab:prospectivo_horizonte} resume el registro (\factProspNScoredFmt{}
 pronósticos generados solo con la información disponible hasta su origen fechado y
 calificados contra el corte realmente publicado después). Conviene precisar su naturaleza:
@@ -3819,12 +3842,19 @@ emisión, de modo que la evidencia genuinamente prospectiva se acumula con cada 
 la Sección~2.3).
 A un paso el error es mínimo (MASE $0.05$; MAE $22$ días), el territorio donde
 el naïve-1 es el rival a vencer; pero crece de forma ordenada con el horizonte, hasta MASE $0.63$ y
-$257$ días a doce meses, mientras el intervalo al $95$\,\% conserva su cobertura (de $0.97$
-a $0.88$). Ahí está la diferencia con la línea base: repetir el último corte entrega una
-predicción \textit{constante} que se degrada conforme la cola avanza, mientras el sistema
-sigue la trayectoria a lo largo de todo el horizonte y acompaña cada punto con incertidumbre
-calibrada. En conjunto el registro promedia MASE $\factProspMase$ y MAE $\factProspMaeDays$
-días.
+$257$ días a doce meses, mientras la cobertura empírica del intervalo al $95$\,\% desciende de
+$0.97$ a $0.88$. Repetir el último corte entrega una predicción \textit{constante}; el registro
+no incluye al naïve-1 sobre los mismos pares, de modo que la ventaja del sistema a horizontes
+largos frente a esa línea base no está contrastada (limitación~iv). En conjunto el registro
+promedia MASE $\factProspMase$ y MAE $\factProspMaeDays$ días.
+
+\paragraph{Evidencia servida en vivo.} Aparte del registro reconstruido, en el corte de octubre
+de 2026 se habían calificado 323 pronósticos servidos en vivo, casi todos a horizontes de uno a
+tres meses: MAE de 180 días, MASE de 0.53 y cobertura empírica del intervalo al $95$\,\% de 0.80
+(intervalo de confianza del $95$\,\% $[0.76,\,0.84]$), por debajo del nominal. En el cara a cara
+por pares contra la sombra naïve-1, el campeón FAD obtiene MASE 0.466 frente a 0.482 (196 pares)
+y el campeón DFF 0.617 frente a 0.593 de la sombra (127 pares). Son diferencias descriptivas que
+alimentan la decisión prospectiva de promoción, no una prueba confirmatoria.
 
 \begin{table}[H]
 \centering
@@ -3832,7 +3862,7 @@ días.
 sistema (\textit{backfill} sin fuga de información: pronósticos generados con la
 información disponible hasta su origen y calificados contra el corte publicado después;
 \factProspNScoredFmt{} evaluaciones). El error crece de forma ordenada con el horizonte
-mientras el intervalo al $95$\,\% conserva su cobertura empírica.}
+y la cobertura empírica del intervalo al $95$\,\% desciende de 0.97 a 0.88.}
 \label{tab:prospectivo_horizonte}
 \begin{tabular}{cccc}
 \toprule
@@ -3927,7 +3957,7 @@ el lapso del conjunto reservado. La fecha de prioridad se expresa en años.}
 \includegraphics[width=\textwidth]{results_backtest_grid_DFF.pdf}
 \caption[Backtest por categoría sobre el conjunto reservado (DFF)]{Backtest análogo para las 25
 combinaciones país$\times$categoría de la tabla DFF. Las series prácticamente constantes
-(p.\,ej. varias de Filipinas) aparecen como líneas planas que el modelo reproduce con error
+(p.\,ej., varias de Filipinas) aparecen como líneas planas que el modelo reproduce con error
 casi nulo; las de movimiento rápido muestran bandas de predicción más anchas.}
 \label{fig:grid_dff}
 \end{figure}
@@ -4083,10 +4113,9 @@ Naïve estacional & 1.434 & 0.809 \\ \bottomrule
 
 La robustez se evalúa por la consistencia del orden de los modelos a través de las
 25 series (cinco áreas $\times$ cinco categorías) y por la estabilidad ante
-perturbaciones controladas (semilla, ventana inicial). El piso del naïve-1 y la posición
-de los parsimoniosos se mantienen en todas las áreas y categorías (también en el bloque
-de empleo); las redes neuronales muestran la mayor varianza entre series, lo que confirma
-su sensibilidad a la cantidad de datos. La validación con cinco semillas cuantifica esta
+perturbaciones controladas de semilla. El naïve-1 gana en \factNaiveOneFadHoldoutWins{} de las 25
+series FAD y ningún modelo lo supera con significancia; en el bloque de empleo el piso se repite
+de forma descriptiva, sin contraste formal. La validación con cinco semillas cuantifica esta
 estabilidad para el ganador profundo: en DFF el MASE varía apenas $\pm0.0006$ entre
 semillas, mientras que en FAD la variación sube a $\pm0.005$, reflejo de la sensibilidad
 del ajuste con muestras pequeñas. Los fallos numéricos se concentran en los modelos clásicos
@@ -4134,6 +4163,68 @@ intervención manual, y cualquier afirmación de operación desatendida queda su
 es de disponibilidad, no de integridad: lo ya ingerido está congelado, verificable y respaldado
 página por página tal como se publicó.
 
+\paragraph{Cohortes de estabilidad y enrutado por cohorte: un resultado negativo documentado.}
+La dirección de tesis planteó segmentar el panel en series estables e inestables y entrenar cada
+grupo por separado. La pregunta se respondió en cuatro tiempos, con la partición y el criterio de
+decisión escritos \textbf{antes} de mirar ningún resultado, para que ninguna conclusión pudiera
+acomodarse a lo observado.
+
+La partición se calcula únicamente con información anterior a la ventana de evaluación: sobre las
+\cohortFactNSeriesEvaluable{} series evaluables quedan \cohortFactNEstable{} estables y
+\cohortFactNNoEstable{} no estables, bajo una regla congelada que declara inestable a la serie
+cuya tasa de retrogresión supera \cohortFactRetroRateMax{} o cuya peor retrogresión excede
+\cohortFactWorstRetroScaledMax{} veces la escala naïve de la propia serie. La quietud no decide:
+viaja como anotación, porque una serie congelada es fácil de predecir por construcción y llamarla
+«estable» sería confundir dos cosas distintas.
+
+El barrido de lo ya puntuado dio \cohortFactScanPeor{} comparaciones concluyentes en las que el
+método resulta peor que el naïve-1 de su propia cohorte y \cohortFactScanBate{} en las que resulta mejor, con
+\cohortFactScanSinDatos{} celdas sin evidencia suficiente. La campaña de entrenamiento real, con
+\cohortFactCampanaLanes{} corridas aisladas de las que \cohortFactCampanaOk{} terminaron,
+tampoco produjo ninguna receta que batiera ese piso (\cohortFactCampanaBate{} de
+\cohortFactCampanaPrimarias{} recetas primarias). Finalmente, el enrutador por cohorte, que
+escoge el método con la evidencia anterior al conjunto reservado y se evalúa solo sobre él, se sometió al
+mismo gate del sistema: mejora material de al menos \cohortFactRouterMargen{} en MASE, contraste
+bilateral con corrección de Holm al \cohortFactRouterAlfa{} y ninguna pérdida material, exigidos
+\textbf{en los tres horizontes} evaluados.
+
+El veredicto es negativo y se conserva: de \cohortFactRouterCeldas{} celdas,
+\cohortFactRouterGana{} ganan. La tabla~\ref{tab:cohortes} y la figura~\ref{fig:cohortes} lo
+muestran con el detalle que importa. En la tabla de fechas de acción final el enrutador mejora de
+forma material en los tres horizontes de ambas cohortes; de las seis combinaciones de cohorte y
+horizonte, \cohortFactRouterFadLargosSignificativos{} resultan significativas, todas a seis o doce
+meses, y \cohortFactRouterFadCortosSignificativos{} a tres meses: \textbf{la ventaja a horizonte largo no
+satisface el corto plazo}, y la regla pide los tres. En la cohorte estable de fechas de
+presentación la mejora a doce meses alcanza \cohortFactRouterDffEstableMejorHDoce{} y aun así la
+celda \textbf{pierde de forma material}, porque a tres meses cae a
+\cohortFactRouterDffEstablePeorHTres{}. Y la cohorte inestable de esa misma tabla, con
+\cohortFactRouterDffNoEstableN{} series, \textbf{no aporta evidencia}: el propio enrutador elige
+allí el piso ingenuo, de modo que se compara consigo mismo.
+
+Segmentar por estabilidad, por sí solo, no cambia quién gana a corto plazo. El hallazgo se
+publica igual: un experimento que solo se reporta cuando confirma la hipótesis deja de ser un
+experimento. Las cifras de este párrafo, la tabla y la figura se derivan del mismo archivo
+versionado y ninguna se teclea a mano.
+
+\begin{table}[H]
+\centering
+\caption[Enrutado por cohorte contra el naïve-1 de cada cohorte]{Enrutado por cohorte frente al
+naïve-1 de la propia cohorte, por tabla, cohorte y horizonte. El efecto es positivo cuando el
+enrutador mejora; la significancia es la del contraste bilateral tras la corrección de Holm sobre
+los tres horizontes de la celda. Retrospectivo, con selección disjunta del conjunto reservado.}
+\label{tab:cohortes}
+\input{cohortes.tex}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{e5_router_effect.pdf}
+\caption[Efecto del enrutado por cohorte y horizonte]{Efecto del enrutado frente al naïve-1 de
+cada cohorte, por celda y horizonte. Las líneas discontinuas marcan el margen material exigido en
+ambos sentidos; las barras llenas señalan los contrastes que sobreviven a la corrección de Holm.}
+\label{fig:cohortes}
+\end{figure}
+
 % ============================================================
 % 3. CONCLUSIONES
 % ============================================================
@@ -4176,9 +4267,9 @@ reformular las redes locales sobre la primera diferencia dejaron de colapsar y e
 de fuera de escala a la zona alta de la tabla); (ii) la optimización de hiperparámetros
 con confirmación en una partición independiente mejora a los árboles ($\factTuningAccepted$ de $\factTuningGroups$ grupos
 aceptados, con media, mediana y porcentaje de series reportados juntos) hasta encabezar la
-métrica de selección, sin bajar del piso en el conjunto reservado; (iii) el mejor profundo
-global optimizado (AutoBiTCN, $\factAutobitcnFadMean\pm0.005$) es hoy \textbf{el mejor
-modelo entrenado del repertorio en FAD}, por debajo de ETS/Theta
+métrica de selección, sin bajar del piso en el conjunto reservado; (iii) los profundos
+globales optimizados (AutoBiTCN, $\factAutobitcnFadMean\pm0.005$, empatado con AutoTiDE)
+quedan a la cabeza de los modelos entrenados en FAD, con una ventaja descriptiva sobre ETS/Theta
 ($\factEtsFadMean$--$\factThetaFadMean$), y BiTCN es muy estable en DFF
 ($\factBitcnDffMean\pm0.0006$, $\sim$\factDeepDffMarginPct\,\% mejor que un Auto-ARIMA re-especificado
 de forma justa); en FAD la prueba de Diebold-Mariano favorece al paseo aleatorio con
@@ -4198,9 +4289,10 @@ valor se degrada conforme las colas se mueven, evaluados con un registro de
 contra los cortes reales (\textit{backfill} sin fuga; la evidencia servida en vivo se
 acumula desde julio de 2026; MASE $\factProspMase$, MAE $\factProspMaeDays$ días; el error por horizonte se
 detalla en la Tabla~\ref{tab:prospectivo_horizonte}); (b) \textbf{intervalos
-de predicción calibrados por horizonte}, con cuantiles empíricos del propio registro e
-inferencia conforme adaptativa desplegada (cobertura del intervalo al $95$\,\%: $\factAciCoverageFad$ en
-FAD y $\factAciCoverageDff$ en DFF); (c) \textbf{coherencia transversal} garantizada por proyección al
+de predicción ajustados por horizonte}, con cuantiles empíricos del propio registro e
+inferencia conforme adaptativa (cobertura del intervalo al $95$\,\% con ACI sobre el ganador
+profundo BiTCN: $\factAciCoverageFad$ en FAD y $\factAciCoverageDff$ en DFF; en vivo, 0.80 en el corte
+de octubre de 2026); (c) \textbf{coherencia transversal} garantizada por proyección al
 cono del dominio (cero violaciones país$\leq$mundial y FAD$\leq$DFF tras el publicador); y
 (d) una \textbf{gobernanza campeón-retador-sombra} que incorporó al naïve-1 como retador
 formal: en FAD el gate lo declara apto a un paso y la promoción se \textbf{retiene} porque
@@ -4208,17 +4300,21 @@ el gate mide $h=1$ y el producto sirve $h=1..12$; en DFF el apto es la mediana d
 Theta, cuya promoción exige el mismo gate prospectivo; y un despliegue en sombra congela cada
 mes su añada para decidir con evidencia prospectiva multi-horizonte. La respuesta a
 ``¿conviene la IA?'' es, por tanto, de ingeniería: la capacidad no compra el punto a un
-paso, pero el \textit{sistema} (horizontes, incertidumbre calibrada, coherencia y
-gobernanza) sí entrega lo que ninguna línea base entrega.
+paso, y el valor del \textit{sistema} está en lo que ofrece además del punto: horizontes,
+incertidumbre declarada, coherencia y gobernanza, cuya ventaja a horizontes largos frente a las
+líneas base aún debe contrastarse con la evidencia prospectiva.
 
 \paragraph{Alcance, reproducibilidad y cobertura del sistema.} El veredicto anterior no es
 una carencia del trabajo sino un hallazgo validado: documenta, con un protocolo reproducible
 y libre de fuga, contra qué piso debe medirse cualquier modelo en este dominio y dónde
 aporta cada familia. La cobertura se extendió de las categorías familiares a las basadas
-en empleo (EB), donde el piso ingenuo se replica, confirmando que las conclusiones no son
-un artefacto de un subconjunto de categorías. El sistema entrega pronósticos con
-intervalos de predicción al $95$\,\% cuya cobertura empírica se mide y se declara
-($\factAciCoverageFad$ en FAD y $\factAciCoverageDff$ en DFF, por debajo del nominal).
+en empleo (EB), donde el piso ingenuo se repite de forma descriptiva, lo que sugiere que las
+conclusiones no son un artefacto de un subconjunto de categorías (sin contraste formal en EB). El
+sistema entrega pronósticos con intervalos de predicción al $95$\,\% cuya cobertura empírica se
+mide y se declara (con ACI sobre BiTCN, $\factAciCoverageFad$ en FAD y $\factAciCoverageDff$ en DFF;
+ambas por debajo del nominal).
+
+\paragraph{Cohortes de estabilidad.} La segmentación del panel en series estables e inestables, propuesta por la dirección de tesis, tampoco cambió quién gana a corto plazo: ninguna de las \cohortFactRouterCeldas{} celdas del enrutador por cohorte superó el criterio de los tres horizontes (§2.3). El resultado negativo se conserva y delimita la utilidad de esa segmentación para el pronóstico a un paso.
 
 \paragraph{Limitaciones y trabajo futuro.} Se reconocen, con transparencia, los límites del
 alcance actual:
@@ -4254,67 +4350,6 @@ El trabajo futuro prioriza la evidencia prospectiva multi-horizonte frente al re
 ingenuo, el tratamiento explícito de los cambios de régimen, la extensión por país de las
 categorías de empleo y la integración del archivo histórico 1992--2001.
 
-\paragraph{Cohortes de estabilidad y enrutado por cohorte: un resultado negativo documentado.}
-La dirección de tesis planteó segmentar el panel en series estables e inestables y entrenar cada
-grupo por separado. La pregunta se respondió en cuatro tiempos, con la partición y el criterio de
-decisión escritos \textbf{antes} de mirar ningún resultado, para que ninguna conclusión pudiera
-acomodarse a lo observado.
-
-La partición se calcula únicamente con información anterior a la ventana de evaluación: sobre las
-\cohortFactNSeriesEvaluable{} series evaluables quedan \cohortFactNEstable{} estables y
-\cohortFactNNoEstable{} no estables, bajo una regla congelada que declara inestable a la serie
-cuya tasa de retrogresión supera \cohortFactRetroRateMax{} o cuya peor retrogresión excede
-\cohortFactWorstRetroScaledMax{} veces la escala naïve de la propia serie. La quietud no decide:
-viaja como anotación, porque una serie congelada es fácil de predecir por construcción y llamarla
-«estable» sería confundir dos cosas distintas.
-
-El barrido de lo ya puntuado dio \cohortFactScanPeor{} comparaciones concluyentes por debajo del
-naïve-1 de su propia cohorte y \cohortFactScanBate{} por encima, con
-\cohortFactScanSinDatos{} celdas sin evidencia suficiente. La campaña de entrenamiento real, con
-\cohortFactCampanaLanes{} corridas aisladas de las que \cohortFactCampanaOk{} terminaron,
-tampoco produjo ninguna receta que batiera ese piso (\cohortFactCampanaBate{} de
-\cohortFactCampanaPrimarias{} recetas primarias). Finalmente, el enrutador por cohorte, que
-escoge el método con la evidencia anterior al conjunto reservado y se evalúa solo sobre él, se sometió al
-mismo gate del sistema: mejora material de al menos \cohortFactRouterMargen{} en MASE, contraste
-bilateral con corrección de Holm al \cohortFactRouterAlfa{} y ninguna pérdida material, exigidos
-\textbf{en los tres horizontes} evaluados.
-
-El veredicto es negativo y se conserva: de \cohortFactRouterCeldas{} celdas,
-\cohortFactRouterGana{} ganan. La tabla~\ref{tab:cohortes} y la figura~\ref{fig:cohortes} lo
-muestran con el detalle que importa. En la tabla de fechas de acción final el enrutador mejora de
-forma material en los tres horizontes y resulta significativo en
-\cohortFactRouterFadLargosSignificativos{} de ellos, todos largos, pero en
-\cohortFactRouterFadCortosSignificativos{} de los cortos: \textbf{la ventaja a horizonte largo no
-satisface el corto plazo}, y la regla pide los tres. En la cohorte estable de fechas de
-presentación la mejora a doce meses alcanza \cohortFactRouterDffEstableMejorHDoce{} y aun así la
-celda \textbf{pierde de forma material}, porque a tres meses cae a
-\cohortFactRouterDffEstablePeorHTres{}. Y la cohorte inestable de esa misma tabla, con
-\cohortFactRouterDffNoEstableN{} series, \textbf{no aporta evidencia}: el propio enrutador elige
-allí el piso ingenuo, de modo que se compara consigo mismo.
-
-Segmentar por estabilidad, por sí solo, no cambia quién gana a corto plazo. El hallazgo se
-publica igual: un experimento que solo se reporta cuando confirma la hipótesis deja de ser un
-experimento. Las cifras de este párrafo, la tabla y la figura se derivan del mismo archivo
-versionado y ninguna se teclea a mano.
-
-\begin{table}[H]
-\centering
-\caption[Enrutado por cohorte contra el naïve-1 de cada cohorte]{Enrutado por cohorte frente al
-naïve-1 de la propia cohorte, por tabla, cohorte y horizonte. El efecto es positivo cuando el
-enrutador mejora; la significancia es la del contraste bilateral tras la corrección de Holm sobre
-los tres horizontes de la celda. Retrospectivo, con selección disjunta del conjunto reservado.}
-\label{tab:cohortes}
-\input{cohortes.tex}
-\end{table}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\linewidth]{e5_router_effect.pdf}
-\caption[Efecto del enrutado por cohorte y horizonte]{Efecto del enrutado frente al naïve-1 de
-cada cohorte, por celda y horizonte. Las líneas discontinuas marcan el margen material exigido en
-ambos sentidos; las barras llenas señalan los contrastes que sobreviven a la corrección de Holm.}
-\label{fig:cohortes}
-\end{figure}
 
 % ============================================================
 % GLOSARIO
@@ -4333,7 +4368,7 @@ ambos sentidos; las barras llenas señalan los contrastes que sobreviven a la co
                     itemsep=2pt, parsep=0pt, topsep=0pt]
     \item[ACF] (\textit{Autocorrelation Function})\hspace{0.3em}Función que cuantifica la correlación entre observaciones separadas por distintos rezagos temporales; herramienta central en la identificación de modelos ARIMA.
 
-    \item[ACI] (\textit{Adaptive Conformal Inference})\hspace{0.3em}Variante de la predicción conforme que ajusta el nivel de error en línea tras cada origen de pronóstico para clavar la cobertura nominal bajo cambios de distribución.
+    \item[ACI] (\textit{Adaptive Conformal Inference})\hspace{0.3em}Variante de la predicción conforme que ajusta el nivel de error en línea tras cada origen de pronóstico para acercarse a la cobertura nominal bajo cambios de distribución, sin garantizarla.
 
     \item[Adam] (\textit{Adaptive Moment Estimation})\hspace{0.3em}Algoritmo de optimización de gradiente estocástico que combina momento y tasas de aprendizaje adaptativas por parámetro; estándar \textit{de facto} en entrenamiento de redes profundas.
 
@@ -4351,7 +4386,7 @@ ambos sentidos; las barras llenas señalan los contrastes que sobreviven a la co
 
     \item[BiLSTM] (\textit{Bidirectional Long Short-Term Memory})\hspace{0.3em}Variante de LSTM que procesa la secuencia simultáneamente en dirección cronológica y anticronológica, permitiendo que cada estado oculto incorpore contexto pasado y futuro.
 
-    \item[BiTCN] (\textit{Bidirectional Temporal Convolutional Network})\hspace{0.3em}Red convolucional temporal bidireccional; el modelo profundo de mejor desempeño global del proyecto.
+    \item[BiTCN] (\textit{Bidirectional Temporal Convolutional Network})\hspace{0.3em}Red convolucional temporal bidireccional; uno de los modelos profundos de mejor desempeño del proyecto, sin superar con significancia al naïve-1.
 
     \item[CatBoost] Implementación de potenciación de gradiente con manejo nativo de variables categóricas y reducción del sesgo de predicción.
 
@@ -4541,68 +4576,68 @@ system,'' en \textit{Proc. 22nd ACM SIGKDD}, 2016, pp. 785--794.
 pp. 1181--1191, 2020.
 \item\label{bib:35} G. P. Zhang, ``Time series forecasting using a hybrid ARIMA and
 neural network model,'' \textit{Neurocomputing}, vol. 50, pp. 159--175, 2003.
-\item\label{bib:36} A. Zeng, M. Chen, L. Zhang, y Q. Xu, ``Are transformers effective for time series forecasting?,'' en \textit{Proc. AAAI Conf. Artificial Intelligence}, vol. 37, n.\textsuperscript{o} 9, pp. 11121 a 11128, 2023.
+\item\label{bib:36} A. Zeng, M. Chen, L. Zhang, y Q. Xu, ``Are transformers effective for time series forecasting?,'' en \textit{Proc. AAAI Conf. Artificial Intelligence}, vol. 37, n.\textsuperscript{o} 9, pp. 11121--11128, 2023.
 \item\label{bib:37} A. Das, W. Kong, A. Leach, S. Mathur, R. Sen, y R. Yu, ``Long-term forecasting with TiDE: Time-series dense encoder,'' \textit{Transactions on Machine Learning Research}, 2023, arXiv:2304.08424.
 \item\label{bib:38} B. N. Oreshkin, D. Carpov, N. Chapados, y Y. Bengio, ``N-BEATS: Neural basis expansion analysis for interpretable time series forecasting,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2020, arXiv:1905.10437.
 \item\label{bib:39} C. Challu, K. G. Olivares, B. N. Oreshkin, F. Garza, M. Mergenthaler-Canseco, y A. Dubrawski, ``NHITS: Neural hierarchical interpolation for time series forecasting,'' en \textit{Proc. AAAI Conf. Artificial Intelligence}, vol. 37, n.\textsuperscript{o} 6, pp. 6989--6997, 2023.
 \item\label{bib:40} B. Lim, S. Ö. Ar{\i}k, N. Loeff, y T. Pfister, ``Temporal fusion transformers for interpretable multi-horizon time series forecasting,'' \textit{International Journal of Forecasting}, vol. 37, n.\textsuperscript{o} 4, pp. 1748--1764, 2021.
 \item\label{bib:41} A. F. Ansari \textit{et al.}, ``Chronos: Learning the language of time series,'' \textit{Transactions on Machine Learning Research}, 2024, arXiv:2403.07815.
-\item\label{bib:42} T. Akiba, S. Sano, T. Yanase, T. Ohta, y M. Koyama, ``Optuna: A
-next-generation hyperparameter optimization framework,'' en \textit{Proc. 25th ACM
-SIGKDD}, 2019, pp. 2623--2631.
-\item\label{bib:43} V. Vovk, A. Gammerman, y G. Shafer, \textit{Algorithmic Learning
-in a Random World}. Nueva York: Springer, 2005.
-\item\label{bib:44} R. J. Hyndman y A. B. Koehler, ``Another look at measures of
-forecast accuracy,'' \textit{International Journal of Forecasting}, vol. 22,
-n.\textsuperscript{o} 4, pp. 679--688, 2006.
-\item\label{bib:45} F. X. Diebold y R. S. Mariano, ``Comparing predictive
-accuracy,'' \textit{Journal of Business \& Economic Statistics}, vol. 13,
-n.\textsuperscript{o} 3, pp. 253--263, 1995.
-\item\label{bib:46} P. R. Hansen, A. Lunde, y J. M. Nason, ``The model confidence
-set,'' \textit{Econometrica}, vol. 79, n.\textsuperscript{o} 2, pp. 453--497, 2011.
-\item\label{bib:47} J. Dem\v{s}ar, ``Statistical comparisons of classifiers over
-multiple data sets,'' \textit{Journal of Machine Learning Research}, vol. 7,
-pp. 1--30, 2006.
-\item\label{bib:48} S. Makridakis, E. Spiliotis, y V. Assimakopoulos, ``The M4
-competition: 100,000 time series and 61 forecasting methods,'' \textit{International
-Journal of Forecasting}, vol. 36, n.\textsuperscript{o} 1, pp. 54--74, 2020.
-\item\label{bib:49} T. Gneiting y A. E. Raftery, ``Strictly proper scoring rules,
-prediction, and estimation,'' \textit{Journal of the American Statistical Association},
-vol. 102, n.\textsuperscript{o} 477, pp. 359--378, 2007.
-\item\label{bib:50} Y. Nie, N. H. Nguyen, P. Sinthong, y J. Kalagnanam, ``A time series is worth 64 words: Long-term forecasting with transformers,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2023, arXiv:2211.14730.
-\item\label{bib:51} O. Sprangers, S. Schelter, y M. de Rijke, ``Parameter-efficient deep probabilistic forecasting,'' \textit{International Journal of Forecasting}, vol. 39, n.\textsuperscript{o} 1, pp. 332--345, 2023.
-\item\label{bib:52} H. Wu, T. Hu, Y. Liu, H. Zhou, J. Wang, y M. Long, ``TimesNet: Temporal 2D-variation modeling for general time series analysis,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2023, arXiv:2210.02186.
-\item\label{bib:53} S. Wang \textit{et al.}, ``TimeMixer: Decomposable multiscale mixing for time series forecasting,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2024, arXiv:2405.14616.
-\item\label{bib:54} Z. Liu \textit{et al.}, ``KAN: Kolmogorov-Arnold networks,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2025, arXiv:2404.19756.
-\item\label{bib:55} I. Gibbs y E. Cand\`es, ``Adaptive conformal inference under
-distribution shift,'' en \textit{Advances in Neural Information Processing Systems
-(NeurIPS)}, vol. 34, pp. 1660--1672, 2021.
-\item\label{bib:56} S. Hoo, S. M\"uller, D. Salinas, y F. Hutter, ``The tabular
-foundation model TabPFN outperforms specialized time series forecasting models,''
-\textit{arXiv:2501.02945}, 2025.
-\item\label{bib:57} R. Kuprieiev \textit{et al.}, ``DVC: Data Version Control, Git
-for data \& models,'' Iterative, software de c\'odigo abierto, 2024. [En l\'inea]. Disponible: \url{https://dvc.org}
-\item\label{bib:58} M. Zaharia \textit{et al.}, ``Accelerating the machine learning
-lifecycle with MLflow,'' \textit{IEEE Data Engineering Bulletin}, vol. 41, n.\textsuperscript{o} 4,
-pp. 39--45, 2018.
-\item\label{bib:59} M. Raasveldt y H. M\"uhleisen, ``DuckDB: An embeddable analytical
+\item\label{bib:42} M. Raasveldt y H. M\"uhleisen, ``DuckDB: An embeddable analytical
 database,'' en \textit{Proc.\ ACM SIGMOD Int.\ Conf.\ on Management of Data}, 2019, pp.\ 1981--1984.
-\item\label{bib:60} S. Seabold y J. Perktold, ``statsmodels: Econometric and statistical
+\item\label{bib:43} R. Kuprieiev \textit{et al.}, ``DVC: Data Version Control, Git
+for data \& models,'' Iterative, software de c\'odigo abierto, 2024. [En l\'inea]. Disponible en: \url{https://dvc.org}
+\item\label{bib:44} S. Seabold y J. Perktold, ``statsmodels: Econometric and statistical
 modeling with Python,'' en \textit{Proc.\ 9th Python in Science Conf.\ (SciPy)}, 2010,
 pp. 92--96.
-\item\label{bib:61} P. Virtanen \textit{et al.}, ``SciPy 1.0: Fundamental algorithms for
+\item\label{bib:45} P. Virtanen \textit{et al.}, ``SciPy 1.0: Fundamental algorithms for
 scientific computing in Python,'' \textit{Nature Methods}, vol. 17, n.\textsuperscript{o} 3,
 pp. 261--272, 2020.
-\item\label{bib:62} J. Herzen \textit{et al.}, ``Darts: User-friendly modern machine
+\item\label{bib:46} J. Herzen \textit{et al.}, ``Darts: User-friendly modern machine
 learning for time series,'' \textit{Journal of Machine Learning Research}, vol. 23,
 n.\textsuperscript{o} 124, pp. 1--6, 2022.
-\item\label{bib:63} A. Paszke \textit{et al.}, ``PyTorch: An imperative style,
+\item\label{bib:47} A. Paszke \textit{et al.}, ``PyTorch: An imperative style,
 high-performance deep learning library,'' en \textit{Advances in Neural Information
 Processing Systems}, vol. 32, 2019, pp. 8024--8035.
-\item\label{bib:64} F. Pedregosa \textit{et al.}, ``Scikit-learn: Machine learning in
+\item\label{bib:48} F. Pedregosa \textit{et al.}, ``Scikit-learn: Machine learning in
 Python,'' \textit{Journal of Machine Learning Research}, vol. 12, pp. 2825--2830, 2011.
-\item\label{bib:65} GitHub, ``GitHub Actions documentation,'' 2026. [En línea].
+\item\label{bib:49} M. Zaharia \textit{et al.}, ``Accelerating the machine learning
+lifecycle with MLflow,'' \textit{IEEE Data Engineering Bulletin}, vol. 41, n.\textsuperscript{o} 4,
+pp. 39--45, 2018.
+\item\label{bib:50} GitHub, ``GitHub Actions documentation,'' 2026. [En línea].
 Disponible en: \url{https://docs.github.com/actions}
+\item\label{bib:51} T. Akiba, S. Sano, T. Yanase, T. Ohta, y M. Koyama, ``Optuna: A
+next-generation hyperparameter optimization framework,'' en \textit{Proc. 25th ACM
+SIGKDD}, 2019, pp. 2623--2631.
+\item\label{bib:52} R. J. Hyndman y A. B. Koehler, ``Another look at measures of
+forecast accuracy,'' \textit{International Journal of Forecasting}, vol. 22,
+n.\textsuperscript{o} 4, pp. 679--688, 2006.
+\item\label{bib:53} T. Gneiting y A. E. Raftery, ``Strictly proper scoring rules,
+prediction, and estimation,'' \textit{Journal of the American Statistical Association},
+vol. 102, n.\textsuperscript{o} 477, pp. 359--378, 2007.
+\item\label{bib:54} F. X. Diebold y R. S. Mariano, ``Comparing predictive
+accuracy,'' \textit{Journal of Business \& Economic Statistics}, vol. 13,
+n.\textsuperscript{o} 3, pp. 253--263, 1995.
+\item\label{bib:55} V. Vovk, A. Gammerman, y G. Shafer, \textit{Algorithmic Learning
+in a Random World}. Nueva York: Springer, 2005.
+\item\label{bib:56} P. R. Hansen, A. Lunde, y J. M. Nason, ``The model confidence
+set,'' \textit{Econometrica}, vol. 79, n.\textsuperscript{o} 2, pp. 453--497, 2011.
+\item\label{bib:57} J. Dem\v{s}ar, ``Statistical comparisons of classifiers over
+multiple data sets,'' \textit{Journal of Machine Learning Research}, vol. 7,
+pp. 1--30, 2006.
+\item\label{bib:58} S. Makridakis, E. Spiliotis, y V. Assimakopoulos, ``The M4
+competition: 100,000 time series and 61 forecasting methods,'' \textit{International
+Journal of Forecasting}, vol. 36, n.\textsuperscript{o} 1, pp. 54--74, 2020.
+\item\label{bib:59} Y. Nie, N. H. Nguyen, P. Sinthong, y J. Kalagnanam, ``A time series is worth 64 words: Long-term forecasting with transformers,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2023, arXiv:2211.14730.
+\item\label{bib:60} O. Sprangers, S. Schelter, y M. de Rijke, ``Parameter-efficient deep probabilistic forecasting,'' \textit{International Journal of Forecasting}, vol. 39, n.\textsuperscript{o} 1, pp. 332--345, 2023.
+\item\label{bib:61} H. Wu, T. Hu, Y. Liu, H. Zhou, J. Wang, y M. Long, ``TimesNet: Temporal 2D-variation modeling for general time series analysis,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2023, arXiv:2210.02186.
+\item\label{bib:62} S. Wang \textit{et al.}, ``TimeMixer: Decomposable multiscale mixing for time series forecasting,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2024, arXiv:2405.14616.
+\item\label{bib:63} Z. Liu \textit{et al.}, ``KAN: Kolmogorov-Arnold networks,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2025, arXiv:2404.19756.
+\item\label{bib:64} I. Gibbs y E. Cand\`es, ``Adaptive conformal inference under
+distribution shift,'' en \textit{Advances in Neural Information Processing Systems
+(NeurIPS)}, vol. 34, pp. 1660--1672, 2021.
+\item\label{bib:65} S. Hoo, S. M\"uller, D. Salinas, y F. Hutter, ``The tabular
+foundation model TabPFN outperforms specialized time series forecasting models,''
+arXiv:2501.02945, 2025.
 \end{enumerate}
 
 % ============================================================
@@ -4622,10 +4657,10 @@ fijadas: \textit{darts}, \textit{PyTorch}, \textit{XGBoost}, \textit{Prophet},
 fija: \texttt{make db} regenera la base de datos; \texttt{make eda} las figuras
 exploratorias; \texttt{make compare} ejecuta la comparación walk-forward; y
 \texttt{make report} produce la tabla y la figura de resultados. Cada corrida
-escribe sus métricas en \texttt{reports/model\_comparison.csv} y registra su
+escribe sus métricas en \texttt{reports/eval/model\_comparison\_\{FAD,DFF\}*.csv} y registra su
 procedencia completa (identificador de corrida, \textit{commit} de Git, semilla,
 versiones de librerías e hiperparámetros) en un registro append-only
-(\texttt{reports/experiment\_runs.jsonl}), de modo que cualquier resultado de este
+(\texttt{reports/eval/experiment\_runs.jsonl}), de modo que cualquier resultado de este
 documento puede atarse al código exacto que lo generó y reconstruirse. La capa de
 modelado se prueba en integración continua con un piso de cobertura propio.
 
@@ -4691,7 +4726,9 @@ entregado con el repositorio.
 \includegraphics[width=0.92\textwidth]{portal_visapredict.png}
 \caption[Portal de divulgación del proyecto]{Página de aterrizaje del proyecto en
 \url{https://visapredictai.com/}, con el resumen del sistema y los indicadores del
-panel. Material descriptivo del proyecto personal del autor, \textbf{no parte del
+panel. Es una captura de una versión anterior del portal: sus indicadores (modelos,
+observaciones y referencias) no corresponden a las cifras vigentes de este documento.
+Material descriptivo del proyecto personal del autor, \textbf{no parte del
 entregable académico evaluado}. Fuente: captura del portal.}
 \label{fig:portal_visapredict}
 \end{figure}
@@ -4804,7 +4841,7 @@ cualquier resultado reportado a partir del c\'odigo exacto que lo produjo.
 \caption[Registro de experimentos en MLflow]{Registro de la campa\~na de modelos profundos
 globales en el almac\'en de experimentos: quince corridas (variantes de NHITS, TiDE, PatchTST
 y BiTCN) con su nombre, fecha y procedencia, parte de las m\'as de 2\,400 corridas conservadas.
-Fuente: captura de la interfaz de MLflow del proyecto.}
+Captura hist\'orica, anterior a la campa\~na causal. Fuente: captura de la interfaz de MLflow del proyecto.}
 \label{fig:mlflow_runs}
 \end{figure}
 
@@ -4917,15 +4954,17 @@ promedio global de SARIMA como referencia. Las series de DFF donde SARIMA no con
 limitaci\'on documentada del alcance mensual, no del m\'etodo. Permanece, adem\'as, con su
 distribuci\'on predictiva evaluada (CRPS $\factCrpsFad$/$\factCrpsDff$ d\'ias como criterio informativo
 del gate) y con las bandas por horizonte e inferencia conforme adaptativa descritas en
-§2.2. La Figura~\ref{fig:mlflow_champion} muestra el registro de este veredicto en el
-almac\'en de experimentos.
+§2.2. La Figura~\ref{fig:mlflow_champion} ilustra c\'omo el almac\'en de experimentos registra un
+veredicto campe\'on-retador; es una captura hist\'orica, anterior a la reconciliaci\'on de octubre,
+y no muestra el veredicto vigente.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.90\textwidth]{mlops_mlflow_champion.png}
 \caption[Veredicto campe\'on-retador registrado]{Registro del procedimiento campe\'on-retador
 en el almac\'en de experimentos: las recetas desplegadas para FAD y DFF con su error medio del
-conjunto reservado, conservadas como corridas trazables. Fuente: captura de la interfaz de MLflow.}
+conjunto reservado, conservadas como corridas trazables. Captura hist\'orica, anterior a la
+reconciliaci\'on de octubre. Fuente: captura de la interfaz de MLflow.}
 \label{fig:mlflow_champion}
 \end{figure}
 
@@ -4944,10 +4983,11 @@ ejecuta el monitor de \textit{drift} (que compara ahora mezclas equivalentes de
 horizontes) y, si todo pasa, redepliega el demostrador. El registro prospectivo es
 inmutable: la a\~nada 2026-07 corresponde al congelado del 3 de julio con el m\'etodo de
 bandas previo, de modo que la primera a\~nada calificada con las bandas por cuantil por
-horizonte ser\'a la de 2026-08. Cada corte publicable queda adem\'as identificado por un
-manifiesto de \textit{release} con suma de verificaci\'on SHA-256 por artefacto; las
-cifras de este documento corresponden a la a\~nada \factPanelVintage{} del panel
-(hash \factPanelHashShort). As\'i, el sistema se
+horizonte fue la de 2026-08. Cada corte publicable queda adem\'as identificado por un
+manifiesto de \textit{release} con suma de verificaci\'on SHA-256 por artefacto. Los
+descriptores del panel de este documento corresponden a la a\~nada \factPanelVintage{}
+(hash \factPanelHashShort); las m\'etricas retrospectivas, a la ventana causal del corte de
+septiembre de 2026, que los boletines posteriores no modifican. As\'i, el sistema se
 mantiene reproducible y auditado. La puesta al d\'ia, en cambio, depende de que la fuente siga
 siendo alcanzable de forma autom\'atica: cuando su cortafuegos rechaza al cliente del proceso
 desatendido, la ingesta del mes pasa a un procedimiento manual gobernado que conserva el congelado
