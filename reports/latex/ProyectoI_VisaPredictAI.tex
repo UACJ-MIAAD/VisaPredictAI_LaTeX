@@ -1968,7 +1968,8 @@ datos. Los árboles se formulan sobre la \textit{primera diferencia} (predicen e
 incremento mensual y lo reintegran), condición necesaria para que puedan extrapolar la
 tendencia en lugar de saturarse en el máximo observado. Se incluye además un
 \textit{foundation model} preentrenado (Chronos) evaluado en modo zero-shot, sin
-ajustarse a estos datos.
+ajustarse a estos datos. La Tabla~\ref{tab:modelos_a6} resume las líneas base y las familias
+del catálogo.
 
 \begin{table}[H]
 \centering
@@ -2451,7 +2452,8 @@ perfiles de dependencias fijados. DuckDB y pandas proporcionan acceso tabular; N
 y las bibliotecas especializadas implementan los árboles. Git conserva el código y DVC liga
 los datos y artefactos voluminosos a sus versiones \cita{43}. MLflow recibe el registro de
 experimentos \cita{49}, mientras pytest, Ruff y mypy verifican comportamiento, estilo y tipos.
-GitHub Actions reproduce estas puertas antes de integrar cambios \cita{50}.
+GitHub Actions reproduce estas puertas antes de integrar cambios \cita{50}. La
+Tabla~\ref{tab:herramientas_a8} resume cada herramienta y su responsabilidad.
 
 \begin{table}[H]
 \centering
@@ -2689,7 +2691,8 @@ de pronóstico; los módulos de transporte y cobertura validan artefactos; y el 
 orquesta esas piezas. Los contratos de entorno comparan los paquetes instalados con los archivos de bloqueo,
 la prueba de humo (\textit{smoke test}) importa los puntos de entrada en procesos limpios y la puerta de linaje contrasta cada
 instantánea con su nombre, \textit{hash} y mes esperado. Esta estructura reduce la dependencia del
-conocimiento tácito y permite probar cada frontera de forma aislada.
+conocimiento tácito y permite probar cada frontera de forma aislada. La
+Tabla~\ref{tab:modulos_a9} resume las responsabilidades de los módulos principales.
 
 \begin{table}[H]
 \centering
