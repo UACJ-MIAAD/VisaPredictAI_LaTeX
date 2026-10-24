@@ -637,7 +637,7 @@ artefacto verificable de cada etapa del proceso de obtención y conversión.}
 \rowcolor{uacjblue!15}
 \textbf{Etapa} & \textbf{Herramienta} & \textbf{Conversión de formato} & \textbf{Artefacto resultante} \\ \midrule
 Descubrimiento & Python: \texttt{requests} y \texttt{beautifulsoup4} & Índice HTML a lista de enlaces & Lista de enlaces mensuales, contrastada con un piso de 290 \\
-Congelado & \texttt{requests} o captura asistida, con escritura atómica & Página o PDF oficial a instantánea inmutable & \texttt{data/snapshots/}: 301 archivos HTML, incluido octubre de 2026 con su PDF de origen \\
+Congelado & \texttt{requests} o captura asistida, con escritura atómica & Página o PDF oficial a instantánea inmutable & \texttt{data/snapshots/}: 302 archivos HTML, incluidos octubre y noviembre de 2026 con su PDF de origen \\
 Extracción & \texttt{beautifulsoup4} y \texttt{pandas} & HTML congelado a tablas por bloque & 11 archivos CSV crudos en \texttt{data/raw/} \\
 Conversión & \texttt{pandas} & CSV por país a panel largo \textit{tidy} & \texttt{visa\_panel\_long.csv}: \factNObsFmt{} filas por 9 variables (1.6~MB) \\
 Almacenamiento & DuckDB y Parquet & Panel \textit{tidy} a almacén dimensional & \texttt{visapredict.duckdb} (12 tablas y 6 vistas, 13~MB) y el archivo columnar equivalente (98~KB) \\
@@ -664,14 +664,14 @@ conversión, por artefacto y por bloque del panel.}
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{Indicador} & \textbf{Valor} & \textbf{Nota} \\ \midrule
-Instantáneas HTML congeladas & 301 & \factNMonths{} meses únicos, más una ruta alterna y un anuncio especial de julio de 2007 \\
-Meses cubiertos por el panel & \factNMonths{} & De diciembre de 2001 a octubre de 2026, sin meses faltantes \\
+Instantáneas HTML congeladas & 302 & \factNMonths{} meses únicos, más una ruta alterna y un anuncio especial de julio de 2007 \\
+Meses cubiertos por el panel & \factNMonths{} & De diciembre de 2001 a noviembre de 2026, sin meses faltantes \\
 Series estructurales & \factNSeriesStructural{} & Combinaciones observadas de 5 áreas de cargabilidad, 21 categorías y 2 tablas \\
 Registros del panel largo & \factNObsFmt{} & Nueve variables por registro \\
-Registros de la tabla FAD & 18{,}888 & \factNMonths{} meses (diciembre de 2001 a octubre de 2026) \\
-Registros de la tabla DFF & 9{,}173 & 133 meses (la tabla existe desde octubre de 2015) \\
-Bloque de preferencia por empleo & 17{,}546 & 16 categorías (EB-1 a EB-5 con subcategorías) \\
-Bloque de preferencia familiar & 10{,}515 & 5 categorías (F1, F2A, F2B, F3 y F4) \\
+Registros de la tabla FAD & 18{,}963 & \factNMonths{} meses (diciembre de 2001 a noviembre de 2026) \\
+Registros de la tabla DFF & 9{,}248 & 134 meses (la tabla existe desde octubre de 2015) \\
+Bloque de preferencia por empleo & 17{,}646 & 16 categorías (EB-1 a EB-5 con subcategorías) \\
+Bloque de preferencia familiar & 10{,}565 & 5 categorías (F1, F2A, F2B, F3 y F4) \\
 Rangos de \textit{Diversity Visa} & \factDvNRowsFmt{} & Hecho separado del almacén; no es objetivo predictivo \\
 \bottomrule
 \end{tabular}
@@ -699,9 +699,9 @@ las celdas publicadas, invariantes verificadas y cobertura efectiva de las serie
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{Indicador} & \textbf{Valor} & \textbf{Interpretación} \\ \midrule
-Celdas con régimen asignado & $>99.99$\,\% & 28{,}060 de \factNObsFmt{}: solo una celda quedó sin dato interpretable \\
-Observaciones con fecha ($e=F$) & \factNObsFFmt{} & 57.8\,\% del panel; único objetivo predictivo \\
-Observaciones \textit{Current} ($e=C$) & 11{,}215 & 40.0\,\%; categoría al corriente, sin fecha que pronosticar \\
+Celdas con régimen asignado & $>99.99$\,\% & 28{,}210 de \factNObsFmt{}: solo una celda quedó sin dato interpretable \\
+Observaciones con fecha ($e=F$) & \factNObsFFmt{} & 57.9\,\% del panel; único objetivo predictivo \\
+Observaciones \textit{Current} ($e=C$) & 11{,}262 & 39.9\,\%; categoría al corriente, sin fecha que pronosticar \\
 Observaciones \textit{Unavailable} ($e=U$) & 625 & 2.2\,\%; sin números disponibles ese mes \\
 Observaciones sin dato (UNK) & 1 & Menos del 0.01\,\%; se conserva el valor crudo \\
 Fechas de prioridad imparseables & 0 & Guarda que detiene la construcción del panel \\
@@ -1011,11 +1011,11 @@ retrogresiones. Derivado del censo automático del EDA.}
 \textbf{Bloque} & \textbf{Tabla} & \textbf{Series} & \textbf{Obs.~$F$} & \textbf{\%~$F$} &
 \textbf{Avance med.~(d)} & \textbf{\%~congelado} & \textbf{Retros} \\
 \midrule
-% --- tab:eda_descriptiva: censo vintage 2026-10 (make_tex_tables.py) ---
-Familiar & FAD & 25 & 6\,939 & 97\,\% & 21 & 28\,\% & 126 \\
-Familiar & DFF & 25 & 3\,205 & 96\,\% & 0 & 66\,\% & 2 \\
-Empleo & FAD & 80 & 3\,830 & 33\,\% & 0 & 38\,\% & 203 \\
-Empleo & DFF & 64 & 2\,246 & 38\,\% & 0 & 76\,\% & 58 \\
+% --- tab:eda_descriptiva: censo vintage 2026-11 (make_tex_tables.py) ---
+Familiar & FAD & 25 & 6\,964 & 97\,\% & 21 & 28\,\% & 126 \\
+Familiar & DFF & 25 & 3\,225 & 96\,\% & 0 & 66\,\% & 2 \\
+Empleo & FAD & 80 & 3\,859 & 33\,\% & 0 & 38\,\% & 203 \\
+Empleo & DFF & 64 & 2\,275 & 39\,\% & 0 & 77\,\% & 58 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1291,32 +1291,32 @@ acuerdo ADF+KPSS. Las 49 series evaluables restantes comparten el veredicto domi
 \textbf{Serie} & \textbf{ADF} & \textbf{KPSS} & \textbf{DF-GLS} & \textbf{Ljung-Box} &
 \textbf{Veredicto} \\
 \midrule
-% --- tab:eda_estacionariedad: censo vintage 2026-10 (make_tex_tables.py) ---
+% --- tab:eda_estacionariedad: censo vintage 2026-11 (make_tex_tables.py) ---
 México F1 & 1.00 & $<$0.01 & 1.00 & $<$0.001 & diferenciar \\
-México F2A & 0.98 & $<$0.01 & 0.01 & 0.029 & diferenciar \\
-México F2B & 1.00 & $<$0.01 & 1.00 & 0.021 & diferenciar \\
-México F3 & 0.99 & $<$0.01 & 0.78 & $<$0.001 & diferenciar \\
+México F2A & 0.98 & $<$0.01 & 0.01 & 0.028 & diferenciar \\
+México F2B & 1.00 & $<$0.01 & 1.00 & 0.025 & diferenciar \\
+México F3 & 0.98 & $<$0.01 & 0.78 & $<$0.001 & diferenciar \\
 México F4 & 0.53 & $<$0.01 & 0.02 & 0.002 & diferenciar \\
-India F1 & 0.98 & $<$0.01 & 0.06 & $<$0.001 & diferenciar \\
+India F1 & 0.99 & $<$0.01 & 0.13 & $<$0.001 & diferenciar \\
 India F2A & 0.99 & $<$0.01 & 0.03 & 0.003 & diferenciar \\
-India F2B & 0.84 & $<$0.01 & 0.33 & 0.002 & diferenciar \\
-India F3 & 1.00 & $<$0.01 & 0.49 & 0.981 & diferenciar \\
+India F2B & 0.91 & $<$0.01 & 0.24 & $<$0.001 & diferenciar \\
+India F3 & 1.00 & $<$0.01 & 0.56 & 0.024 & diferenciar \\
 India F4 & 0.00 & $<$0.01 & 0.98 & 0.021 & mixto \\
-China F1 & 0.99 & $<$0.01 & 0.24 & $<$0.001 & diferenciar \\
-China F2A & 1.00 & $<$0.01 & 0.10 & 0.008 & diferenciar \\
-China F2B & 0.80 & $<$0.01 & 0.48 & 0.001 & diferenciar \\
-China F3 & 1.00 & $<$0.01 & 0.64 & 0.986 & diferenciar \\
-China F4 & 0.82 & $<$0.01 & 0.57 & 0.891 & diferenciar \\
-Filipinas F1 & 0.87 & $<$0.01 & 0.09 & 0.198 & diferenciar \\
+China F1 & 1.00 & $<$0.01 & 0.35 & $<$0.001 & diferenciar \\
+China F2A & 0.99 & $<$0.01 & 0.10 & 0.007 & diferenciar \\
+China F2B & 0.89 & $<$0.01 & 0.36 & $<$0.001 & diferenciar \\
+China F3 & 1.00 & $<$0.01 & 0.67 & 0.030 & diferenciar \\
+China F4 & 0.91 & $<$0.01 & 0.43 & 0.613 & diferenciar \\
+Filipinas F1 & 0.87 & $<$0.01 & 0.09 & 0.199 & diferenciar \\
 Filipinas F2A & 0.99 & $<$0.01 & 0.08 & 0.002 & diferenciar \\
-Filipinas F2B & 0.91 & $<$0.01 & 0.13 & 0.002 & diferenciar \\
+Filipinas F2B & 0.90 & $<$0.01 & 0.13 & 0.002 & diferenciar \\
 Filipinas F3 & 0.99 & $<$0.01 & 0.56 & $<$0.001 & diferenciar \\
-Filipinas F4 & 0.99 & $<$0.01 & 0.65 & 0.003 & diferenciar \\
-Resto del mundo F1 & 0.98 & $<$0.01 & 0.07 & $<$0.001 & diferenciar \\
+Filipinas F4 & 0.99 & $<$0.01 & 0.38 & 0.004 & diferenciar \\
+Resto del mundo F1 & 0.99 & $<$0.01 & 0.13 & 0.002 & diferenciar \\
 Resto del mundo F2A & 0.99 & $<$0.01 & 0.07 & 0.002 & diferenciar \\
-Resto del mundo F2B & 0.91 & $<$0.01 & 0.39 & $<$0.001 & diferenciar \\
-Resto del mundo F3 & 1.00 & $<$0.01 & 0.67 & 0.968 & diferenciar \\
-Resto del mundo F4 & 0.77 & $<$0.01 & 0.67 & 0.839 & diferenciar \\
+Resto del mundo F2B & 0.95 & $<$0.01 & 0.30 & $<$0.001 & diferenciar \\
+Resto del mundo F3 & 1.00 & $<$0.01 & 0.70 & 0.012 & diferenciar \\
+Resto del mundo F4 & 0.90 & $<$0.01 & 0.40 & 0.445 & diferenciar \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1325,9 +1325,9 @@ Resto del mundo F4 & 0.77 & $<$0.01 & 0.67 & 0.839 & diferenciar \\
 
 El censo panorámico (Tabla~\ref{tab:eda_descriptiva} y
 Figura~\ref{fig:eda_completitud}) revela por qué el bloque de empleo requiere un
-tratamiento distinto: solo el $33$--$38$\,\% de sus celdas tiene fecha publicada
+tratamiento distinto: solo el $33$--$39$\,\% de sus celdas tiene fecha publicada
 (las categorías EB transitan con frecuencia a \textit{Current} o
-\textit{Unavailable}) y, cuando la hay, el congelamiento domina ($38$--$76$\,\% de
+\textit{Unavailable}) y, cuando la hay, el congelamiento domina ($38$--$77$\,\% de
 los meses sin movimiento, con avance mediano de cero días). Sus retrogresiones son
 además más frecuentes que las familiares (261 episodios contra 128) y de gran
 magnitud (Figura~\ref{fig:eda_retros}). Estas propiedades justifican la cobertura
@@ -1404,7 +1404,7 @@ la asimetría capta el sesgo (las retrogresiones producen colas izquierdas) y la
 curtosis, el peso de las colas (eventos extremos).
 
 Las Tablas~\ref{tab:features_estructura} y~\ref{tab:features_anomalias} reportan estos
-descriptores para las 25 series, rederivados hasta octubre de 2026. Las medidas de estabilidad y \textit{lumpiness}
+descriptores para las 25 series, rederivados hasta noviembre de 2026. Las medidas de estabilidad y \textit{lumpiness}
 (varianza de medias y de varianzas por bloque) se calculan en el módulo pero se omiten
 de las tablas por ser dependientes de la escala en días; quedan en el registro
 reproducible.
@@ -1419,31 +1419,31 @@ reproducible.
 \rowcolor{uacjblue!15}
 \textbf{Área} & \textbf{Cat.} & $\mathbf{F_T}$ & $\mathbf{F_S}$ & $\mathbf{H}$ & \textbf{ACF1} & $\mathbf{ACF1}_{\Delta}$ & $\mathbf{d}$ \\ \midrule
 % --- tab:features_estructura: vp_model.series_characterization (make_tex_tables.py) ---
-CN & F1 & 0.993 & 0.013 & 0.307 & 0.986 & $+0.297$ & 1 \\
-CN & F2A & 0.991 & 0.000 & 0.350 & 0.986 & $+0.145$ & 1 \\
-CN & F2B & 0.997 & 0.037 & 0.308 & 0.988 & $+0.197$ & 1 \\
-CN & F3 & 0.992 & 0.000 & 0.364 & 0.982 & $+0.036$ & 1 \\
-CN & F4 & 0.989 & 0.008 & 0.376 & 0.980 & $-0.125$ & 1 \\
-IN & F1 & 0.989 & 0.001 & 0.314 & 0.988 & $+0.225$ & 1 \\
-IN & F2A & 0.994 & 0.000 & 0.329 & 0.988 & $+0.146$ & 1 \\
-IN & F2B & 0.998 & 0.036 & 0.279 & 0.991 & $+0.186$ & 1 \\
-IN & F3 & 0.995 & 0.000 & 0.348 & 0.985 & $+0.039$ & 1 \\
+CN & F1 & 0.992 & 0.000 & 0.315 & 0.985 & $+0.285$ & 1 \\
+CN & F2A & 0.991 & 0.000 & 0.352 & 0.986 & $+0.145$ & 1 \\
+CN & F2B & 0.997 & 0.028 & 0.313 & 0.987 & $+0.175$ & 1 \\
+CN & F3 & 0.991 & 0.000 & 0.374 & 0.980 & $+0.027$ & 1 \\
+CN & F4 & 0.987 & 0.000 & 0.387 & 0.979 & $-0.124$ & 1 \\
+IN & F1 & 0.988 & 0.000 & 0.319 & 0.987 & $+0.218$ & 1 \\
+IN & F2A & 0.994 & 0.000 & 0.331 & 0.988 & $+0.146$ & 1 \\
+IN & F2B & 0.998 & 0.027 & 0.282 & 0.990 & $+0.166$ & 1 \\
+IN & F3 & 0.992 & 0.000 & 0.356 & 0.984 & $+0.030$ & 1 \\
 IN & F4 & 0.993 & 0.000 & 0.336 & 0.988 & $-0.062$ & 1 \\
-MX & F1 & 0.934 & 0.227 & 0.405 & 0.958 & $+0.043$ & 2 \\
-MX & F2A & 0.994 & 0.016 & 0.315 & 0.988 & $+0.133$ & 1 \\
-MX & F2B & 0.997 & 0.068 & 0.355 & 0.984 & $+0.087$ & 2 \\
-MX & F3 & 0.773 & 0.000 & 0.435 & 0.922 & $-0.142$ & 1 \\
-MX & F4 & 0.945 & 0.000 & 0.407 & 0.973 & $-0.019$ & 1 \\
+MX & F1 & 0.936 & 0.227 & 0.403 & 0.959 & $+0.043$ & 2 \\
+MX & F2A & 0.993 & 0.000 & 0.318 & 0.988 & $+0.133$ & 1 \\
+MX & F2B & 0.997 & 0.066 & 0.355 & 0.984 & $+0.081$ & 2 \\
+MX & F3 & 0.776 & 0.000 & 0.432 & 0.923 & $-0.142$ & 1 \\
+MX & F4 & 0.947 & 0.000 & 0.405 & 0.973 & $-0.019$ & 1 \\
 PH & F1 & 0.991 & 0.000 & 0.250 & 0.991 & $+0.116$ & 1 \\
-PH & F2A & 0.994 & 0.001 & 0.329 & 0.988 & $+0.146$ & 1 \\
-PH & F2B & 0.995 & 0.020 & 0.276 & 0.990 & $+0.157$ & 1 \\
-PH & F3 & 0.968 & 0.080 & 0.331 & 0.981 & $+0.075$ & 1 \\
-PH & F4 & 0.997 & 0.000 & 0.323 & 0.989 & $+0.223$ & 1 \\
-RoW & F1 & 0.991 & 0.013 & 0.308 & 0.987 & $+0.218$ & 1 \\
-RoW & F2A & 0.994 & 0.002 & 0.329 & 0.988 & $+0.146$ & 1 \\
-RoW & F2B & 0.998 & 0.036 & 0.279 & 0.991 & $+0.204$ & 1 \\
-RoW & F3 & 0.995 & 0.000 & 0.348 & 0.985 & $+0.040$ & 1 \\
-RoW & F4 & 0.994 & 0.001 & 0.345 & 0.986 & $-0.132$ & 1 \\
+PH & F2A & 0.994 & 0.000 & 0.331 & 0.988 & $+0.146$ & 1 \\
+PH & F2B & 0.995 & 0.021 & 0.276 & 0.990 & $+0.156$ & 1 \\
+PH & F3 & 0.967 & 0.058 & 0.331 & 0.982 & $+0.075$ & 1 \\
+PH & F4 & 0.997 & 0.000 & 0.323 & 0.989 & $+0.220$ & 1 \\
+RoW & F1 & 0.990 & 0.004 & 0.313 & 0.986 & $+0.212$ & 1 \\
+RoW & F2A & 0.994 & 0.000 & 0.331 & 0.988 & $+0.146$ & 1 \\
+RoW & F2B & 0.998 & 0.025 & 0.282 & 0.990 & $+0.182$ & 1 \\
+RoW & F3 & 0.992 & 0.000 & 0.356 & 0.984 & $+0.031$ & 1 \\
+RoW & F4 & 0.993 & 0.000 & 0.353 & 0.985 & $-0.130$ & 1 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1458,31 +1458,31 @@ RoW & F4 & 0.994 & 0.001 & 0.345 & 0.986 & $-0.132$ & 1 \\
 \rowcolor{uacjblue!15}
 \textbf{Área} & \textbf{Cat.} & \textbf{Atípicos} & \textbf{LB}\,$p$ & \textbf{Asim.} & \textbf{Curt.} \\ \midrule
 % --- tab:features_anomalias: vp_model.series_characterization (make_tex_tables.py) ---
-CN & F1 & 66 & 0.000 & $-2.43$ & 48.9 \\
-CN & F2A & 70 & 0.000 & $-3.17$ & 28.6 \\
-CN & F2B & 29 & 0.000 & $-2.90$ & 70.3 \\
-CN & F3 & 46 & 0.000 & $+5.86$ & 103.6 \\
-CN & F4 & 46 & 0.000 & $-0.46$ & 43.6 \\
-IN & F1 & 77 & 0.000 & $-4.78$ & 56.0 \\
-IN & F2A & 71 & 0.000 & $-3.38$ & 32.9 \\
-IN & F2B & 31 & 0.000 & $-2.85$ & 75.3 \\
-IN & F3 & 50 & 0.000 & $+6.26$ & 118.1 \\
-IN & F4 & 55 & 0.000 & $-3.11$ & 49.2 \\
-MX & F1 & 75 & 0.000 & $-2.62$ & 99.7 \\
-MX & F2A & 83 & 0.000 & $-5.33$ & 71.5 \\
-MX & F2B & 64 & 0.000 & $+1.15$ & 20.4 \\
-MX & F3 & 86 & 0.000 & $-4.83$ & 80.0 \\
-MX & F4 & 68 & 0.000 & $-3.40$ & 79.7 \\
-PH & F1 & 75 & 0.000 & $-6.24$ & 57.5 \\
-PH & F2A & 67 & 0.000 & $-3.38$ & 32.9 \\
-PH & F2B & 71 & 0.000 & $-4.05$ & 66.7 \\
-PH & F3 & 81 & 0.000 & $+0.88$ & 48.6 \\
-PH & F4 & 60 & 0.000 & $-7.40$ & 103.7 \\
-RoW & F1 & 63 & 0.000 & $-3.73$ & 47.8 \\
-RoW & F2A & 68 & 0.000 & $-3.38$ & 32.9 \\
-RoW & F2B & 30 & 0.000 & $-2.98$ & 78.8 \\
-RoW & F3 & 49 & 0.000 & $+6.26$ & 118.0 \\
-RoW & F4 & 46 & 0.000 & $-0.41$ & 57.3 \\
+CN & F1 & 64 & 0.000 & $-2.25$ & 46.1 \\
+CN & F2A & 72 & 0.000 & $-3.18$ & 28.7 \\
+CN & F2B & 28 & 0.000 & $-2.32$ & 61.8 \\
+CN & F3 & 49 & 0.000 & $+5.49$ & 88.3 \\
+CN & F4 & 46 & 0.000 & $-0.36$ & 40.9 \\
+IN & F1 & 76 & 0.000 & $-4.61$ & 54.0 \\
+IN & F2A & 64 & 0.000 & $-3.39$ & 33.0 \\
+IN & F2B & 30 & 0.000 & $-2.27$ & 66.4 \\
+IN & F3 & 54 & 0.000 & $+5.87$ & 100.6 \\
+IN & F4 & 56 & 0.000 & $-3.11$ & 49.4 \\
+MX & F1 & 75 & 0.000 & $-2.62$ & 100.1 \\
+MX & F2A & 73 & 0.000 & $-5.34$ & 71.7 \\
+MX & F2B & 65 & 0.000 & $+1.15$ & 20.5 \\
+MX & F3 & 84 & 0.000 & $-4.83$ & 80.3 \\
+MX & F4 & 66 & 0.000 & $-3.41$ & 79.9 \\
+PH & F1 & 83 & 0.000 & $-6.25$ & 57.7 \\
+PH & F2A & 62 & 0.000 & $-3.38$ & 33.0 \\
+PH & F2B & 65 & 0.000 & $-4.05$ & 66.9 \\
+PH & F3 & 79 & 0.000 & $+0.89$ & 48.8 \\
+PH & F4 & 62 & 0.000 & $-7.41$ & 103.9 \\
+RoW & F1 & 64 & 0.000 & $-3.61$ & 46.2 \\
+RoW & F2A & 66 & 0.000 & $-3.39$ & 33.0 \\
+RoW & F2B & 31 & 0.000 & $-2.37$ & 69.3 \\
+RoW & F3 & 54 & 0.000 & $+5.87$ & 100.6 \\
+RoW & F4 & 45 & 0.000 & $-0.29$ & 53.5 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1490,8 +1490,8 @@ RoW & F4 & 46 & 0.000 & $-0.41$ & 57.3 \\
 
 \paragraph{Lectura de la Tabla~\ref{tab:features_estructura} (estructura).} El panel
 presenta tendencia fuerte: la fuerza $F_T$ supera 0.99 en la mayoría de
-las series; entre las menores se encuentran MX/F3 con $F_T=0.773$, MX/F1 con
-$0.934$ y PH/F3 con $0.968$. La fuerza de
+las series; entre las menores se encuentran MX/F3 con $F_T=0.776$, MX/F1 con
+$0.936$ y PH/F3 con $0.967$. La fuerza de
 estacionalidad $F_S$ es prácticamente nula en todo el panel ($F_S < 0.23$, con muchas
 series exactamente en 0). Esta descripción no demuestra ausencia de estacionalidad
 ni explica por sí sola las diferencias predictivas entre SARIMA y ARIMA. La autocorrelación de
@@ -1513,19 +1513,19 @@ frente a la estacionalidad.}
 prueba de Ljung-Box rechaza el ruido blanco en las 25 series ($p < 0.001$ en todas):
 hay estructura temporal que un modelo puede aprovechar. La distribución de los avances
 es marcadamente no gaussiana: la asimetría es mayoritariamente negativa (las
-retrogresiones generan colas izquierdas) y la curtosis es extrema (entre 20.4 y 118.1),
+retrogresiones generan colas izquierdas) y la curtosis es extrema (entre 20.5 y 103.9),
 lo que señala eventos atípicos frecuentes.
 
 \subsubsection{Cambios de régimen frente a anomalías puntuales}
 
-El conteo de la columna ``Atípicos'' (29--86) proviene de un $z$-score robusto por
+El conteo de la columna ``Atípicos'' (28--84) proviene de un $z$-score robusto por
 punto y, por sí solo, confunde dos fenómenos distintos. Un diagnóstico de mayor nivel
 los separa: por un lado, los \textbf{cambios de régimen} (desplazamientos estructurales
 duraderos) se detectan con el algoritmo PELT (\textit{Pruned Exact Linear Time})
 \cita{17} sobre la serie estandarizada; por otro, las \textbf{anomalías puntuales}
 (observaciones aisladas) con un filtro de Hampel sobre el residuo de la STL (mediana y
 MAD locales). Aplicado a México/F3/FAD, el método identifica \textbf{solo 3 cambios de
-régimen}, una medida distinta de los 86 residuos atípicos. Las anomalías puntuales
+régimen}, una medida distinta de los 84 residuos atípicos. Las anomalías puntuales
 aparecen tanto en 2002--2008 como en fechas posteriores
 (Figura~\ref{fig:eda_changepoints}). Los diagnósticos distinguen fenómenos, pero no
 atribuyen por sí solos los residuos atípicos a cambios de régimen. Su efecto
@@ -1562,7 +1562,7 @@ XGBoost. Su comparación predictiva se decide con el protocolo temporal de evalu
 
 \subsubsection{Caracterización retrospectiva de la dificultad por serie}
 
-Con muestras de 133--\factNMonths{} observaciones por serie, cada grado de libertad cuenta, por
+Con muestras de 134--\factNMonths{} observaciones por serie, cada grado de libertad cuenta, por
 lo que el conjunto unido de características de caracterización (catch22 y descriptores
 de pronóstico y de diagnóstico) se somete a un análisis formal de relevancia en dos pasos.
 Primero, un filtro de relevancia univariada con corrección de multiplicidad de Benjamini-Yekutieli
@@ -1706,7 +1706,7 @@ Tabla~\ref{tab:features_anomalias}, Figura~\ref{fig:eda_acf} &
 Los modelos autorregresivos tienen señal que capturar; el orden se orienta con las funciones
 de autocorrelación de la serie diferenciada \\
 La distribución de los avances es asimétrica y de cola pesada (asimetría negativa en 20 de
-las 25 series, curtosis de hasta 118) &
+las 25 series, curtosis de hasta 104) &
 Figuras~\ref{fig:eda_dist}, \ref{fig:eda_violin_c} y~\ref{fig:eda_ridge} &
 Se descarta el supuesto gaussiano: la evaluación usa métricas robustas y los intervalos de
 predicción se construyen por cuantiles empíricos, no por desviación estándar \\
@@ -1732,7 +1732,7 @@ Figuras~\ref{fig:eda_retros} y~\ref{fig:eda_len} &
 Los cambios de régimen quedan fuera de lo que el sistema promete predecir, pero la validación
 debe demostrar que el modelo los tolera sin degradarse \\
 Los atípicos son mayoritariamente estructurales: en México/F3 hay 3 cambios de régimen frente
-a 86 observaciones marcadas como atípicas &
+a 84 observaciones marcadas como atípicas &
 Figura~\ref{fig:eda_changepoints} &
 No se recortan ni se imputan como si fueran ruido; se conservan y se emplea validación
 progresiva con ventanas móviles, que respeta el orden temporal \\
@@ -3340,7 +3340,7 @@ respecto de esas versiones: el conjunto reservado cubre otro tramo de la cola y 
 usa información posterior al origen. Los complementos que cerraron los huecos de la campaña
 (procedencia de la campaña por cohorte, cobertura de referencia y CRPS) se integraron mediante un
 recibo de reconciliación verificable (Apéndice~A.8). El censo operativo posterior
-incorpora octubre de 2026 y actualiza sus descriptores, pero no amplía esa ventana
+incorpora octubre y noviembre de 2026 y actualiza sus descriptores, pero no amplía esa ventana
 retrospectiva ni representa otra ejecución de la campaña.
 
 Las cuatro métricas reportadas se definen como sigue. Sean $y_t$ el valor observado y
@@ -4881,16 +4881,16 @@ ORDER BY obs_F DESC;
 \footnotesize
 \caption[Resultado de la consulta de resumen]{Salida real de la consulta anterior sobre el
 almac\'en: observaciones entrenables por bloque y tabla. La suma de \texttt{obs\_F}
-(6939+3830+3205+2246) reproduce las \factNObsFFmt{} observaciones entrenables del panel.}
+(6964+3859+3225+2275) reproduce las \factNObsFFmt{} observaciones entrenables del panel.}
 \label{tab:duckdb_query}
 \begin{tabular}{@{}l l r r r@{}}
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{block} & \textbf{tabla} & \textbf{series} & \textbf{obs\_F} & \textbf{pct\_F} \\ \midrule
-family     & FAD & 25 & 6\,939 & 96.5 \\
-employment & FAD & 80 & 3\,830 & 32.7 \\
-family     & DFF & 25 & 3\,205 & 96.4 \\
-employment & DFF & 64 & 2\,246 & 38.4 \\
+family     & FAD & 25 & 6\,964 & 96.5 \\
+employment & FAD & 80 & 3\,859 & 32.8 \\
+family     & DFF & 25 & 3\,225 & 96.3 \\
+employment & DFF & 64 & 2\,275 & 38.6 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -5096,7 +5096,7 @@ con su dominio y el valor que toman en una observación real (México, F3, FAD, 
 \texttt{block}           & Texto   & Bloque de preferencia: \texttt{family} o \texttt{employment} & \texttt{family} \\
 \texttt{category}        & Texto   & 21 códigos canónicos (F1--F4 y EB1--EB5 con subcategorías) & \texttt{F3} \\
 \texttt{table}           & Texto   & Tipo de tabla: \texttt{FAD} o \texttt{DFF} & \texttt{FAD} \\
-\texttt{bulletin\_date}  & Fecha   & Primer día del mes del boletín, de 2001-12 a 2026-10 & \texttt{2026-07-01} \\
+\texttt{bulletin\_date}  & Fecha   & Primer día del mes del boletín, de 2001-12 a 2026-11 & \texttt{2026-07-01} \\
 \texttt{status}          & Texto   & Régimen $e$: \texttt{F}, \texttt{C}, \texttt{U} o \texttt{UNK} & \texttt{F} \\
 \texttt{priority\_date}  & Fecha   & Fecha de prioridad publicada; definida solo si \texttt{status = F} & \texttt{2001-06-01} \\
 \texttt{days\_since\_base} & Entero & Variable dependiente $y_{p,c,b,t}$: días desde $t_0 = $ 1975-01-01; definida solo si \texttt{status = F} & \texttt{9648} \\
@@ -5133,17 +5133,17 @@ aportan entre 38 y 39 series cada una, para un total de \factNSeriesStructural{}
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{Bloque} & \textbf{Categoría} & \textbf{Obs.} & \textbf{Bloque} & \textbf{Categoría} & \textbf{Obs.} \\ \midrule
-Familiar & F1  & 2{,}103 & Empleo & EB5            & 480 \\
-Familiar & F2A & 2{,}103 & Empleo & EB5\_TEA       & 729 \\
-Familiar & F2B & 2{,}103 & Empleo & EB5\_PILOT     & 105 \\
-Familiar & F3  & 2{,}103 & Empleo & EB5\_RC        & 805 \\
-Familiar & F4  & 2{,}103 & Empleo & EB5\_NONRC     & 790 \\
-Empleo & EB1        & 2{,}074 & Empleo & EB5\_UNRESERVED & 540 \\
-Empleo & EB2        & 2{,}074 & Empleo & EB5\_RURAL      & 540 \\
-Empleo & EB3        & 2{,}074 & Empleo & EB5\_HIGHUNEMP  & 540 \\
-Empleo & EB3\_OW    & 2{,}074 & Empleo & EB5\_INFRA      & 540 \\
-Empleo & EB4        & 2{,}074 & \multicolumn{2}{l}{\textbf{Total familiar}} & \textbf{10{,}515} \\
-Empleo & EB4\_RW    & 2{,}067 & \multicolumn{2}{l}{\textbf{Total empleo}}   & \textbf{17{,}546} \\
+Familiar & F1  & 2{,}113 & Empleo & EB5            & 480 \\
+Familiar & F2A & 2{,}113 & Empleo & EB5\_TEA       & 729 \\
+Familiar & F2B & 2{,}113 & Empleo & EB5\_PILOT     & 105 \\
+Familiar & F3  & 2{,}113 & Empleo & EB5\_RC        & 805 \\
+Familiar & F4  & 2{,}113 & Empleo & EB5\_NONRC     & 790 \\
+Empleo & EB1        & 2{,}084 & Empleo & EB5\_UNRESERVED & 550 \\
+Empleo & EB2        & 2{,}084 & Empleo & EB5\_RURAL      & 550 \\
+Empleo & EB3        & 2{,}084 & Empleo & EB5\_HIGHUNEMP  & 550 \\
+Empleo & EB3\_OW    & 2{,}084 & Empleo & EB5\_INFRA      & 550 \\
+Empleo & EB4        & 2{,}084 & \multicolumn{2}{l}{\textbf{Total familiar}} & \textbf{10{,}565} \\
+Empleo & EB4\_RW    & 2{,}077 & \multicolumn{2}{l}{\textbf{Total empleo}}   & \textbf{17{,}646} \\
 Empleo & EB4\_TRANS & 40      & \multicolumn{2}{l}{\textbf{Total panel}}    & \textbf{\factNObsFmt{}} \\
 \bottomrule
 \end{tabular}
@@ -5153,16 +5153,16 @@ Empleo & EB4\_TRANS & 40      & \multicolumn{2}{l}{\textbf{Total panel}}    & \t
 
 Cada construcción del panel escribe un registro de limpieza determinista, versionado junto
 al código, que documenta qué produjo esa añada y qué guardas se evaluaron. El registro del
-corte operativo de octubre de 2026 es el siguiente. El panel y los pronósticos operativos
+corte operativo de noviembre de 2026 es el siguiente. El panel y los pronósticos operativos
 se actualizan mensualmente; las comparaciones retrospectivas conservan el corte causal
 de septiembre usado por la campaña, sin recalcularse al incorporar otro boletín:
 
 \begin{verbatim}
 {
- "vintage": "2026-10",
- "n_rows": 28061,
+ "vintage": "2026-11",
+ "n_rows": 28211,
  "n_series": 194,
- "rows_by_status": {"F": 16220, "C": 11215, "U": 625, "UNK": 1},
+ "rows_by_status": {"F": 16323, "C": 11262, "U": 625, "UNK": 1},
  "dup_collapsed": 0,
  "bulletin_date_unparseable": 0,
  "f_priority_date_unparseable": 0,
