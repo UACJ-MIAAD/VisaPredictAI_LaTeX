@@ -4149,12 +4149,51 @@ cada corte publicable y declara el estado de la fuente, la fecha desde la que ri
 Esta prosa no repite esos valores a propósito, porque un estado que cambia no debe quedar tecleado
 en un documento.
 
-La consecuencia operativa es que la ingesta del mes pasó a ser \textbf{semiautomática}: la página
-se obtiene a mano y entra por la misma orden gobernada que usaba el proceso desatendido, de modo
-que el congelado inmutable de cada página, las sumas de verificación por artefacto y el gate que
-exige que el mes llegue efectivamente al panel siguen rigiendo. Cambia quién trae la página, no
-cómo se valida ni cómo se almacena, y por eso el corte vigente no tiene meses ausentes: la
-cobertura sigue siendo de \factNMonths{} de \factNMonths{} meses.
+La consecuencia operativa es que la ingesta del mes adopta una modalidad
+\textbf{manual-automatizada}: el operador obtiene el PDF oficial y lo deposita en una carpeta
+de entrada; la orden local \texttt{make bulletin MONTH=AAAA-MM} extrae el texto con Poppler,
+identifica las cuatro matrices y valida el mes, las etiquetas, los estados y las 150 celdas.
+Conserva el PDF, el texto extraído, el HTML contractual y un recibo con sus huellas. Después
+reconstruye el panel y el almacén DuckDB en un área temporal, sin reemplazar las salidas
+vigentes. La Figura~\ref{fig:ingesta_pdf_asistida} separa esta operación
+de la publicación. Los PDF sin texto utilizable o con matrices ambiguas se rechazan; no se
+introducen celdas inferidas ni una transcripción silenciosa.
+El proceso necesita las instantáneas históricas previamente verificadas: el PDF de un mes
+no reconstruye por sí solo los meses anteriores.
+
+\begin{figure}[H]
+\centering
+\fbox{\begin{minipage}{0.92\textwidth}
+\centering\small
+\textbf{Operador: PDF oficial en la carpeta de entrada}\\[3pt]
+$\downarrow$\\[3pt]
+\textbf{Orden local: extracción de texto y cuatro matrices}\\[3pt]
+$\downarrow$\\[3pt]
+\textbf{Validación: mes, países, categorías, estados y 150 celdas}\\[3pt]
+$\downarrow$\\[3pt]
+\textbf{Evidencia durable: PDF, texto, HTML y recibo con hashes}\\[3pt]
+$\downarrow$\\[3pt]
+\textbf{Área temporal: panel, DuckDB y contratos de integridad}\\[3pt]
+$\downarrow$\\[3pt]
+\textbf{Candidato local; publicación explícita y gobernada}
+\end{minipage}}
+\caption[Ingesta manual-automatizada del boletín]{Flujo local desde el PDF oficial hasta el
+panel y DuckDB. Una validación fallida detiene el candidato. Prepararlo no publica en S3 ni
+crea tags, campañas o despliegues. Fuente: elaboración propia.}
+\label{fig:ingesta_pdf_asistida}
+\end{figure}
+
+El congelado inmutable, las sumas de verificación y el gate que exige la presencia del mes
+en el panel siguen rigiendo. Cambia la obtención de la fuente, no su validación; el corte
+vigente conserva \factNMonths{} de \factNMonths{} meses. La aceptación de esta modalidad
+operativa no acredita dos ciclos desatendidos: cada corrida conserva su propia evidencia,
+y el registro prospectivo de scoring se archiva de forma separada.
+
+La publicación exige una invocación explícita con \texttt{PUBLISH=1} y la ruta del recibo
+de preparación. Usa exactamente el HTML validado, lo archiva en S3 sin sobrescribir una
+fuente previa y solicita el flujo mensual gobernado. Ese flujo reconstruye los datos,
+pronósticos, scoring, EDA y FE, y aplica las puertas del corte, CI y despliegue. Una
+preparación local correcta no se presenta como una publicación ya realizada.
 
 Lo que sí queda amenazado es la \textbf{frescura} del corte y, con ella, la acumulación de añadas
 prospectivas, que es justamente la evidencia que el gate campeón-retador necesita para decidir a
@@ -4341,14 +4380,12 @@ de información: reproduce los pronósticos que el sistema habría emitido con l
 disponible en cada origen, pero solo las añadas congeladas desde julio de 2026 constituyen
 evidencia servida en tiempo real. La distinción se reporta de forma explícita y las añadas
 en vivo se acumulan mes con mes.
-\item El acceso automático a la fuente primaria está bloqueado por su cortafuegos de aplicación,
-de modo que la ingesta del mes es hoy semiautomática. El congelado inmutable y las verificaciones
-no cambian, pero la frescura del corte depende de una intervención manual; la Sección~2.3 acota el
-alcance de esta amenaza y el feed canónico de ingesta publica el estado vigente.
+\item La ingesta manual-automatizada depende de la descarga humana del PDF porque la fuente
+bloquea el acceso automático. La Sección~2.3 describe los contratos y la evidencia; el feed
+canónico de ingesta declara el estado vigente.
 \end{enumerate}
-El trabajo futuro prioriza la evidencia prospectiva multi-horizonte frente al retador
-ingenuo, el tratamiento explícito de los cambios de régimen, la extensión por país de las
-categorías de empleo y la integración del archivo histórico 1992--2001.
+Las prioridades futuras son la evaluación prospectiva frente al naïve-1, los cambios de
+régimen, la ampliación por país del bloque de empleo y el archivo histórico 1992--2001.
 
 
 % ============================================================

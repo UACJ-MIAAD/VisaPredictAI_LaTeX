@@ -3,7 +3,7 @@
 # fijada (resuelve el tocloft.sty que falta en instalaciones locales), con 3 pasadas para
 # estabilizar referencias, y falla ante refs/citas indefinidas, labels duplicados o un
 # censo de overfull sobre el umbral documentado. PDFs y logs quedan como artefactos.
-# El gate es de VERIFICACIÓN: Overleaf sigue siendo el compilador oficial del entregable.
+# El gate es de VERIFICACIÓN: la entrega se compila y revisa localmente; no depende de Overleaf.
 name: LaTeX gate
 
 on:
