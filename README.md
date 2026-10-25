@@ -1,8 +1,8 @@
 # VisaPredictAI LaTeX
 
-Repositorio documental de VisaPredictAI. Esta es la fuente que debe conectarse a
-Overleaf y compilarse; el repositorio de datos ya no es el punto de entrada para
-los documentos académicos.
+Repositorio documental de VisaPredictAI. Esta es la autoridad de fuentes para
+la compilación y revisión locales; el repositorio de datos ya no es el punto de
+entrada para los documentos académicos. Overleaf no es una dependencia de entrega.
 
 ## Documentos
 
@@ -16,16 +16,18 @@ El workflow **LaTeX gate** compila los tres documentos desde un clon limpio,
 comprueba referencias, citas, labels y overfulls, y conserva PDF y logs como
 artefactos de CI. También ejecuta el guardarraíl tipográfico de Proyecto I.
 
-## Uso con Overleaf
+## Compilación local
 
-1. Importar o vincular este repositorio de GitHub.
-2. Para la tesis, seleccionar
-   `reports/latex/ProyectoI_VisaPredictAI.tex` como documento principal.
-3. Para el anteproyecto, seleccionar
-   `reports/latex/AnteproyectoVisaPredictAI.tex`.
-4. Para el paper, seleccionar `reports/paper_micai/paper.tex`.
-5. Usar pdfLaTeX. No editar únicamente en Overleaf: todo cambio durable vuelve
-   por PR a este repositorio.
+Desde la carpeta del documento, ejecutar tres veces
+`pdflatex -interaction=nonstopmode -halt-on-error <archivo.tex>` con TeX Live local.
+Comprobar después los logs con `tools/check_latex_log.sh`: los umbrales son
+`0 0` para Proyecto I y Anteproyecto, y `3 15` para el paper. Ejecutar también
+`python3 tools/check_no_emdash.py` y las pruebas documentales.
+
+Antes de entregar, revisar las páginas renderizadas, conservar el SHA de las
+fuentes, la versión del compilador, los logs y el SHA-256 del PDF. Los paquetes
+DOCX y PPTX se exportan a PDF localmente. Una compilación correcta no sustituye
+la revisión del autor, el aval del asesor ni el acuse de entrega.
 
 ## Procedencia
 
