@@ -93,3 +93,27 @@ def test_referencias_del_maestro_son_contiguas_y_todas_se_usan() -> None:
     for inicio, fin in re.findall(r"\\cita\{(\d+)\}\\textendash\\cita\{(\d+)\}", texto):
         citadas.update(range(int(inicio), int(fin) + 1))
     assert citadas == set(referencias)
+
+
+def test_las_herramientas_citadas_apuntan_a_su_propia_referencia() -> None:
+    """Una cita junto al nombre de una herramienta debe resolver a la entrada de esa herramienta.
+
+    La renumeración por primera aparición dejó en el apéndice DVC, MLflow y DuckDB apuntando a
+    las entradas que antes llevaban esos números (Demšar, M4 y PatchTST).
+    """
+    texto = _texto()
+    entradas = {
+        int(numero): _normalizar(cuerpo).lower()
+        for numero, cuerpo in re.findall(
+            r"\\item\\label\{bib:(\d+)\}(.*?)(?=\\item\\label|\\end\{enumerate\})", texto, re.S
+        )
+    }
+    nombres = {"dvc": "dvc", "mlflow": "machine learning lifecycle", "duckdb": "duckdb",
+               "pandas": "python", "requests": "requests", "beautifulsoup4": "beautiful soup"}
+    patron = r"(DVC|MLflow|DuckDB|duckdb|pandas|requests|beautifulsoup4)\}?~?\s*\\cita\{(\d+)\}"
+    errores = [
+        f"{herramienta} -> [{numero}]"
+        for herramienta, numero in re.findall(patron, texto)
+        if nombres[herramienta.lower()] not in entradas[int(numero)]
+    ]
+    assert not errores, errores
