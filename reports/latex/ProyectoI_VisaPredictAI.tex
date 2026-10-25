@@ -4842,7 +4842,7 @@ Monitor de \textit{drift} & Vigila degradaci\'on de desempe\~no, cobertura y dat
 \section{A.5 Pipeline reproducible y versionado de datos}
 
 La cadena de datos abiertos se declara como un grafo de dependencias versionado con la
-herramienta de control de versiones de datos (\textit{Data Version Control}, DVC~\cita{57}).
+herramienta de control de versiones de datos (\textit{Data Version Control}, DVC~\cita{43}).
 El comando \texttt{dvc repro} reconstruye \textit{en orden y solo lo que cambi\'o} la
 secuencia \texttt{scrape} $\to$ \texttt{panel} $\to$ \{\texttt{bulletins}, almac\'en,
 cifras canónicas\}, con la carpeta de \textit{snapshots} HTML congelados como ra\'iz
@@ -4857,7 +4857,7 @@ no recomputa nada) y un mismo \textit{rebuild} produce datos id\'enticos byte a 
 \section{A.6 Seguimiento de experimentos}
 
 Cada corrida de modelado se registra en un almac\'en de experimentos gestionado con
-MLflow~\cita{58}: par\'ametros, m\'etricas (MASE, sMAPE, cobertura), identificador de
+MLflow~\cita{49}: par\'ametros, m\'etricas (MASE, sMAPE, cobertura), identificador de
 \textit{commit} de Git y artefactos asociados. En total se conservan \textbf{m\'as de
 2\,400 corridas} trazables a lo largo de las campa\~nas de comparaci\'on, ajuste y ensamble.
 Desde la \'ultima campa\~na, cada corrida porta adem\'as el \textbf{identificador de
@@ -4885,7 +4885,7 @@ Captura hist\'orica, anterior a la campa\~na causal. Fuente: captura de la inter
 \section{A.7 Almac\'en dimensional en estrella}
 
 El panel se carga en un almac\'en dimensional en estrella implementado sobre la base de
-datos anal\'itica embebida DuckDB~\cita{59}. El modelo (ya presentado en la
+datos anal\'itica embebida DuckDB~\cita{42}. El modelo (ya presentado en la
 Figura~\ref{fig:schema_er}) comprende doce tablas: siete dimensiones, dos tablas de
 hechos y tres de gobernanza y procedencia (la versi\'on del esquema, la bit\'acora de
 ejecuci\'on ampliada y el linaje de artefactos fuente, que ata cada mes del panel al
@@ -5236,9 +5236,9 @@ Python                            & 3.14     & Intérprete de todo el flujo \\
 \texttt{requests} \cita{7}     & 2.33.0   & Descarga de las páginas del boletín \\
 \texttt{beautifulsoup4} \cita{8} & 4.14.3 & Análisis sintáctico del HTML congelado \\
 \texttt{pandas} \cita{9}    & 3.0.0    & Consolidación y conversión al panel largo \\
-\texttt{duckdb} \cita{59}      & 1.5.3    & Almacén dimensional y archivo columnar \\
+\texttt{duckdb} \cita{42}      & 1.5.3    & Almacén dimensional y archivo columnar \\
 \texttt{tqdm}                     & 4.67.3   & Barra de progreso de los recorridos largos \\
-DVC \cita{57}                  & \textit{fijada por perfil} & Grafo de dependencias y versionado de datos \\
+DVC \cita{43}                  & \textit{fijada por perfil} & Grafo de dependencias y versionado de datos \\
 \texttt{matplotlib}               & 3.10.8   & Motor de todas las figuras, con paleta institucional única \\
 \texttt{seaborn}                  & 0.13.2   & Diagramas de violín y de caja, y mapas de calor con agrupamiento jerárquico \\
 \texttt{statsmodels}              & 0.14.6   & Descomposición estacional, pruebas de raíz unitaria y de estacionariedad, autocorrelaciones y pruebas de ruido blanco \\
