@@ -4153,9 +4153,9 @@ La consecuencia operativa es que la ingesta del mes adopta una modalidad
 \textbf{manual-automatizada}: el operador obtiene el PDF oficial y lo deposita en una carpeta
 de entrada; la orden local \texttt{make bulletin MONTH=AAAA-MM} extrae el texto con Poppler,
 identifica las cuatro matrices y valida el mes, las etiquetas, los estados y las 150 celdas.
-Conserva el PDF, el texto extraído, el HTML contractual y un recibo con sus huellas. Después
-reconstruye el panel y el almacén DuckDB en un área temporal, sin reemplazar las salidas
-vigentes. La Figura~\ref{fig:ingesta_pdf_asistida} separa esta operación
+Conserva el PDF, el texto extraído y el HTML contractual. Reconstruye el panel y el almacén
+DuckDB en un área temporal, sin reemplazar las salidas vigentes; al finalizar, emite el
+recibo con las huellas de la cadena. La Figura~\ref{fig:ingesta_pdf_asistida} separa esta operación
 de la publicación. Los PDF sin texto utilizable o con matrices ambiguas se rechazan; no se
 introducen celdas inferidas ni una transcripción silenciosa.
 El proceso necesita las instantáneas históricas previamente verificadas: el PDF de un mes
@@ -4171,9 +4171,9 @@ $\downarrow$\\[3pt]
 $\downarrow$\\[3pt]
 \textbf{Validación: mes, países, categorías, estados y 150 celdas}\\[3pt]
 $\downarrow$\\[3pt]
-\textbf{Evidencia durable: PDF, texto, HTML y recibo con hashes}\\[3pt]
-$\downarrow$\\[3pt]
 \textbf{Área temporal: panel, DuckDB y contratos de integridad}\\[3pt]
+$\downarrow$\\[3pt]
+\textbf{Cierre: recibo durable con hashes de fuentes y resultados}\\[3pt]
 $\downarrow$\\[3pt]
 \textbf{Candidato local; publicación explícita y gobernada}
 \end{minipage}}
