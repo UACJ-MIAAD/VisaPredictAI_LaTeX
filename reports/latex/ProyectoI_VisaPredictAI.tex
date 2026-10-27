@@ -498,11 +498,12 @@ $y_{p,c,b,t}$ como los días transcurridos desde la época base.
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
   font=\footnotesize,
+  execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000},
   stage/.style={rectangle, rounded corners=3pt, draw=uacjblue, line width=0.7pt, fill=white,
-    text width=2.6cm, align=center, minimum height=1.5cm, inner sep=4pt},
+    text width=2.6cm, align=center, minimum height=1.9cm, inner sep=4pt},
   src/.style={stage, fill=uacjblue!8},
   whbox/.style={stage, fill=uacjyellow!30, draw=uacjblack},
-  lbl/.style={font=\scriptsize, text=uacjgray, align=center, text width=2.6cm},
+  lbl/.style={font=\scriptsize, text=uacjgray, align=center, text width=3.2cm},
   darr/.style={-{Latex[length=2.4mm]}, uacjgray, line width=1.0pt}]
   \node[src] (web) {\textbf{travel.state.gov}\\ Visa Bulletin (HTML mensual)};
   \node[stage, right=0.75cm of web] (snap) {Instantánea HTML congelada (respaldo S3)};
@@ -511,7 +512,7 @@ $y_{p,c,b,t}$ como los días transcurridos desde la época base.
   \node[whbox, right=0.75cm of panel] (wh) {Almacén estrella DuckDB (capa gold)};
   \draw[darr] (web)--(snap); \draw[darr] (snap)--(parse);
   \draw[darr] (parse)--(panel); \draw[darr] (panel)--(wh);
-  \node[lbl, below=0.12cm of snap] {\textit{congelar} (skip-if-exists)};
+  \node[lbl, below=0.12cm of snap] {\textit{congelar} si aún no existe};
   \node[lbl, below=0.12cm of parse] {\textit{clasificar} $C/F/U$};
   \node[lbl, below=0.12cm of panel] {$y=$ días desde $t_0{=}$1975};
 \end{tikzpicture}%
@@ -789,12 +790,14 @@ Figura~\ref{fig:cleansing} muestra la lógica que clasifica cada celda en uno de
 \centering
 \begin{tikzpicture}[
   font=\footnotesize,
+  execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000},
   io/.style={rectangle, rounded corners=2pt, draw=uacjgray, fill=uacjblue!6, line width=0.6pt,
-    text width=4.6cm, align=center, minimum height=0.8cm, inner sep=3pt},
+    text width=5.4cm, align=center, minimum height=0.8cm, inner sep=3pt},
   dec/.style={diamond, draw=uacjblue, fill=white, line width=0.8pt, aspect=2.6,
-    inner sep=1pt, align=center, font=\scriptsize, text width=1.7cm},
+    inner sep=1pt, align=center, font=\scriptsize, text width=1.9cm,
+    minimum width=3.6cm, minimum height=1.35cm},
   reg/.style={rectangle, rounded corners=3pt, line width=0.9pt, text width=6.0cm,
-    align=left, inner sep=4pt, minimum height=0.9cm},
+    align=left, inner sep=4pt, minimum height=1.35cm},
   arr/.style={-{Latex[length=2mm]}, uacjgray, line width=0.8pt},
   si/.style={font=\scriptsize\bfseries, text=uacjblue, inner sep=1.5pt},
   no/.style={font=\scriptsize, text=uacjgray, inner sep=1.5pt}]
@@ -804,14 +807,14 @@ Figura~\ref{fig:cleansing} muestra la lógica que clasifica cada celda en uno de
   \node[dec, below=17mm of d1] (d2) {¿Es \texttt{C}?};
   \node[dec, below=17mm of d2] (d3) {¿Es \texttt{U}?};
   \node[reg, draw=uacjblue, fill=uacjblue!12, right=1.4cm of d1] (oF)
-    {\textbf{\textcolor{uacjblue}{F}: fecha de prioridad.} Parseo \texttt{\%d\%b\%y} con
-    guarda de siglo; $y=$ días desde $t_0{=}$1975. \textbf{Único objetivo predictivo.}};
+    {\textbf{\textcolor{uacjblue}{F}: fecha de prioridad.} Parseo con el formato \texttt{\%d\%b\%y}
+    y guarda de siglo; $y=$ días desde $t_0{=}$1975. \textbf{Único objetivo predictivo.}};
   \node[reg, draw=regC, fill=regC!12, right=1.4cm of d2] (oC)
     {\textbf{\textcolor{regC}{C}: \textit{Current}.} Sin fecha; en el entrenamiento global se
     codifica como el mes del boletín.};
   \node[reg, draw=regU, fill=regU!12, right=1.4cm of d3] (oU)
     {\textbf{\textcolor{regU}{U}: \textit{Unavailable}.} Sin números; sin fecha.};
-  \node[reg, draw=regUNK, fill=regUNK!15, below=9mm of d3] (oUNK)
+  \node[reg, draw=regUNK, fill=regUNK!15, below=7mm of oU] (oUNK)
     {\textbf{\textcolor{regUNK}{UNK}: vacía o no parseable.} Centinela explícito (no
     ``\texttt{NA}'', que \texttt{pandas} coercería a \texttt{NaN}).};
   \draw[arr] (cell)--(norm);
@@ -821,7 +824,7 @@ Figura~\ref{fig:cleansing} muestra la lógica que clasifica cada celda en uno de
   \draw[arr] (d2)--node[si,above]{sí}(oC);
   \draw[arr] (d2)--node[no,left]{no}(d3);
   \draw[arr] (d3)--node[si,above]{sí}(oU);
-  \draw[arr] (d3)--node[no,left]{no}(oUNK);
+  \draw[arr] (d3.south)|-node[no,left,pos=0.25]{no}(oUNK.west);
 \end{tikzpicture}
 \caption[Clasificación y conversión de cada celda]{Lógica de limpieza: cada celda publicada se
 normaliza y se clasifica en uno de cuatro regímenes. Solo las celdas con fecha (\textbf{F})
@@ -1790,8 +1793,9 @@ transformaciones, todas diseñadas para evitar la fuga de información (\textit{
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
   font=\footnotesize,
+  execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000},
   fstep/.style={rectangle, rounded corners=3pt, draw=uacjblue, line width=0.7pt, fill=white,
-    text width=2.5cm, align=center, minimum height=1.4cm, inner sep=4pt},
+    text width=2.5cm, align=center, minimum height=1.65cm, inner sep=4pt},
   srcb/.style={fstep, fill=uacjblue!8},
   matb/.style={fstep, fill=uacjyellow!30, draw=uacjblack},
   far/.style={-{Latex[length=2.2mm]}, uacjgray, line width=0.9pt}]
@@ -2105,8 +2109,9 @@ que detalla exclusivamente el flujo interno de modelado.
 \resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
   font=\footnotesize,
+  execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000},
   stage/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!8,
-    line width=0.8pt, text width=2.55cm, align=center, minimum height=1.15cm,
+    line width=0.8pt, text width=2.55cm, align=center, minimum height=1.45cm,
     inner sep=4pt},
   source/.style={stage, fill=uacjyellow!25, draw=uacjblack},
   output/.style={stage, fill=regC!14, draw=regC},
@@ -2127,10 +2132,9 @@ que detalla exclusivamente el flujo interno de modelado.
   \draw[arr] (db)--(fe);\draw[arr] (fe)--(model);\draw[arr] (model)--(eval);
   \draw[arr] (eval)--(release);
 
-  \node[band] (gov) at (4.88,-4.05) {\textbf{Capas transversales:} Git + DVC para
-  versionado \quad $\bullet$ \quad registro de experimentos \quad $\bullet$ \quad
-  pruebas, contratos de datos y procedencia};
-  \node[lab, below=1mm of release] {Consulta web y recuperación documental};
+  \node[band] (gov) at (4.88,-4.05) {\textbf{Capas transversales:} versionado con Git y DVC
+  \quad $\bullet$ \quad registro de experimentos\\pruebas \quad $\bullet$ \quad contratos de
+  datos \quad $\bullet$ \quad procedencia};
 \end{tikzpicture}%
 }
 \caption[Arquitectura general de VisaPredict AI]{Arquitectura extremo a extremo por
@@ -2284,8 +2288,9 @@ validada y produce una salida verificable antes de habilitar la siguiente.
 \resizebox{0.98\textwidth}{!}{%
 \begin{tikzpicture}[
   font=\footnotesize,
+  execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000},
   box/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!8,
-    line width=0.8pt, text width=2.7cm, align=center, minimum height=1.15cm,
+    line width=0.8pt, text width=2.7cm, align=center, minimum height=1.45cm,
     inner sep=5pt},
   guard/.style={box, draw=regC, fill=regC!12},
   store/.style={box, draw=uacjblack, fill=uacjyellow!22},
@@ -2298,9 +2303,9 @@ validada y produce una salida verificable antes de habilitar la siguiente.
   \draw[arr] (prep)--(registry);
   \draw[arr] (registry)--(walk);
 
-  \node[guard] (metrics) at (8.75,-2.25) {\textbf{Evaluación común}\\MASE, errores y cobertura};
-  \node[store] (artifacts) at (5.25,-2.25) {\textbf{Persistencia}\\Pronósticos, modelos y recibos};
-  \node[guard] (gate) at (1.75,-2.25) {\textbf{Puerta de aceptación}\\Cobertura y procedencia};
+  \node[guard] (metrics) at (10.5,-2.25) {\textbf{Evaluación común}\\MASE, errores y cobertura};
+  \node[store] (artifacts) at (7.0,-2.25) {\textbf{Persistencia}\\Pronósticos, modelos y recibos};
+  \node[guard] (gate) at (3.5,-2.25) {\textbf{Puerta de aceptación}\\Cobertura y procedencia};
   \draw[arr] (walk)--(metrics);
   \draw[arr] (metrics)--(artifacts);
   \draw[arr] (artifacts)--(gate);
@@ -2788,7 +2793,7 @@ un archivo como una transición válida.
 \begin{tikzpicture}[
   font=\footnotesize,
   state/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!8,
-    line width=0.9pt, text width=2.8cm, align=center, minimum height=1.62cm,
+    line width=0.9pt, text width=2.8cm, align=center, minimum height=1.85cm,
     inner sep=5pt, execute at begin node={\hyphenpenalty=10000\relax}},
   accepted/.style={state, draw=regC, fill=regC!12},
   failed/.style={state, draw=regU, fill=regU!9},
@@ -2799,9 +2804,9 @@ un archivo como una transición válida.
   \node[accepted] (validated) at (9.8,0) {\textbf{validated}\\Revisión humana acreditada};
   \node[accepted] (published) at (14.7,0) {\textbf{published}\\Versión servida};
   \node[failed] (failed) at (4.9,-2.45) {\textbf{failed}\\Evidencia conservada};
-  \draw[arr] (run)--node[above=2pt, font=\scriptsize]{productores}(computed);
-  \draw[arr] (computed)--node[above=2pt, font=\scriptsize]{revisión}(validated);
-  \draw[arr] (validated)--node[above=2pt, font=\scriptsize]{autorización}(published);
+  \draw[arr] (run)--node[above=4pt, font=\scriptsize]{productores}(computed);
+  \draw[arr] (computed)--node[above=4pt, font=\scriptsize]{revisión}(validated);
+  \draw[arr] (validated)--node[above=4pt, font=\scriptsize]{autorización}(published);
   \draw[reject] (run.south) |- (failed.west);
   \draw[reject] (computed.south) -- (failed.north);
   \draw[reject] (validated.south) |- (failed.east);
@@ -3737,8 +3742,8 @@ paso del modelo profundo global (BiTCN) para México/F1/FAD, emitidos en cada un
 del lapso reservado (no un pronóstico a 24 meses),
 comparado con las fechas de prioridad reales (estado F). La banda anidada representa los
 intervalos de predicción al 50, 80 y 95\,\%: se abre en los saltos de la cola y se cierra al
-estabilizarse, una incertidumbre honesta y resuelta en el tiempo. La
-fecha de prioridad se expresa en años.}
+estabilizarse, una incertidumbre honesta y resuelta en el tiempo. El eje vertical
+muestra la fecha de prioridad.}
 \label{fig:hero}
 \end{figure}
 
@@ -3918,7 +3923,7 @@ Naïve-1 \textit{(piso)} & línea base, por serie & \textit{\factNaiveOneFadMean
 global (BiTCN) frente a las fechas de prioridad reales (estado F) sobre el conjunto reservado
 de 24 meses, con su intervalo de predicción al 95\,\%, en la serie de mayor cobertura de cada
 tabla. El modelo reproduce la trayectoria escalonada y los avances bruscos de la cola
-migratoria; la fecha de prioridad se expresa en años.}
+migratoria; el eje vertical muestra la fecha de prioridad.}
 \label{fig:forecast}
 \end{figure}
 
@@ -3948,7 +3953,8 @@ la fecha mundial.
 conjunto reservado de 24 meses para las 25 combinaciones país$\times$categoría de la tabla
 FAD. Cada panel contrasta la fecha de prioridad real (estado F) con el pronóstico de la red
 profunda global (BiTCN) y su intervalo de predicción al $95$\,\%; la franja sombreada marca
-el lapso del conjunto reservado. La fecha de prioridad se expresa en años.}
+el lapso del conjunto reservado. El eje vertical
+muestra la fecha de prioridad.}
 \label{fig:grid_fad}
 \end{figure}
 
@@ -4163,20 +4169,28 @@ no reconstruye por sí solo los meses anteriores.
 
 \begin{figure}[H]
 \centering
-\fbox{\begin{minipage}{0.92\textwidth}
-\centering\small
-\textbf{Operador: PDF oficial en la carpeta de entrada}\\[3pt]
-$\downarrow$\\[3pt]
-\textbf{Orden local: extracción de texto y cuatro matrices}\\[3pt]
-$\downarrow$\\[3pt]
-\textbf{Validación: mes, países, categorías, estados y 150 celdas}\\[3pt]
-$\downarrow$\\[3pt]
-\textbf{Área temporal: panel, DuckDB y contratos de integridad}\\[3pt]
-$\downarrow$\\[3pt]
-\textbf{Cierre: recibo durable con hashes de fuentes y resultados}\\[3pt]
-$\downarrow$\\[3pt]
-\textbf{Candidato local; publicación explícita y gobernada}
-\end{minipage}}
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\footnotesize, execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000},
+  % Geometría: tres pasos por fila de 3.6 x 1.55 cm, cada 4.3 cm; segunda fila de derecha a izquierda.
+  st/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!6, line width=0.7pt,
+    text width=3.3cm, align=center, minimum height=1.55cm, inner sep=3pt},
+  hum/.style={st, draw=uacjblack, fill=uacjyellow!28},
+  outn/.style={st, draw=regC, fill=regC!12},
+  num/.style={circle, fill=uacjblue, text=white, inner sep=1pt, font=\scriptsize\bfseries,
+    minimum size=4.2mm},
+  arr/.style={-{Latex[length=2mm]}, uacjgray, line width=0.8pt}]
+  \node[hum] (s1) at (0,0) {\textbf{Operador}\\PDF oficial en la carpeta de entrada};
+  \node[st] (s2) at (4.3,0) {\textbf{Orden local}\\extracción de texto y cuatro matrices};
+  \node[st] (s3) at (8.6,0) {\textbf{Validación}\\mes, países, categorías, estados y 150 celdas};
+  \node[st] (s4) at (8.6,-2.3) {\textbf{Área temporal}\\panel, DuckDB y contratos de integridad};
+  \node[st] (s5) at (4.3,-2.3) {\textbf{Cierre}\\recibo durable con hashes de fuentes y resultados};
+  \node[outn] (s6) at (0,-2.3) {\textbf{Candidato local}\\publicación explícita y gobernada};
+  \draw[arr] (s1)--(s2); \draw[arr] (s2)--(s3); \draw[arr] (s3)--(s4);
+  \draw[arr] (s4)--(s5); \draw[arr] (s5)--(s6);
+  \foreach \n/\k in {s1/1,s2/2,s3/3,s4/4,s5/5,s6/6} \node[num] at (\n.north west) {\k};
+\end{tikzpicture}%
+}
 \caption[Ingesta manual-automatizada del boletín]{Flujo local desde el PDF oficial hasta el
 panel y DuckDB. Una validación fallida detiene el candidato. Prepararlo no publica en S3 ni
 crea tags, campañas o despliegues. Fuente: elaboración propia.}
@@ -4675,6 +4689,12 @@ distribution shift,'' en \textit{Advances in Neural Information Processing Syste
 \item\label{bib:65} S. Hoo, S. M\"uller, D. Salinas, y F. Hutter, ``The tabular
 foundation model TabPFN outperforms specialized time series forecasting models,''
 arXiv:2501.02945, 2025.
+\item\label{bib:66} S. E. Robertson y H. Zaragoza, ``The probabilistic relevance framework: BM25
+and beyond,'' \textit{Foundations and Trends in Information Retrieval}, vol. 3,
+n.\textsuperscript{o} 4, pp. 333--389, 2009.
+\item\label{bib:67} P. Lewis \textit{et al.}, ``Retrieval-augmented generation for
+knowledge-intensive NLP tasks,'' en \textit{Advances in Neural Information Processing Systems},
+vol. 33, 2020, pp. 9459--9474.
 \end{enumerate}
 
 % ============================================================
@@ -4751,23 +4771,122 @@ semilla fija, cada figura y tabla de este documento desde cero.
 \section{A.3 Portal de divulgación del proyecto}
 
 El dominio \texttt{visapredictai.com} corresponde a un proyecto personal del autor
-y \textbf{no forma parte del entregable académico evaluado}. La
-Figura~\ref{fig:portal_visapredict} muestra su página de aterrizaje como material
-descriptivo del proyecto; el demostrador académico oficial se ejecuta desde el
-repositorio público (Sección~A.2), sin dependencia operativa del dominio. Cualquier
-cifra cuantitativa reportada en este documento se refiere exclusivamente al sistema
-entregado con el repositorio.
+y \textbf{no forma parte del entregable académico evaluado}. Las figuras de esta sección
+lo muestran como material descriptivo del proyecto; el demostrador académico oficial se
+ejecuta desde el repositorio público (Sección~A.2), sin dependencia operativa del dominio.
+Cualquier cifra cuantitativa reportada en este documento se refiere exclusivamente al sistema
+entregado con el repositorio. El portal no entrena modelos: descarga el manifiesto del corte
+publicado, verifica el hash SHA-256 de cada artefacto y, si alguno no coincide, conserva el
+corte anterior. Las capturas se tomaron el 27 de octubre de 2026 sobre el corte de noviembre
+de 2026; las cifras que muestran son las del portal en esa fecha.
 
-\begin{figure}[H]
+\paragraph{Inicio y mapa del sistema.} La página de inicio (Figura~\ref{fig:portal_visapredict}) presenta
+el problema, los accesos al pronóstico y los indicadores del panel, que se generan en la
+construcción del sitio desde los artefactos del corte y no se escriben a mano. La sección de
+ingeniería contiene el mapa del sistema (Figura~\ref{fig:web_sistema}), que recorre los once
+componentes desde la fuente hasta la operación mensual y enlaza cada uno con su documentación
+técnica.
+
+\begin{figure}[htbp]
 \centering
-\includegraphics[width=0.92\textwidth]{portal_visapredict.png}
-\caption[Portal de divulgación del proyecto]{Página de aterrizaje del proyecto en
-\url{https://visapredictai.com/}, con el resumen del sistema y los indicadores del
-panel. Es una captura de una versión anterior del portal: sus indicadores (modelos,
-observaciones y referencias) no corresponden a las cifras vigentes de este documento.
-Material descriptivo del proyecto personal del autor, \textbf{no parte del
-entregable académico evaluado}. Fuente: captura del portal.}
+\includegraphics[width=\textwidth]{web_home.png}
+\caption[Portal VisaPredict AI: página de inicio]{Página de inicio del portal, con el título
+del proyecto, el acceso al pronóstico y los indicadores del panel publicado. Fuente: captura de
+\url{https://visapredictai.com}.}
 \label{fig:portal_visapredict}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{web_sistema_mapa.png}
+\caption[Portal VisaPredict AI: mapa del sistema]{Mapa del sistema publicado en la sección de
+ingeniería: once componentes, de la fuente y su archivo a la operación mensual, con enlaces a
+la vista de cada componente. Fuente: captura de \url{https://visapredictai.com/ingenieria/}.}
+\label{fig:web_sistema}
+\end{figure}
+
+\paragraph{Galería de pronósticos.} La galería (Figura~\ref{fig:web_galeria}) reúne todas las
+series con pronóstico publicado. Cada tarjeta muestra un trazo compacto del histórico y de la
+proyección, el MASE de la serie, la espera actual y el avance proyectado; los filtros por país,
+tabla y bloque y el orden por precisión, espera o avance quedan en la dirección de la página,
+de modo que una vista se puede compartir. Al abrir una serie se muestra su gráfico con zoom
+(Figura~\ref{fig:web_zoom}): los últimos años del histórico, la proyección a doce meses y las
+bandas conformes al 80\,\% y al 95\,\%. El modo histórico muestra la serie completa con la
+misma proyección. Al pasar el cursor, una etiqueta indica el mes y la fecha de prioridad
+estimada; debajo, el panel de precisión verificada resume el error típico por horizonte y la
+cobertura observada del registro prospectivo, y una herramienta indica si una fecha de
+prioridad dada quedaría al corriente dentro del horizonte.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{web_resultados_galeria.png}
+\caption[Portal VisaPredict AI: galería de pronósticos]{Galería de pronósticos con los
+conteos del corte, los filtros y las tarjetas destacadas por área. Fuente: captura de
+\url{https://visapredictai.com/resultados/}.}
+\label{fig:web_galeria}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.80\textwidth]{web_resultados_zoom.png}\\[2pt]
+{\footnotesize (a) Vista con zoom: últimos años y proyección a doce meses.}\\[8pt]
+\includegraphics[width=0.80\textwidth]{web_resultados_historico.png}\\[2pt]
+{\footnotesize (b) Vista histórica: serie completa con la misma proyección.}
+\caption[Portal VisaPredict AI: pronóstico de México F2A FAD]{Pronóstico de México, categoría
+F2A, tabla FAD, en la galería: (a) vista con zoom y (b) vista histórica, con bandas conformes
+al 80\,\% y al 95\,\%, la etiqueta del mes señalado y el panel de precisión verificada. Fuente:
+captura de \url{https://visapredictai.com/resultados/}.}
+\label{fig:web_zoom}
+\end{figure}
+
+\paragraph{Asistente VisaBot.} VisaBot responde preguntas sobre el boletín y sobre el propio
+proyecto a partir de un índice documental del corte publicado: el glosario, la documentación
+técnica, la tarjeta de modelo y los datos. La recuperación combina un índice léxico BM25, que
+funciona desde el primer momento en el navegador~\cita{66}, con un motor semántico opcional que
+sólo se descarga si la persona lo autoriza; los resultados se fusionan y se reordenan, y cada
+respuesta cita sus fuentes, según el esquema de generación aumentada por recuperación~\cita{67}.
+Cuando el modelo generativo no está disponible, el asistente compone la respuesta directamente
+de los fragmentos recuperados y lo indica. La consola (Figura~\ref{fig:web_bot}) añade un panel
+de contexto (país, categoría, tabla y mes) y herramientas que dibujan, con los mismos datos del
+portal, el pronóstico con zoom, la evolución de fechas, la comparación y la carrera entre
+países, el mapa de calor de la espera y el radar de espera por categoría
+(Figura~\ref{fig:web_bot_tools}). También compara dos boletines celda por celda y resalta sólo
+lo que se movió (Figura~\ref{fig:web_bot_diff}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{web_bot_consola_zoom.png}
+\caption[VisaBot: consola con pronóstico]{Consola de VisaBot: a la izquierda, los indicadores
+del corte, el contexto seleccionado y las herramientas; a la derecha, el pronóstico con zoom de
+México F3 FAD dibujado por la herramienta correspondiente. Fuente: captura de
+\url{https://visapredictai.com/asistente/}.}
+\label{fig:web_bot}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[t]{0.47\textwidth}\centering
+\includegraphics[height=5.1cm]{web_bot_calor.png}\\[2pt]
+{\footnotesize (a) Mapa de calor de la espera}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.52\textwidth}\centering
+\includegraphics[height=5.1cm]{web_bot_radar.png}\\[2pt]
+{\footnotesize (b) Radar de espera}
+\end{minipage}
+\caption[VisaBot: herramientas de visualización]{Herramientas de VisaBot sobre la tabla FAD
+familiar: (a) años de espera por país y categoría en el último boletín y (b) la misma espera
+como huella por país. Fuente: captura de \url{https://visapredictai.com/asistente/}.}
+\label{fig:web_bot_tools}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.80\textwidth]{web_bot_diff.png}
+\caption[VisaBot: comparación de dos boletines]{Comparación de los boletines de noviembre de
+2025 y noviembre de 2026 en la tabla FAD: cada celda muestra el valor de ambos meses y marca
+avances, retrocesos y cambios de estado. Fuente: captura de
+\url{https://visapredictai.com/asistente/}.}
+\label{fig:web_bot_diff}
 \end{figure}
 
 \section{A.4 Plataforma de operaciones de aprendizaje autom\'atico (MLOps)}
@@ -4782,7 +4901,7 @@ transversales (seguimiento/versionado y guardarra\'iles autom\'aticos) y un lazo
 retroalimentaci\'on que califica las predicciones contra la realidad conforme llegan
 nuevos boletines.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
   font=\footnotesize,
@@ -4818,7 +4937,7 @@ bolet\'in nuevo.}
 La Tabla~\ref{tab:mlops_pilares} enumera los seis componentes de la plataforma, cada uno
 reproducible con un \'unico comando.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Componentes de la plataforma MLOps]{Los seis componentes de la plataforma, su
@@ -4835,6 +4954,327 @@ Almac\'en dimensional & Carga el panel en un esquema estrella con restricciones 
 Campe\'on-retador & Eval\'ua la receta desplegada frente a alternativas y emite un veredicto & \texttt{make challenger} \\
 Tarjeta de modelo & Genera la ficha del sistema con su linaje reproducible & \texttt{make model-card} \\
 Monitor de \textit{drift} & Vigila degradaci\'on de desempe\~no, cobertura y datos & \texttt{make drift} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\paragraph{Modelo de operación.} Las secciones A.5, A.8 y A.9 detallan por separado el grafo
+de datos, los guardarraíles y la integración continua. El resto de esta sección los reúne en un
+solo modelo de operación: cómo un boletín oficial se convierte en un pronóstico servido, qué
+decide si un modelo puede desplegarse y qué impide que una cifra distinta llegue a una
+superficie pública. Cada elemento corresponde a un archivo del repositorio público
+(Sección~A.2): el grafo vive en \texttt{dvc.yaml}, la política de promoción en
+\texttt{vp\_model/promotion.py}, la máquina de estados de las campañas en su registro de
+decisión de arquitectura y los flujos de integración en \texttt{.github/workflows/}. Las
+figuras no repiten métricas de desempeño: los valores vigentes se leen de los artefactos
+canónicos citados en el texto.
+
+\paragraph{Vista por capas.} La Figura~\ref{fig:mlops_capas} organiza el sistema en cuatro
+capas. La capa de \textbf{datos} recibe el boletín, lo congela como evidencia y lo propaga por
+un grafo reproducible hasta el panel, el almacén y las cifras canónicas. La capa de
+\textbf{modelado y evaluación} expone los \factNModels{} modelos del catálogo tras una interfaz
+común, los evalúa con validación temporal y conjunto reservado y produce bandas conformes por
+horizonte. La capa de \textbf{gobernanza} separa lo que se mide de lo que se decide: el retador
+corre en sombra, la evaluación prospectiva lo compara contra cortes ya publicados y la promoción
+la autoriza un gate pre-registrado ejecutado por una persona. La capa de \textbf{publicación}
+sella cada corte con un manifiesto de hashes y sólo entrega artefactos cuyo CI terminó en verde.
+El guardián de consistencia atraviesa las cuatro capas: compara la misma cifra en el documento,
+el artículo, el portal, el asistente y la tarjeta de modelo, y detiene la integración si
+difieren~\cita{49}\cita{50}.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\footnotesize, execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000},
+  % Geometría: pestaña de capa 2.1 cm; tarjetas de 3.2 x 1.75 cm con paso de 3.55 cm;
+  % filas cada 2.1 cm; el guardián ocupa la columna derecha a lo alto de las cuatro filas.
+  layer/.style={rectangle, rounded corners=3pt, fill=uacjblue, text=white,
+    text width=1.9cm, align=center, minimum height=1.75cm, inner sep=3pt,
+    font=\footnotesize\bfseries},
+  card/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!6,
+    line width=0.7pt, text width=2.95cm, align=center, minimum height=1.75cm,
+    inner sep=3pt},
+  guard/.style={rectangle, rounded corners=3pt, draw=uacjblack, fill=uacjyellow!28,
+    line width=0.8pt, text width=2.7cm, align=center, minimum height=8.05cm, inner sep=4pt},
+  arr/.style={-{Latex[length=2mm]}, uacjgray, line width=0.8pt},
+  vlink/.style={-{Latex[length=2mm]}, uacjblue, line width=0.9pt},
+  dlink/.style={uacjgray, line width=0.6pt, dashed}]
+  \foreach \y/\name/\txt in {0/L1/Datos, -2.1/L2/Modelado y evaluación,
+      -4.2/L3/Gobernanza, -6.3/L4/Publicación}
+    \node[layer] (\name) at (0,\y) {\txt};
+  \node[card] (d1) at (2.95,0) {\textbf{Ingesta gobernada}\\PDF oficial revisado o instantánea congelada};
+  \node[card] (d2) at (6.50,0) {\textbf{Grafo DVC}\\de las instantáneas al panel y sus derivados};
+  \node[card] (d3) at (10.05,0) {\textbf{Panel y almacén}\\con sus cifras canónicas};
+  \node[card] (m1) at (2.95,-2.1) {\textbf{Catálogo común}\\\factNModels{} modelos con una sola interfaz};
+  \node[card] (m2) at (6.50,-2.1) {\textbf{Validación temporal}\\origen expansible y conjunto reservado};
+  \node[card] (m3) at (10.05,-2.1) {\textbf{Campeón y retador}\\bandas conformes por horizonte};
+  \node[card] (g1) at (2.95,-4.2) {\textbf{Despliegue en sombra}\\registro inmutable por añada};
+  \node[card] (g2) at (6.50,-4.2) {\textbf{Evaluación prospectiva}\\contra cortes ya publicados};
+  \node[card] (g3) at (10.05,-4.2) {\textbf{Gate de promoción}\\pre-registrado, lo aplica una persona};
+  \node[card] (p1) at (2.95,-6.3) {\textbf{Manifiesto de release}\\hash SHA-256 por artefacto};
+  \node[card] (p2) at (6.50,-6.3) {\textbf{Release gate}\\CI verde sobre el SHA exacto};
+  \node[card] (p3) at (10.05,-6.3) {\textbf{Superficies}\\portal, VisaBot, documento y artículo};
+  \foreach \a/\b in {d1/d2,d2/d3,m1/m2,m2/m3,g1/g2,g2/g3,p1/p2,p2/p3}
+    \draw[arr] ([xshift=1pt]\a.east) -- ([xshift=-1pt]\b.west);
+  \foreach \a/\b in {L1/L2,L2/L3,L3/L4}
+    \draw[vlink] (\a.south) -- (\b.north);
+  \node[guard] (gd) at (13.75,-3.15) {\textbf{Guardián de consistencia}\\[5pt]
+    Una sola fuente de cifras:\\{\scriptsize\texttt{key\_facts.json}}\\[5pt]
+    La misma cifra en documento, artículo, portal, asistente y tarjeta de modelo.\\[5pt]
+    Si difieren, el CI falla.};
+  \foreach \n in {d3,m3,g3,p3}
+    \draw[dlink] (\n.east) -- (\n.east -| gd.west);
+\end{tikzpicture}%
+}
+\caption[Modelo MLOps de VisaPredict AI por capas]{Modelo de operación MLOps por capas. Cada
+capa entrega a la siguiente un artefacto versionado: el panel alimenta al modelado, las
+métricas a la gobernanza y la decisión a la publicación. El guardián de consistencia compara
+la salida de cada capa con la fuente única de cifras.}
+\label{fig:mlops_capas}
+\end{figure}
+
+\paragraph{Grafo reproducible de datos.} La Figura~\ref{fig:mlops_dag} muestra el grafo que
+declara \texttt{dvc.yaml}~\cita{43}. Su raíz es la carpeta de instantáneas congeladas, de modo
+que ninguna etapa del grafo accede a la red. \texttt{scrape} extrae las tablas sin conexión;
+\texttt{panel} aplica la limpieza y deja el registro de limpieza; desde el panel se derivan en
+paralelo el feed de boletines, el almacén columnar, las cifras canónicas, los hechos del
+análisis exploratorio y los del preprocesamiento. Las cifras canónicas dependen además de los
+informes de evaluación, por lo que una métrica nueva sólo cambia el documento cuando el grafo
+vuelve a ejecutarse. El archivo \texttt{dvc.lock} registra el hash de cada entrada y salida;
+la integración continua exige que coincida con el grafo y vuelve a derivar las cifras desde los
+datos, así que un cambio de código sin su bloqueo actualizado no se integra.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\footnotesize, execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000},
+  % Geometría: nodos de 2.7 cm; columnas a 0, 3.3, 6.6 y 10.6 cm; derivados cada 1.15 cm,
+  % alimentados por un bus vertical en x = 8.55 cm.
+  st/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!6,
+    line width=0.7pt, text width=2.5cm, align=center, minimum height=0.9cm, inner sep=3pt},
+  src/.style={st, draw=uacjblack, fill=uacjyellow!28},
+  outn/.style={st, draw=regC, fill=regC!12, text width=3.2cm, minimum height=0.8cm},
+  ext/.style={st, draw=uacjgray, fill=uacjgray!10, dashed},
+  arr/.style={-{Latex[length=2mm]}, uacjgray, line width=0.8pt},
+  bus/.style={uacjgray, line width=0.8pt},
+  lab/.style={font=\scriptsize\itshape, text=uacjgray, align=center}]
+  \node[src] (snap) at (0,0) {\textbf{Instantáneas}\\{\scriptsize\texttt{data/snapshots}}};
+  \node[st] (scrape) at (3.3,0) {\textbf{scrape}\\tablas crudas};
+  \node[st] (panel) at (6.6,0) {\textbf{panel}\\CSV largo y registro de limpieza};
+  \node[outn] (db) at (10.6,2.3) {\textbf{database}: almacén columnar};
+  \node[outn] (bull) at (10.6,1.15) {\textbf{bulletins}: feed mensual};
+  \node[outn] (kf) at (10.6,0) {\textbf{key\_facts}: cifras canónicas};
+  \node[outn] (eda) at (10.6,-1.15) {\textbf{eda\_facts}: hechos del EDA};
+  \node[outn] (fe) at (10.6,-2.3) {\textbf{fe\_facts}: hechos del preprocesamiento};
+  \node[ext] (rep) at (14.3,-1.15) {Informes de evaluación y campaña};
+  \node[ext] (s3) at (14.3,2.3) {Remoto S3 de DVC};
+  \draw[arr] (snap) -- (scrape);
+  \draw[arr] (scrape) -- (panel);
+  \draw[bus] (panel.east) -- (8.55,0);
+  \draw[bus] (8.55,-2.3) -- (8.55,1.15);
+  \foreach \n in {bull,kf,eda,fe} \draw[arr] (8.55,0 |- \n.west) -- (\n.west);
+  \draw[arr] (scrape.north) |- (db.west);
+  \draw[arr] (rep.west) -- ++(-0.35,0) |- (kf.east);
+  \draw[arr] (rep.west) -- ++(-0.35,0) |- (fe.east);
+  \draw[arr, dashed] (db.east) -- (s3.west);
+  \node[lab, below=1.5mm of snap] {raíz determinista:\\ninguna etapa usa la red};
+  \node[lab, below=1.5mm of panel] {\texttt{dvc.lock} fija el hash\\de cada entrada y salida};
+\end{tikzpicture}%
+}
+\caption[Grafo reproducible de datos]{Grafo reproducible declarado en \texttt{dvc.yaml}. Las
+siete etapas parten de las instantáneas congeladas; el panel alimenta cinco derivados, y las
+cifras canónicas y los hechos del preprocesamiento dependen también de los informes de
+evaluación. Los binarios derivados se respaldan en el remoto de DVC.}
+\label{fig:mlops_dag}
+\end{figure}
+
+\paragraph{Ciclo de vida del modelo.} La Figura~\ref{fig:mlops_ciclo} sigue a un modelo desde
+el catálogo hasta el despliegue. La evaluación retrospectiva (validación temporal más conjunto
+reservado, con la prueba de Wilcoxon y la corrección de Holm a un paso) sólo declara si un
+modelo es \textit{apto en el conjunto reservado}; no autoriza producción. El retador se
+despliega en sombra: cada mes se congela su pronóstico en un registro de sólo anexado y, cuando
+el boletín siguiente se publica, se puntúa con la misma maquinaria que al campeón, sin
+mezclarse con él. La promoción la decide un gate prospectivo cuyas reglas se registraron antes
+de observar un solo par en vivo (Tabla~\ref{tab:mlops_gate}). Su decisión es consultiva: el
+manifiesto del campeón sólo cambia cuando una persona ejecuta la promoción y el gate la
+autoriza, y como ese manifiesto está versionado en Git, revertir el \textit{commit} restaura al
+campeón anterior. Los experimentos se registran como corridas trazables~\cita{49}.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\footnotesize, execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000},
+  % Geometría: dos filas a 0 y -2.5 cm; columnas cada 3.6 cm; tarjetas de 3.0 x 1.35 cm;
+  % las tres decisiones restantes cuelgan del rombo a -4.5 cm.
+  st/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!6,
+    line width=0.7pt, text width=2.8cm, align=center, minimum height=1.35cm, inner sep=3pt},
+  hum/.style={st, draw=uacjblack, fill=uacjyellow!28},
+  ok/.style={rectangle, rounded corners=2pt, draw=regC, fill=regC!12, text width=2.1cm,
+    align=center, minimum height=0.7cm, inner sep=2pt},
+  no/.style={ok, draw=regU, fill=regU!10},
+  wait/.style={ok, draw=uacjgray, fill=uacjgray!10},
+  dec/.style={diamond, aspect=1.7, draw=uacjblue, fill=white, line width=0.8pt,
+    text width=1.95cm, align=center, inner sep=1pt},
+  arr/.style={-{Latex[length=2mm]}, uacjgray, line width=0.8pt},
+  lab/.style={font=\scriptsize\itshape, text=uacjgray, align=center}]
+  \node[st] (cat) at (0,0) {\textbf{Catálogo}\\\factNModels{} modelos, interfaz común};
+  \node[st] (retro) at (3.9,0) {\textbf{Evaluación retrospectiva}\\validación temporal y reservado};
+  \node[st] (shadow) at (7.8,0) {\textbf{Retador en sombra}\\añada congelada cada mes};
+  \node[st] (ledger) at (11.7,0) {\textbf{Registro prospectivo}\\puntuado contra el corte publicado};
+  \node[dec] (gate) at (11.7,-2.5) {Gate\\pre-registrado};
+  \node[ok] (prom) at (7.8,-2.5) {\textbf{promover}};
+  \node[hum] (human) at (3.9,-2.5) {\textbf{Persona}\\ejecuta la promoción};
+  \node[st] (champ) at (0,-2.5) {\textbf{Campeón vigente}\\manifiesto versionado en Git};
+  \node[wait] (ret) at (9.4,-4.5) {retener};
+  \node[wait] (ext) at (11.7,-4.5) {extender sombra};
+  \node[no] (rej) at (14.0,-4.5) {rechazar};
+  \draw[arr] (cat) -- (retro);
+  \draw[arr] (retro) -- node[lab, above]{apto} (shadow);
+  \draw[arr] (shadow) -- (ledger);
+  \draw[arr] (ledger) -- (gate);
+  \draw[arr] (gate) -- (prom);
+  \draw[arr] (prom) -- (human);
+  \draw[arr] (human) -- (champ);
+  \draw[arr] (gate.south) -- (ext.north);
+  \draw[arr] (gate.south west) -- (ret.north);
+  \draw[arr] (gate.south east) -- (rej.north);
+  \node[lab, below=1.5mm of champ] {rollback: revertir\\el \textit{commit}};
+\end{tikzpicture}%
+}
+\caption[Ciclo de vida del modelo y gate de promoción]{Ciclo de vida de un modelo. La
+evaluación retrospectiva sólo declara la aptitud; el retador acumula evidencia en sombra y el
+gate pre-registrado emite una de cuatro decisiones. Únicamente \textit{promover} habilita a una
+persona a cambiar el manifiesto del campeón, que puede revertirse.}
+\label{fig:mlops_ciclo}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption[Reglas del gate de promoción pre-registrado]{Reglas del gate de promoción
+pre-registrado (\texttt{vp\_model/promotion.py}, política v1.0.1). Se fijaron con cero pares en
+vivo puntuados.}
+\label{tab:mlops_gate}
+\begin{tabular}{p{3.4cm}p{10.6cm}}
+\toprule
+\textbf{Regla} & \textbf{Contenido} \\
+\midrule
+Evidencia admitida & Sólo pares en vivo en ambos lados; el relleno retrospectivo informa pero no promueve. \\
+Muestra mínima & Al menos 3 añadas en vivo y 30 pares por tabla y por banda de horizonte (1--3, 4--6 y 7--12 meses); si no se alcanza, la decisión es extender la sombra. \\
+Unidad de inferencia & La serie: mediana del error escalado por serie y banda, porque los orígenes consecutivos se traslapan. \\
+Hipótesis & No inferioridad a un paso y mejora material en todas las bandas; Wilcoxon pareado unilateral por banda y Holm entre bandas, $\alpha = 0.05$. \\
+Margen y retroceso & Mejora relativa del MASE de al menos 10\,\% en cada banda; un retroceso significativo mayor de 5\,\% en alguna banda produce \textit{rechazar}. \\
+Cobertura & El intervalo al 95\,\% del retador debe cubrir al menos 0.90 en vivo y no quedar más de 3 puntos por debajo del campeón. \\
+Aplicación & La decisión es consultiva; el cambio de campeón exige una persona y es reversible por Git. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{La campaña como transacción.} Una campaña de modelado vuelve a calcular el
+veredicto completo y puede durar más de un día. Para que un fallo a mitad de camino no deje
+artefactos mezclados, cada campaña es una transacción con la máquina de estados que la sección~1.4.1 presenta en la
+Figura~\ref{fig:estados_a10}. Sólo el estado \textit{validada} autoriza publicar; \textit{en
+curso}, \textit{calculada} y \textit{fallida} bloquean, y una interrupción abrupta deja la
+campaña \textit{en curso}, que también bloquea. Llegar a \textit{calculada} exige que las
+puertas de entrada pasen; llegar a \textit{validada}, además, una revisión humana registrada.
+Al validarse, la evidencia del cálculo se copia de forma inmutable y su hash viaja con la
+campaña, de modo que la publicación lee exactamente lo que se revisó.
+
+
+\paragraph{Operación mensual y entrega continua.} La Figura~\ref{fig:mlops_mensual} reparte la
+operación mensual entre sus actores. Como la fuente rechaza a los clientes automatizados, la
+persona descarga el PDF oficial y lo deja en la carpeta de entrada. La orden de preparación
+extrae las tablas, valida identidades y estados y construye un candidato con su recibo, sin
+publicar nada. Sólo después de revisarlo, la publicación explícita archiva la fuente sin
+sobrescritura y activa el flujo mensual. Ese flujo reconstruye el panel y el almacén, regenera
+los pronósticos de la receta desplegada, puntúa el registro prospectivo, ejecuta el gate de
+promoción y el monitor de deriva y sella el corte. La entrega espera el CI verde de ese SHA
+exacto; sólo entonces dispara la reconstrucción del portal, que verifica cada hash del
+manifiesto y conserva el corte anterior si algo no coincide~\cita{50}. Un vigilante semanal
+comprueba que producción sirva el mes vigente y que la última corrida exitosa sea reciente.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\footnotesize, execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000},
+  % Geometría: cuatro carriles de 1.55 cm; pasos de 2.55 cm cada 2.95 cm.
+  lane/.style={rectangle, fill=uacjblue, text=white, text width=1.6cm, align=center,
+    minimum height=1.35cm, inner sep=2pt, font=\scriptsize\bfseries},
+  st/.style={rectangle, rounded corners=3pt, draw=uacjblue, fill=uacjblue!6,
+    line width=0.7pt, text width=2.4cm, align=center, minimum height=1.1cm, inner sep=2pt,
+    font=\scriptsize},
+  hum/.style={st, draw=uacjblack, fill=uacjyellow!28},
+  outn/.style={st, draw=regC, fill=regC!12},
+  arr/.style={-{Latex[length=2mm]}, uacjgray, line width=0.8pt},
+  num/.style={circle, fill=uacjblue, text=white, inner sep=1pt, font=\tiny\bfseries,
+    minimum size=3.6mm}]
+  \foreach \y/\t in {0/Persona, -1.55/Repositorio de datos, -3.10/GitHub Actions, -4.65/Portal}
+    { \node[lane] at (0,\y) {\t};
+      \draw[uacjgray!40, line width=0.4pt] (0.85,\y-0.775) -- (18.6,\y-0.775); }
+  \node[hum] (s1) at (2.3,0) {Descarga el PDF oficial a \texttt{data/inbox}};
+  \node[st]  (s2) at (5.25,-1.55) {\texttt{make bulletin}: candidato + recibo, sin publicar};
+  \node[hum] (s3) at (8.2,0) {Revisa el candidato y su recibo};
+  \node[st]  (s4) at (8.2,-1.55) {\texttt{PUBLISH=1}: archivo sin sobrescritura};
+  \node[st]  (s5) at (11.15,-3.10) {\textbf{update}: panel, pronósticos, registro, gate y sello};
+  \node[st]  (s6) at (14.1,-3.10) {\textbf{CI} verde sobre el SHA final};
+  \node[st]  (s7) at (17.05,-3.10) {\textbf{delivery}: dispara el portal};
+  \node[outn] (s8) at (17.05,-4.65) {Verifica hashes y sirve el corte};
+  \draw[arr] (s1.south) |- (s2.west);
+  \draw[arr] (s2.north) |- (s3.west);
+  \draw[arr] (s3) -- (s4);
+  \draw[arr] (s4.east) -| (s5.north);
+  \draw[arr] (s5) -- (s6);
+  \draw[arr] (s6) -- (s7);
+  \draw[arr] (s7) -- (s8);
+  \foreach \n/\k in {s1/1,s2/2,s3/3,s4/4,s5/5,s6/6,s7/7,s8/8}
+    \node[num] at (\n.north west) {\k};
+  \node[st, draw=uacjgray, fill=uacjgray!8, dashed] (wd) at (11.15,-4.65) {Vigilante semanal: frescura de producción};
+  \draw[arr, dashed] (wd.east) -- (s8.west);
+\end{tikzpicture}%
+}
+\caption[Operación mensual y entrega continua]{Operación mensual por actores. La persona
+aporta la fuente y la revisión; el repositorio prepara y archiva; los flujos de GitHub Actions
+reconstruyen, sellan y entregan sólo tras el CI verde del SHA exacto; el portal verifica los
+hashes antes de servir el corte.}
+\label{fig:mlops_mensual}
+\end{figure}
+
+\paragraph{Integración continua y estructura del código.} La Tabla~\ref{tab:mlops_ci} resume
+los flujos que protegen el repositorio. El código se organiza en capas cuya dirección de
+dependencia sólo apunta hacia abajo, y una prueba lo verifica sobre el árbol sintáctico de los
+imports: \texttt{experiments} (orquestación y campañas) puede importar todo; \texttt{tools}
+(gates y utilidades de línea de órdenes) usa los dominios; \texttt{vp\_model} (métricas,
+validación temporal, intervalos, registro y promoción) depende sólo de \texttt{vp\_data}; y
+\texttt{vp\_data} (parseo, limpieza, contratos y seguimiento) no importa nada del proyecto. La
+red sólo entra por un puerto de descarga con reintentos, y las reglas de dominio se prueban sin
+DVC ni MLflow.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption[Flujos de integración y operación continua]{Flujos de integración y operación
+continua del repositorio de datos.}
+\label{tab:mlops_ci}
+\begin{tabular}{p{2.9cm}p{2.6cm}p{8.2cm}}
+\toprule
+\textbf{Flujo} & \textbf{Trabajo} & \textbf{Qué verifica o ejecuta} \\
+\midrule
+CI (cada cambio) & \texttt{commit-policy} & Política de mensajes y autoría de los \textit{commits}. \\
+ & \texttt{lint-and-test} & Estructura del proyecto, estilo, formato, tipos y pruebas con piso de cobertura. \\
+ & \texttt{model-tests} & Bloqueo de DVC acorde al grafo, re-derivación parcial de las cifras y pruebas de modelado con pisos por módulo. \\
+ & \texttt{consistency} & Guardián de consistencia contra el documento y el portal, contratos de artefactos, catálogo de modelos y presupuestos de deuda. \\
+ & \texttt{ci-gate} & Agregador obligatorio: falla si algún trabajo requerido no terminó con éxito. \\
+\midrule
+Boletín nuevo & \texttt{gate} & Ventana de ejecución y condiciones de entrada. \\
+ & \texttt{update} & Reconstrucción, pronósticos, registro prospectivo, gobernanza y sellado del corte. \\
+ & \texttt{delivery} & Espera el CI del SHA sellado, dispara el portal y comprueba el corte servido. \\
+\midrule
+Vigilante semanal & \texttt{check} & Frescura de producción, estado de la fuente y antigüedad de la última corrida exitosa; abre un aviso si algo falla. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -4997,11 +5437,11 @@ y no muestra el veredicto vigente.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.90\textwidth]{mlops_mlflow_champion.png}
+\includegraphics[width=\textwidth]{mlops_mlflow_champion.png}
 \caption[Veredicto campe\'on-retador registrado]{Registro del procedimiento campe\'on-retador
-en el almac\'en de experimentos: las recetas desplegadas para FAD y DFF con su error medio del
-conjunto reservado, conservadas como corridas trazables. Captura hist\'orica, anterior a la
-reconciliaci\'on de octubre. Fuente: captura de la interfaz de MLflow.}
+en el almac\'en de experimentos: las recetas desplegadas para FAD y DFF conservadas como
+corridas trazables; sus m\'etricas se consultan en el detalle de cada corrida. Captura
+hist\'orica, anterior a la reconciliaci\'on de octubre. Fuente: captura de la interfaz de MLflow.}
 \label{fig:mlflow_champion}
 \end{figure}
 
