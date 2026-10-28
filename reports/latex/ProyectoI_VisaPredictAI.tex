@@ -4777,7 +4777,7 @@ ejecuta desde el repositorio público (Sección~A.2), sin dependencia operativa 
 Cualquier cifra cuantitativa reportada en este documento se refiere exclusivamente al sistema
 entregado con el repositorio. El portal no entrena modelos: descarga el manifiesto del corte
 publicado, verifica el hash SHA-256 de cada artefacto y, si alguno no coincide, conserva el
-corte anterior. Las capturas se tomaron el 27 de octubre de 2026 sobre el corte de noviembre
+corte anterior. Las capturas se tomaron el 27 y el 28 de octubre de 2026 sobre el corte de noviembre
 de 2026; las cifras que muestran son las del portal en esa fecha.
 
 \paragraph{Inicio y mapa del sistema.} La página de inicio (Figura~\ref{fig:portal_visapredict}) presenta
@@ -4881,7 +4881,7 @@ como huella por país. Fuente: captura de \url{https://visapredictai.com/asisten
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.80\textwidth]{web_bot_diff.png}
+\includegraphics[width=\textwidth]{web_bot_diff.png}
 \caption[VisaBot: comparación de dos boletines]{Comparación de los boletines de noviembre de
 2025 y noviembre de 2026 en la tabla FAD: cada celda muestra el valor de ambos meses y marca
 avances, retrocesos y cambios de estado. Fuente: captura de
@@ -4889,6 +4889,80 @@ avances, retrocesos y cambios de estado. Fuente: captura de
 \label{fig:web_bot_diff}
 \end{figure}
 
+\paragraph{Conversaciones con el asistente.} Las Figuras~\ref{fig:web_bot_pronostico}
+a~\ref{fig:web_bot_glosario} reproducen conversaciones reales con el asistente en producción,
+capturadas el 28 de octubre de 2026 con el modelo generativo activo. Cada respuesta se compone
+de un texto que cita sus fuentes y, cuando la pregunta lo pide, de una gráfica o tabla dibujada
+con los datos del corte publicado. Ante una pregunta de pronóstico (Figura~\ref{fig:web_bot_pronostico}),
+el asistente lee el último corte real, la proyección a doce meses del modelo desplegado y su banda
+al 95\,\%, y añade el historial de precisión verificado contra cortes ya publicados; fuera del
+horizonte validado no ofrece estimación. La misma consulta funciona en inglés
+(Figura~\ref{fig:web_bot_en}). Las preguntas comparativas producen la espera actual por país en
+una categoría (Figura~\ref{fig:web_bot_comparar}) o la trayectoria histórica de cada país con su
+pronóstico (Figura~\ref{fig:web_bot_carrera}); las preguntas sobre un boletín devuelven el resumen
+de movimientos y la tabla completa de fechas (Figura~\ref{fig:web_bot_boletin}), y las preguntas
+conceptuales se responden desde el glosario del proyecto (Figura~\ref{fig:web_bot_glosario}).
+Como toda salida de un modelo generativo, la redacción varía entre ejecuciones; las respuestas
+mostradas se contrastaron con los artefactos canónicos del corte, y las cifras que valen para este
+documento son las de los capítulos de resultados, no las del portal.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.80\textwidth]{web_bot_pronostico_mx.png}
+\caption[VisaBot: pronóstico de México F4]{Respuesta de VisaBot a «¿Cuándo avanza México F4?»:
+último corte real, proyección a doce meses con su banda al 95\,\%, gráfica del pronóstico con
+bandas al 80\,\% y 95\,\% e historial de precisión verificado. Fuente: captura de
+\url{https://visapredictai.com/asistente/}.}
+\label{fig:web_bot_pronostico}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\textwidth]{web_bot_forecast_en.png}
+\caption[VisaBot: consulta en inglés]{La misma clase de consulta en la versión en inglés del
+portal: pronóstico de México F2B en la tabla FAD, con la banda al 95\,\% y el historial de
+precisión. Fuente: captura de \url{https://visapredictai.com/en/asistente/}.}
+\label{fig:web_bot_en}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.80\textwidth]{web_bot_comparar_paises.png}
+\caption[VisaBot: comparación de países en F4]{Respuesta a «Compara países en F4 FAD»: años de
+espera entre el boletín vigente y la fecha de prioridad de cada país o área de cargabilidad.
+Fuente: captura de \url{https://visapredictai.com/asistente/}.}
+\label{fig:web_bot_comparar}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.80\textwidth]{web_bot_carrera.png}
+\caption[VisaBot: carrera de países en F3]{Respuesta a «Muéstrame la carrera de países en F3 FAD»:
+fecha de prioridad de cada país desde 2001, con el tramo pronosticado en línea punteada; las
+caídas abruptas son retrogresiones del boletín. Fuente: captura de
+\url{https://visapredictai.com/asistente/}.}
+\label{fig:web_bot_carrera}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.74\textwidth]{web_bot_boletin.png}
+\caption[VisaBot: cambios del boletín de noviembre de 2026]{Respuesta a «¿Qué cambió en el
+boletín de noviembre 2026?»: resumen de avances y retrocesos y tabla FAD completa por categoría y
+país. Fuente: captura de \url{https://visapredictai.com/asistente/}.}
+\label{fig:web_bot_boletin}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.84\textwidth]{web_bot_glosario.png}
+\caption[VisaBot: pregunta conceptual]{Respuesta a «¿Qué diferencia hay entre Final Action Dates y
+Dates for Filing?», construida desde el glosario del proyecto y la tarjeta de modelo. Fuente:
+captura de \url{https://visapredictai.com/asistente/}.}
+\label{fig:web_bot_glosario}
+\end{figure}
+
+\clearpage
 \section{A.4 Plataforma de operaciones de aprendizaje autom\'atico (MLOps)}
 
 El sistema no se limita al modelo: se sostiene sobre una plataforma de operaciones de
