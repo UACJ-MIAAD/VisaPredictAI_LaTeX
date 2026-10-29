@@ -25,16 +25,25 @@ def test_a10_conserva_los_avances_previos_y_anade_el_cierre() -> None:
     for etiqueta in (
         "fig:implementacion_a8",
         "alg:implementacion_a8",
-        "fig:orquestacion_a9",
-        "alg:orquestacion_a9",
         "tab:avances_a10",
         "fig:estados_a10",
         "alg:cierre_a10",
-        "tab:fallos_a10",
         "tab:config_a10",
         "tab:pruebas_a10",
     ):
         assert seccion.count(rf"\label{{{etiqueta}}}") == 1
+    # Consolidación 1.4.1 (29-oct-2026): la taxonomía de fallos de A10 se conserva en prosa, con
+    # su respuesta segura por clase, y la tabla de avances identifica el aporte de A10.
+    normal = _normalizada()
+    for respuesta in ("un entorno divergente del archivo de bloqueo aborta antes de calcular",
+                      "un linaje inválido rechaza la etapa de datos",
+                      "una salida incompleta conserva la preparación sin agregar",
+                      "la contaminación se etiqueta, se aísla",
+                      "una mutación posterior invalida el recibo",
+                      "bloquea la promoción final"):
+        assert respuesta in normal, respuesta
+    avances = normal[normal.index(r"\label{tab:avances_a10}"):]
+    assert r"\textbf{A10} & Cerrar el ciclo de vida del resultado" in avances[: avances.index(r"\end{table}")]
 
 
 def test_a10_define_estados_y_prohibe_transiciones_por_existencia() -> None:
@@ -43,7 +52,11 @@ def test_a10_define_estados_y_prohibe_transiciones_por_existencia() -> None:
         assert rf"\texttt{{{estado}}}" in seccion
     assert "nunca se interpreta la mera existencia de un archivo" in seccion
     assert "Sólo una campaña calculada, validada por revisión humana y autorizada puede publicarse" in seccion
-    assert r"\textbf{validated}\\Revisión humana acreditada" in _seccion_implementacion()
+    implementacion = _seccion_implementacion()
+    fin = implementacion.index(r"\label{fig:estados_a10}")
+    figura = implementacion[implementacion.rindex(r"\begin{figure}", 0, fin):fin]
+    tarjeta = re.search(r"validated/\{([^}]*)\}", figura)
+    assert tarjeta and " ".join(tarjeta.group(1).replace("\\\\", " ").split()) == "Revisión humana acreditada"
     assert r"\texttt{validated} exige además una revisión humana acreditada" in seccion
 
 

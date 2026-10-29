@@ -33,7 +33,7 @@ def test_quality_status_counts_cover_the_current_panel() -> None:
     assert sum(_number(row[1]) for row in statuses) == _fact("factNObs")
 
 
-def test_sql_summary_dated_counts_cover_the_current_trainable_observations() -> None:
-    rows = [line.split("&") for line in _table("tab:duckdb_query").splitlines() if re.match(r"(?:family|employment)\s+&", line)]
+def test_block_census_dated_counts_cover_the_current_trainable_observations() -> None:
+    rows = [line.split("&") for line in _table("tab:eda_descriptiva").splitlines() if re.match(r"(?:Familiar|Empleo)\s+&", line)]
     assert len(rows) == 4
     assert sum(_number(row[3]) for row in rows) == _fact("factNObsF")
