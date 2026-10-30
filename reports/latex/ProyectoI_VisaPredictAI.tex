@@ -593,14 +593,13 @@ objetivo \texttt{days\_since\_base}; las celdas $C$ y $U$ se conservan como anot
 Ese panel se materializa en el almacén cuyo núcleo en estrella muestra la
 Figura~\ref{fig:schema_er} (doce tablas: siete dimensiones, dos tablas de hechos y tres de
 gobernanza y procedencia, además de vistas/marts), sobre el que cualquier consulta es
-reproducible. La ampliación de procedencia añade la tabla \texttt{source\_artifact}, ausente de
-ese dibujo del núcleo, que conserva la identidad y la huella de los archivos fuente y se vincula
-con los hechos mediante la migración de procedencia del almacén.
+reproducible. La tabla de procedencia \texttt{source\_artifact} conserva la identidad y la huella de los
+archivos fuente y se vincula con los hechos mediante la migración de procedencia del almacén.
 
 \begin{figure}[tbp]
 \centering
 \includegraphics[width=\textwidth]{data_csv_panel.pdf}
-\caption[Panel \textit{tidy} resultante]{Muestra del panel largo \texttt{visa\_panel\_long.csv}:
+\caption[Panel largo ordenado resultante]{Muestra del panel largo \texttt{visa\_panel\_long.csv}:
 cada fila combina país, categoría, tabla y mes con su régimen, su fecha de prioridad y la
 variable objetivo \texttt{days\_since\_base}, definida solo cuando el estado es $F$.}
 \label{fig:csv_panel}
@@ -608,11 +607,89 @@ variable objetivo \texttt{days\_since\_base}, definida solo cuando el estado es 
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=0.92\textwidth]{ligeras/data_schema_er_ligera.png}
-\caption[Núcleo en estrella del almacén]{Núcleo dimensional del almacén DuckDB (capa
-gold): siete dimensiones, dos tablas de hechos (prioridades y rangos de \textit{Diversity Visa})
-y vistas/marts. El dibujo precede a la ampliación de procedencia: la tabla
-\texttt{source\_artifact} se documenta en el texto y en el esquema SQL vigente.}
+% Geometría: cuatro columnas en 15.0 cm (centros 1.65, 5.6, 9.55, 13.35 cm). Cada tabla es un
+% nodo de 3.3 cm (hechos 3.6 cm) con encabezado de color y cuerpo blanco en \scriptsize; los
+% nombres de columna van en \ttfamily. Dimensiones en azul; hechos en amarillo; gobernanza y
+% procedencia en gris; las dos vistas de consumo con borde discontinuo. Las claves foráneas son
+% líneas ortogonales (horizontales salvo alias y región); la derivación de vistas, discontinua.
+\begin{tikzpicture}[
+  font=\scriptsize,
+  tbl/.style={draw=#1, line width=0.6pt, inner sep=0pt, outer sep=0pt, fill=white},
+  view/.style={dash pattern=on 2.5pt off 1.5pt},
+  fk/.style={uacjgray, line width=0.5pt},
+  vw/.style={-{Latex[length=1.6mm, width=1.4mm]}, uacjgray, line width=0.5pt,
+    dash pattern=on 2pt off 1.5pt}]
+  \setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.05}
+  % #1 nodo, #2 posición (centro superior), #3 color, #4 color del título, #5 ancho, #6 título,
+  % #7 cuerpo, #8 estilo extra del contorno
+  \newcommand{\ertbl}[8]{%
+    \node[tbl=#3, anchor=north, #8] (#1) at (#2) {%
+      \begin{tabular}{>{\raggedright\arraybackslash}p{#5}}
+        \rowcolor{#3}\textcolor{#4}{\bfseries\ttfamily #6}\\
+        #7
+      \end{tabular}};}
+  % --- Hecho de prioridades y sus dimensiones propias
+  \ertbl{fp}{5.6,0}{uacjyellow}{uacjblack}{3.3cm}{fact\_priority}{%
+    \texttt{area\_id} \textsc{fk}\\ \texttt{category\_id} \textsc{fk}\\ \texttt{table\_id} \textsc{fk}\\
+    \texttt{date\_id} \textsc{fk}\\ \texttt{status} \textsc{fk}\\ \texttt{priority\_date}\\
+    \texttt{days\_since\_base} ($y$)\\ \quad definida sólo con $F$\\ \texttt{etl\_run\_id} \textsc{fk}\\
+    \textit{\factNObsFmt{} filas}}{}
+  \ertbl{area}{1.65,0}{uacjblue}{white}{3.0cm}{dim\_area}{%
+    \texttt{area\_id} \textsc{pk}\\ \texttt{slug}, \texttt{name}\\ \texttt{is\_residual\_group}}{}
+  \ertbl{cat}{1.65,-1.7}{uacjblue}{white}{3.0cm}{dim\_category}{%
+    \texttt{category\_id} \textsc{pk}\\ \texttt{block}, \texttt{code}\\ \texttt{preference\_level}}{}
+  \ertbl{tab}{1.65,-3.4}{uacjblue}{white}{3.0cm}{dim\_table}{%
+    \texttt{table\_id} \textsc{pk}\\ \texttt{code}: FAD o DFF}{}
+  \ertbl{alias}{1.65,-4.75}{uacjblue}{white}{3.0cm}{dim\_category\_alias}{%
+    \texttt{alias\_id} \textsc{pk}\\ \texttt{category\_id} \textsc{fk}\\ \texttt{raw\_label}, vigencia}{}
+  % --- Dimensiones conformadas, compartidas por los dos hechos
+  \ertbl{date}{9.55,-0.55}{uacjblue}{white}{3.0cm}{dim\_date}{%
+    \texttt{date\_id} \textsc{pk}\\ \texttt{bulletin\_date} \textsc{uk}\\ año, mes, año fiscal}{}
+  \ertbl{status}{9.55,-2.1}{uacjblue}{white}{3.0cm}{dim\_status}{%
+    \texttt{status} \textsc{pk}: C, F, U, UNK\\ \texttt{is\_predictable}}{}
+  % --- Hecho de \textit{Diversity Visa} y su dimensión
+  \ertbl{dv}{13.35,0}{uacjyellow}{uacjblack}{3.0cm}{fact\_dv\_rank}{%
+    \texttt{region\_id} \textsc{fk}\\ \texttt{date\_id} \textsc{fk}\\ \texttt{status} \textsc{fk}\\
+    \texttt{rank\_cutoff}\\ \texttt{raw\_value}, \texttt{exceptions}\\ \texttt{etl\_run\_id} \textsc{fk}\\ \textit{\factDvNRowsFmt{} filas}}{}
+  \ertbl{reg}{13.75,-3.75}{uacjblue}{white}{2.2cm}{dim\_region}{%
+    \texttt{region\_id} \textsc{pk}\\ \texttt{slug}, \texttt{name}}{}
+  % --- Vistas de consumo
+  \ertbl{mtr}{5.6,-4.75}{uacjgray}{white}{3.3cm}{mart\_training\_F}{%
+    vista: sólo el estado $F$\\ \textit{\factNObsFFmt{} filas}}{view}
+  \ertbl{mss}{5.6,-6.05}{uacjgray}{white}{3.3cm}{mart\_series\_summary}{%
+    vista: una fila por serie\\ \textit{\factNSeriesStructural{} series}}{view}
+  % --- Gobernanza y procedencia
+  \ertbl{etl}{9.55,-3.6}{uacjgray}{white}{3.0cm}{etl\_run}{%
+    \texttt{run\_id} \textsc{pk}\\ \texttt{git\_sha}, \texttt{panel\_sha256}\\ \texttt{build\_status}}{}
+  \ertbl{src}{9.55,-5.25}{uacjgray}{white}{3.0cm}{source\_artifact}{%
+    \texttt{source\_id} \textsc{pk}\\ \texttt{url}, \texttt{sha256}, añada}{}
+  \ertbl{ver}{13.75,-5.15}{uacjgray}{white}{2.2cm}{schema\_version}{%
+    \texttt{version} \textsc{pk}\\ \texttt{checksum}}{}
+  % --- Claves foráneas y derivación de vistas
+  \begin{scope}[on background layer]
+    \foreach \d in {area, cat, tab} \draw[fk] (\d.east) -- (\d.east -| fp.west);
+    \draw[fk] (alias.west) -- ++(-0.18,0) |- (cat.west);
+    \foreach \d in {date, status} {
+      \draw[fk] (\d.west) -- (\d.west -| fp.east);
+      \draw[fk] (\d.east) -- (\d.east -| dv.west);
+    }
+    \draw[fk] (reg.north) -- (reg.north |- dv.south);
+    \draw[fk] (etl.east) -| ([xshift=3mm]dv.south west);
+    \draw[fk] (etl.west) -| ([xshift=6mm]fp.south);
+  \end{scope}
+  \draw[vw] ([xshift=-6mm]fp.south) -- ([xshift=-6mm]mtr.north);
+  % --- Leyenda bajo la columna izquierda
+  \foreach \c/\t [count=\k] in {uacjblue/dimensión, uacjyellow/hecho, uacjgray/gobernanza y procedencia} {
+    \fill[\c] (0.15, -6.25-0.42*\k) rectangle ++(0.32, 0.2);
+    \node[anchor=west, inner sep=0pt] at (0.6, -6.15-0.42*\k) {\t};
+  }
+  \draw[uacjgray, line width=0.6pt, dash pattern=on 2.5pt off 1.5pt] (0.15, -7.93) rectangle ++(0.32, 0.2);
+  \node[anchor=west, inner sep=0pt] at (0.6, -7.83) {vista de consumo};
+\end{tikzpicture}
+\caption[Núcleo en estrella del almacén]{Esquema del almacén DuckDB (capa gold): siete
+dimensiones, dos tablas de hechos (prioridades y rangos de \textit{Diversity Visa}), tres
+tablas de gobernanza y procedencia y las dos vistas de consumo. Las líneas continuas son
+claves foráneas; la flecha discontinua, la vista de entrenamiento que se deriva de los hechos.}
 \label{fig:schema_er}
 \end{figure}
 
@@ -1002,7 +1079,7 @@ el EDA profundiza.
 \caption[El panel completo en una sola imagen]{Las $\factNObsFmt$ observaciones del panel en
 una sola imagen: cada fila es una serie país~$\times$~categoría~$\times$~tabla y cada
 celda un boletín mensual, clasificado según si la fecha avanza, se congela, retrocede,
-está en \textit{Current} o no se publica. El blanco indica que la serie no existe ese
+está vigente ($C$) o no se publica. El blanco indica que la serie no existe ese
 mes (por ejemplo, DFF antes de octubre de 2015).}
 \label{fig:eda_panel}
 \end{figure}
@@ -1036,8 +1113,8 @@ Empleo & DFF & 64 & 2\,275 & 39\,\% & 0 & 77\,\% & 58 \\
 \caption[Radiografía de completitud de las \factNSeriesStructural{} series]{Composición de régimen
 ($F$/$C$/$U$/sin dato) de las \factNSeriesStructural{} series estructurales, ordenadas por proporción de
 fechas dentro de cada bloque (izquierda), y distribución de la continuidad del tramo
-con fechas (derecha). El bloque de empleo concentra los periodos \textit{Current} y
-\textit{Unavailable}; el familiar es casi íntegramente entrenable.}
+con fechas (derecha). El bloque de empleo concentra los periodos vigentes ($C$) y
+no disponibles ($U$); el familiar es casi íntegramente entrenable.}
 \label{fig:eda_completitud}
 \end{figure}
 
@@ -1110,7 +1187,8 @@ la forma.}
 \centering
 \includegraphics[width=0.86\textwidth]{eda2_violin_category.pdf}
 \caption[Avance mensual por categoría (violín)]{Distribución del avance mensual por categoría
-de preferencia familiar (FAD).}
+de preferencia familiar (FAD); las líneas internas marcan los cuartiles. Avance recortado para
+apreciar la forma.}
 \label{fig:eda_violin_cat}
 \end{figure}
 
@@ -1180,8 +1258,10 @@ con el atraso bajo FAD (acción final), para las series con ambas tablas publica
 \end{figure}
 
 La descomposición STL (\textit{Seasonal-Trend decomposition using Loess})\cita{12} de una serie representativa (Figura~\ref{fig:eda_stl})
-confirma una tendencia creciente dominante y una componente estacional pequeña,
-con residuos volátiles concentrados en el periodo temprano. Las pruebas de
+confirma una tendencia creciente dominante. La componente estacional es prácticamente
+nula desde 2012; sus picos anteriores no son estacionalidad, sino las retrogresiones de
+2002 a 2010, que la STL reparte entre esa componente y unos residuos volátiles concentrados
+en el periodo temprano. Las pruebas de
 estacionariedad lo formalizan: para la serie México/F3/FAD, la prueba de
 \textit{Augmented Dickey-Fuller} (ADF) no rechaza la raíz unitaria ($p=0.99$) y la
 de \textit{Kwiatkowski-Phillips-Schmidt-Shin} (KPSS)\cita{13} rechaza la estacionariedad en
@@ -1446,7 +1526,9 @@ predictivo debe contrastarse mediante validación temporal y métricas robustas.
 \includegraphics[width=0.86\textwidth]{eda_changepoints_mexico_F3_FAD.png}
 \caption[Cambios de régimen y anomalías puntuales]{Cambios de régimen (PELT, líneas
 verticales) frente a anomalías puntuales (filtro de Hampel, marcadores) en
-México/F3/FAD. Distingue desplazamientos estructurales de observaciones aisladas.}
+México/F3/FAD. PELT ubica tres cambios de régimen en el tramo reciente; la retrogresión
+de 2006, que se revierte en pocos meses, no queda marcada como cambio de régimen, lo que
+ilustra el límite del detector ante episodios breves y extremos.}
 \label{fig:eda_changepoints}
 \end{figure}
 
@@ -1740,12 +1822,10 @@ media positiva y por tanto extrapolable por los modelos.}
 \begin{figure}[tbp]
 \centering
 \includegraphics[width=0.77\textwidth]{fe_gaps.pdf}
-\caption[Política de huecos (MNAR)]{Estructura de ausencia sobre México/EB4\_RW/FAD,
-la serie con las corridas de ausencia más largas del panel: observaciones publicadas
-(puntos) y tramos de relleno de la rejilla de entrenamiento (segmentos). La política
-vigente rellena todo hueco de la rejilla de modelado arrastrando la última
-observación publicada, sin usar el extremo futuro; la imputación por Kalman existe
-solo para caracterizar los huecos en el EDA, jamás como insumo de entrenamiento.}
+\caption[Política de huecos (MNAR)]{Ausencias de México/EB-4 religiosos/FAD, la serie con las
+corridas sin fecha más largas: interpolación descriptiva de huecos de hasta tres meses,
+Kalman sobre los largos y huecos largos sin rellenar. Ningún relleno entra al entrenamiento,
+cuya rejilla arrastra la última observación publicada.}
 \label{fig:fe_gaps}
 \end{figure}
 
@@ -1754,7 +1834,7 @@ solo para caracterizar los huecos en el EDA, jamás como insumo de entrenamiento
 \includegraphics[width=0.77\textwidth]{fe_regime.pdf}
 \caption[Régimen administrativo y máscara de evaluación]{Régimen administrativo de
 cada mes (fondos) y máscara de evaluación (franja inferior) sobre una serie de empleo
-con episodios \textit{Current} y \textit{Unavailable}: la línea existe solo donde hay
+con episodios vigentes ($C$) y no disponibles ($U$): la línea existe solo donde hay
 fecha publicada y la evaluación puntúa únicamente esos meses; los rellenos de
 continuidad del entrenamiento nunca se califican.}
 \label{fig:fe_regime}
@@ -1762,17 +1842,18 @@ continuidad del entrenamiento nunca se califican.}
 
 Para verificar qué información usan efectivamente los modelos tabulares, la
 Figura~\ref{fig:fe_importance} reporta la importancia de características de un árbol de
-potenciación de gradiente (LightGBM) entrenado sobre el avance mensual: domina el avance del
-mes anterior ($t-1$), seguido de los rezagos cortos y del rezago anual ($t-12$), mientras que
-los regresores de calendario aportan una señal menor pero no nula, coherente con la débil
-estacionalidad observada en el EDA.
+potenciación de gradiente (LightGBM) entrenado sobre el avance mensual, medida por el número de divisiones en que interviene cada
+variable: los avances de los meses $t-1$ y $t-3$ encabezan el orden casi empatados, seguidos de los
+demás rezagos cortos y del rezago anual ($t-12$), mientras que los regresores de calendario
+aportan una señal menor pero no nula, coherente con la débil estacionalidad observada en el EDA.
 
 \begin{figure}[tbp]
 \centering
 \includegraphics[width=0.71\textwidth]{fe_importance.pdf}
-\caption[Importancia de características]{Importancia (por ganancia) de las características de un
-modelo de potenciación de gradiente para predecir el avance mensual de la fecha (FAD): los
-rezagos del propio avance dominan; el calendario cíclico aporta una señal secundaria.}
+\caption[Importancia de características]{Importancia (por número de divisiones) de las
+características de un modelo de potenciación de gradiente para predecir el avance mensual de la
+fecha (FAD): los rezagos del propio avance dominan; el calendario cíclico aporta una señal
+secundaria.}
 \label{fig:fe_importance}
 \end{figure}
 
@@ -2010,7 +2091,7 @@ común (\texttt{fit}/\texttt{predict}) mediante la biblioteca \textit{Darts} \ci
 reúsa el motor de validación temporal y la generación de bandas probabilísticas; PyTorch
 sustenta las redes neuronales \cita{47}, \texttt{scikit-learn} aporta utilidades para
 aprendizaje automático \cita{48}, y XGBoost, LightGBM y CatBoost implementan los regresores
-sobre avances \cita{30}\cita{31}\cita{32}. Los modelos locales se ajustan por serie y los
+sobre avances \cita{30}\textendash\cita{32}. Los modelos locales se ajustan por serie y los
 globales aprenden de varias series sobre la misma representación causal. El código propio se
 limita a la cascada ARIMA-LSTM (ajusta un ARIMA y entrena un LSTM sobre sus residuales), el
 envoltorio que diferencia las series para los árboles y el adaptador de Chronos en modo
@@ -2894,7 +2975,9 @@ la narrativa del capítulo.
 (menor es mejor), con la barra de diferencia crítica (CD) de la prueba de Nemenyi al $95$\,\%.
 Los modelos unidos por una barra horizontal no presentan una diferencia estadísticamente
 significativa en su rango. (a) FAD, sobre las 25 series; (b) DFF, sobre las 14 series distintas
-tras descontar la pseudo-replicación del corte mundial.}
+tras descontar la pseudo-replicación del corte mundial. La prueba sólo admite modelos con
+puntuación en todas las series: quedan fuera ARIMA y SARIMA en FAD, y ARIMA, SARIMA y ARIMA-LSTM
+en DFF, que no producen pronóstico en alguna serie.}
 \label{fig:cd}
 \end{figure}
 
@@ -3132,7 +3215,7 @@ Naïve-1 \textit{(piso)} & línea base, por serie & \textit{\factNaiveOneFadMean
 \end{tabular}
 \end{table}
 
-\paragraph{Backtest por categoría: el pronóstico sobre el lapso reservado.} El backtest sobre
+\paragraph{Validación por categoría: el pronóstico sobre el lapso reservado.} La validación sobre
 las \textbf{25 combinaciones país$\times$categoría} de cada tabla (Figura~\ref{fig:grid_fad} y, en el Apéndice~A.6,
 Figura~\ref{fig:grid_dff}) muestra cómo el modelo sigue la trayectoria escalonada de cada cola
 \textit{dentro del conjunto reservado} (sombreado), con su intervalo al $95$\,\%: reproduce
@@ -3152,7 +3235,7 @@ mundial.
 \begin{figure}[tbp]
 \centering
 \includegraphics[width=\textwidth]{results_backtest_grid_FAD.pdf}
-\caption[Backtest por categoría sobre el conjunto reservado (FAD)]{Backtest del pronóstico sobre el
+\caption[Validación por categoría sobre el conjunto reservado (FAD)]{Validación del pronóstico sobre el
 conjunto reservado de 24 meses para las 25 combinaciones país$\times$categoría de la tabla
 FAD. Cada panel contrasta la fecha de prioridad real (estado F) con el pronóstico de la red
 profunda global (BiTCN) y su intervalo de predicción al $95$\,\%; la franja sombreada marca
@@ -3403,7 +3486,8 @@ los tres horizontes de la celda. Retrospectivo, con selección disjunta del conj
 \includegraphics[width=0.78\linewidth]{e5_router_effect.pdf}
 \caption[Efecto del enrutado por cohorte y horizonte]{Efecto del enrutado frente al naïve-1 de
 cada cohorte, por celda y horizonte. Las líneas discontinuas marcan el margen material exigido en
-ambos sentidos; las barras llenas señalan los contrastes que sobreviven a la corrección de Holm.}
+ambos sentidos; las barras llenas señalan los contrastes que sobreviven a la corrección de Holm y
+las huecas, los que no.}
 \label{fig:cohortes}
 \end{figure}
 
@@ -3637,34 +3721,34 @@ bloquee el acceso automático (Sección~2.3).
 mining guide,'' SPSS Inc., 2000.
 \item\label{bib:2} C. Bergmeir y J. M. Benítez, ``On the use of cross-validation for time series predictor evaluation,'' \textit{Information Sciences}, vol. 191, pp. 192--213, 2012.
 \item\label{bib:3} U.S. Department of State, Bureau of Consular Affairs, ``Visa Bulletin.'' [En línea].
-Disponible en: \url{https://travel.state.gov/content/travel/en/legal/visa-law0/visa-bulletin.html}
-\item\label{bib:4} \textit{Immigration and Nationality Act}, 8 U.S.C. 1152, ``Numerical limitations on
-individual foreign states.'' [En línea]. Disponible en: \url{https://uscode.house.gov/}
+Disponible en: \url{https://travel.state.gov/content/travel/en/legal/visa-law0/visa-bulletin.html}. [Accedido: 23-oct-2026].
+\item\label{bib:4} \textit{Immigration and Nationality Act}, 8 U.S.C. \S~1152, ``Numerical limitations on
+individual foreign states.'' [En línea]. Disponible en: \url{https://uscode.house.gov/}. [Accedido: 29-oct-2026].
 \item\label{bib:5} U.S. Citizenship and Immigration Services, ``Adjustment of Status Filing Charts from
 the Visa Bulletin.'' [En línea]. Disponible en:
-\url{https://www.uscis.gov/green-card/green-card-processes-and-procedures/visa-availability-priority-dates/adjustment-of-status-filing-charts-from-the-visa-bulletin}
+\url{https://www.uscis.gov/green-card/green-card-processes-and-procedures/visa-availability-priority-dates/adjustment-of-status-filing-charts-from-the-visa-bulletin}. [Accedido: 29-oct-2026].
 \item\label{bib:6} U.S. Department of State, Bureau of Consular Affairs, ``Annual Report of the Visa
 Office.'' [En línea]. Disponible en:
 \url{https://travel.state.gov/content/travel/en/legal/visa-law0/visa-statistics/annual-reports.html}
 \item\label{bib:7} K. Reitz, ``Requests: HTTP for Humans,'' documentación del proyecto, 2026. [En línea].
-Disponible en: \url{https://requests.readthedocs.io}
+Disponible en: \url{https://requests.readthedocs.io}. [Accedido: 29-oct-2026].
 \item\label{bib:8} L. Richardson, ``Beautiful Soup documentation,'' 2026. [En línea]. Disponible en:
-\url{https://www.crummy.com/software/BeautifulSoup/bs4/doc/}
+\url{https://www.crummy.com/software/BeautifulSoup/bs4/doc/}. [Accedido: 29-oct-2026].
 \item\label{bib:9} W. McKinney, ``Data structures for statistical computing in Python,'' en
 \textit{Proc. 9th Python in Science Conf. (SciPy)}, 2010, pp. 56--61.
 \item\label{bib:10} H. Wickham, ``Tidy data,'' \textit{Journal of Statistical Software}, vol. 59,
 n.\textsuperscript{o} 10, pp. 1--23, 2014.
 \item\label{bib:11} Apache Software Foundation, ``Apache Parquet,'' software de código abierto, 2026.
-[En línea]. Disponible en: \url{https://parquet.apache.org}
+[En línea]. Disponible en: \url{https://parquet.apache.org}. [Accedido: 29-oct-2026].
 \item\label{bib:12} R. B. Cleveland, W. S. Cleveland, J. E. McRae, y I. Terpenning, ``STL: A seasonal-trend decomposition procedure based on loess,'' \textit{Journal of Official Statistics}, vol. 6, n.\textsuperscript{o} 1, pp. 3--73, 1990.
 \item\label{bib:13} D. Kwiatkowski, P. C. B. Phillips, P. Schmidt, y Y. Shin, ``Testing the null hypothesis of stationarity against the alternative of a unit root,'' \textit{Journal of Econometrics}, vol. 54, n.\textsuperscript{o} 1--3, pp. 159--178, 1992.
 \item\label{bib:14} G. Elliott, T. J. Rothenberg, y J. H. Stock, ``Efficient tests for
 an autoregressive unit root,'' \textit{Econometrica}, vol. 64, n.\textsuperscript{o} 4,
 pp. 813--836, 1996.
-\item\label{bib:15} X. Wang, K. Smith, y R. Hyndman, ``Characteristic-based
+\item\label{bib:15} X. Wang, K. Smith, y R. J. Hyndman, ``Characteristic-based
 clustering for time series data,'' \textit{Data Mining and Knowledge Discovery},
 vol. 13, n.\textsuperscript{o} 3, pp. 335--364, 2006.
-\item\label{bib:16} R. J. Hyndman y G. Athanasopoulos, \textit{Forecasting: Principles and Practice (FPP3)}, 3.\textsuperscript{a} ed. Melbourne, Australia: OTexts, 2021.
+\item\label{bib:16} R. J. Hyndman y G. Athanasopoulos, \textit{Forecasting: Principles and Practice}, 3.\textsuperscript{a} ed. Melbourne, Australia: OTexts, 2021.
 \item\label{bib:17} R. Killick, P. Fearnhead, y I. A. Eckley, ``Optimal detection of
 changepoints with a linear computational cost,'' \textit{Journal of the American
 Statistical Association}, vol. 107, n.\textsuperscript{o} 500, pp. 1590--1598, 2012.
@@ -3675,13 +3759,13 @@ and Knowledge Discovery}, vol. 33, n.\textsuperscript{o} 6, pp. 1821--1852, 2019
 for independence based on the correlation dimension,'' \textit{Econometric Reviews},
 vol. 15, n.\textsuperscript{o} 3, pp. 197--235, 1996.
 \item\label{bib:20} M. Christ, N. Braun, J. Neuffer, y A. W. Kempa-Liehr, ``Time series
-feature extraction on basis of scalable hypothesis tests (tsfresh),''
+feature extraction on basis of scalable hypothesis tests (tsfresh -- A Python package),''
 \textit{Neurocomputing}, vol. 307, pp. 72--77, 2018.
 \item\label{bib:21} C. Ding y H. Peng, ``Minimum redundancy feature selection from
 microarray gene expression data,'' \textit{Journal of Bioinformatics and Computational
 Biology}, vol. 3, n.\textsuperscript{o} 2, pp. 185--205, 2005.
 \item\label{bib:22} T. Henderson y B. D. Fulcher, ``An empirical evaluation of
-time-series feature sets,'' en \textit{ICDM Workshops}, 2021, pp. 1032--1038.
+time-series feature sets,'' en \textit{Proc. 2021 Int. Conf. on Data Mining Workshops (ICDMW)}, 2021, pp. 1032--1038.
 \item\label{bib:23} S. Moritz y T. Bartz-Beielstein, ``imputeTS: Time series missing
 value imputation in R,'' \textit{The R Journal}, vol. 9, n.\textsuperscript{o} 1,
 pp. 207--218, 2017.
@@ -3696,8 +3780,8 @@ Hoboken, NJ: Wiley, 2015.
 American Statistician}, vol. 72, n.\textsuperscript{o} 1, pp. 37--45, 2018.
 \item\label{bib:30} T. Chen y C. Guestrin, ``XGBoost: A scalable tree boosting
 system,'' en \textit{Proc. 22nd ACM SIGKDD}, 2016, pp. 785--794.
-\item\label{bib:31} G. Ke \textit{et al.}, ``LightGBM: A highly efficient gradient boosting decision tree,'' en \textit{Advances in Neural Information Processing Systems (NIPS)}, 2017, pp. 3146--3154.
-\item\label{bib:32} L. Prokhorenkova, G. Gusev, A. Vorobev, A. V. Dorogush, y A. Gulin, ``CatBoost: Unbiased boosting with categorical features,'' en \textit{Advances in Neural Information Processing Systems (NeurIPS)}, 2018, pp. 6639--6649.
+\item\label{bib:31} G. Ke \textit{et al.}, ``LightGBM: A highly efficient gradient boosting decision tree,'' en \textit{Advances in Neural Information Processing Systems}, vol. 30, 2017, pp. 3146--3154.
+\item\label{bib:32} L. Prokhorenkova, G. Gusev, A. Vorobev, A. V. Dorogush, y A. Gulin, ``CatBoost: Unbiased boosting with categorical features,'' en \textit{Advances in Neural Information Processing Systems}, vol. 31, 2018, pp. 6638--6648.
 \item\label{bib:33} S. Hochreiter y J. Schmidhuber, ``Long short-term memory,''
 \textit{Neural Computation}, vol. 9, n.\textsuperscript{o} 8, pp. 1735--1780, 1997.
 \item\label{bib:34} D. Salinas, V. Flunkert, J. Gasthaus, y T. Januschowski,
@@ -3715,7 +3799,7 @@ neural network model,'' \textit{Neurocomputing}, vol. 50, pp. 159--175, 2003.
 \item\label{bib:42} M. Raasveldt y H. M\"uhleisen, ``DuckDB: An embeddable analytical
 database,'' en \textit{Proc.\ ACM SIGMOD Int.\ Conf.\ on Management of Data}, 2019, pp.\ 1981--1984.
 \item\label{bib:43} R. Kuprieiev \textit{et al.}, ``DVC: Data Version Control, Git
-for data \& models,'' Iterative, software de c\'odigo abierto, 2024. [En l\'inea]. Disponible en: \url{https://dvc.org}
+for data \& models,'' Iterative, software de c\'odigo abierto, 2024. [En l\'inea]. Disponible en: \url{https://dvc.org}. [Accedido: 29-oct-2026].
 \item\label{bib:44} S. Seabold y J. Perktold, ``statsmodels: Econometric and statistical
 modeling with Python,'' en \textit{Proc.\ 9th Python in Science Conf.\ (SciPy)}, 2010,
 pp. 92--96.
@@ -3727,14 +3811,14 @@ learning for time series,'' \textit{Journal of Machine Learning Research}, vol. 
 n.\textsuperscript{o} 124, pp. 1--6, 2022.
 \item\label{bib:47} A. Paszke \textit{et al.}, ``PyTorch: An imperative style,
 high-performance deep learning library,'' en \textit{Advances in Neural Information
-Processing Systems}, vol. 32, 2019, pp. 8024--8035.
+Processing Systems}, vol. 32, 2019, pp. 8026--8037.
 \item\label{bib:48} F. Pedregosa \textit{et al.}, ``Scikit-learn: Machine learning in
 Python,'' \textit{Journal of Machine Learning Research}, vol. 12, pp. 2825--2830, 2011.
 \item\label{bib:49} M. Zaharia \textit{et al.}, ``Accelerating the machine learning
 lifecycle with MLflow,'' \textit{IEEE Data Engineering Bulletin}, vol. 41, n.\textsuperscript{o} 4,
 pp. 39--45, 2018.
 \item\label{bib:50} GitHub, ``GitHub Actions documentation,'' 2026. [En línea].
-Disponible en: \url{https://docs.github.com/actions}
+Disponible en: \url{https://docs.github.com/actions}. [Accedido: 29-oct-2026].
 \item\label{bib:51} T. Akiba, S. Sano, T. Yanase, T. Ohta, y M. Koyama, ``Optuna: A
 next-generation hyperparameter optimization framework,'' en \textit{Proc. 25th ACM
 SIGKDD}, 2019, pp. 2623--2631.
@@ -3763,10 +3847,11 @@ Journal of Forecasting}, vol. 36, n.\textsuperscript{o} 1, pp. 54--74, 2020.
 \item\label{bib:62} S. Wang \textit{et al.}, ``TimeMixer: Decomposable multiscale mixing for time series forecasting,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2024, arXiv:2405.14616.
 \item\label{bib:63} Z. Liu \textit{et al.}, ``KAN: Kolmogorov-Arnold networks,'' en \textit{Int. Conf. on Learning Representations (ICLR)}, 2025, arXiv:2404.19756.
 \item\label{bib:64} I. Gibbs y E. Cand\`es, ``Adaptive conformal inference under
-distribution shift,'' en \textit{Advances in Neural Information Processing Systems
-(NeurIPS)}, vol. 34, pp. 1660--1672, 2021.
-\item\label{bib:65} S. Hoo, S. M\"uller, D. Salinas, y F. Hutter, ``The tabular
-foundation model TabPFN outperforms specialized time series forecasting models,''
+distribution shift,'' en \textit{Advances in Neural Information Processing Systems},
+vol. 34, 2021, pp. 1660--1672.
+\item\label{bib:65} S. B. Hoo, S. M\"uller, D. Salinas, y F. Hutter, ``The tabular
+foundation model TabPFN outperforms specialized time series forecasting models based on
+simple features,''
 arXiv:2501.02945, 2025.
 \item\label{bib:66} S. E. Robertson y H. Zaragoza, ``The probabilistic relevance framework: BM25
 and beyond,'' \textit{Foundations and Trends in Information Retrieval}, vol. 3,
@@ -3889,7 +3974,7 @@ de cada artefacto y, si alguno no coincide, conserva el corte anterior. Las capt
 27 y el 28 de octubre de 2026 sobre el corte de noviembre de 2026; las cifras que muestran son las
 del portal en esa fecha.
 
-La Figura~\ref{fig:portal_visapredict} recorre el portal. La página de inicio presenta el
+Las Figuras~\ref{fig:portal_visapredict} y~\ref{fig:portal_galeria} recorren el portal. La página de inicio presenta el
 problema, el acceso al pronóstico y los indicadores del panel, que se generan en la construcción
 del sitio desde los artefactos del corte y no se escriben a mano. La sección de ingeniería
 contiene el mapa del sistema, que recorre once componentes desde la fuente hasta la operación
@@ -3906,29 +3991,29 @@ una fecha de prioridad dada quedaría al corriente dentro del horizonte.
 
 \begin{figure}[tbp]
 \centering
-\begin{minipage}[b]{0.485\textwidth}\centering
-\includegraphics[width=\linewidth, trim=274 140 1152 302, clip]{web_home.png}\\[2pt]
-{\footnotesize (a) Inicio}
-\end{minipage}\hfill
-\begin{minipage}[b]{0.485\textwidth}\centering
-\includegraphics[width=\linewidth, trim=24 16 775 673, clip]{web_sistema_mapa.png}\\[2pt]
-{\footnotesize (b) Mapa del sistema (fragmento)}
-\end{minipage}\\[10pt]
-\begin{minipage}[b]{0.485\textwidth}\centering
-\includegraphics[width=\linewidth, trim=288 200 1050 360, clip]{web_resultados_galeria.png}\\[2pt]
-{\footnotesize (c) Galería de pronósticos}
-\end{minipage}\hfill
-\begin{minipage}[b]{0.485\textwidth}\centering
-\includegraphics[width=\linewidth, trim=600 420 28 330, clip]{web_resultados_zoom.png}\\[2pt]
-{\footnotesize (d) Pronóstico de una serie: tramo final con zoom}
-\end{minipage}
-\caption[Portal VisaPredict AI]{Portal de divulgación: (a) página de inicio, con el acceso al
-pronóstico y los indicadores del panel publicado; (b) mapa del sistema de la sección de ingeniería,
-siete de sus once componentes; (c) galería de pronósticos, con los conteos del corte, los filtros y
-las series destacadas por área; (d) tramo final del pronóstico de México F2A FAD: el histórico reciente,
-la proyección a doce meses y las bandas conformes al 80\,\% y al 95\,\%. Fuente: capturas de \url{https://visapredictai.com} (inicio, \texttt{/ingenieria/} y
-\texttt{/resultados/}).}
+\includegraphics[width=0.8\linewidth, trim=250 540 1080 330, clip]{web_home.png}\\[2pt]
+{\footnotesize (a) Inicio}\\[8pt]
+\includegraphics[width=\linewidth, trim=20 10 20 770, clip]{web_sistema_mapa.png}\\[2pt]
+{\footnotesize (b) Mapa del sistema}
+\caption[Portal VisaPredict AI: inicio y mapa del sistema]{Portal de divulgación: (a) página de
+inicio, con el planteamiento y el acceso al pronóstico; (b) mapa del sistema de la sección de
+ingeniería, con sus once componentes desde la fuente hasta la operación mensual. Fuente: capturas
+de \url{https://visapredictai.com} (inicio y \texttt{/ingenieria/}).}
 \label{fig:portal_visapredict}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=0.85\linewidth, trim=250 180 1080 820, clip]{web_resultados_galeria.png}\\[2pt]
+{\footnotesize (a) Galería de pronósticos: series destacadas}\\[8pt]
+\includegraphics[width=\linewidth, trim=30 430 78 0, clip]{web_resultados_zoom.png}\\[2pt]
+{\footnotesize (b) Pronóstico de una serie con zoom}
+\caption[Portal VisaPredict AI: galería y pronóstico de una serie]{Galería del portal: (a) series
+destacadas por país o área, cada una con su MASE, la espera actual, el avance proyectado y un trazo
+compacto del histórico y de la proyección; (b) pronóstico de México F2A FAD con zoom: histórico
+reciente, proyección a doce meses y bandas conformes al 80\,\% y al 95\,\%. Fuente: capturas de
+\url{https://visapredictai.com/resultados/}.}
+\label{fig:portal_galeria}
 \end{figure}
 
 VisaBot responde preguntas sobre el boletín y sobre el propio proyecto a partir de un índice
@@ -3942,12 +4027,15 @@ indica. La consola añade un panel de contexto (país, categoría, tabla y mes) 
 dibujan, con los mismos datos del portal, el pronóstico con zoom, la evolución de fechas, la
 comparación y la carrera entre países, el mapa de calor y el radar de la espera, y la comparación
 celda por celda de dos boletines, que resalta sólo lo que se movió
-(Figura~\ref{fig:web_bot}). Las conversaciones de la figura son reales, en producción, capturadas
+(Figura~\ref{fig:web_bot}). Las conversaciones de la Figura~\ref{fig:web_bot_conv} son reales, en producción, capturadas
 el 28 de octubre de 2026 con el modelo generativo activo: cada respuesta cita sus fuentes y, cuando
 la pregunta lo pide, añade una gráfica o tabla con los datos del corte. Ante una pregunta de
 pronóstico, el asistente lee el último corte real, la proyección a doce meses del modelo
 desplegado y su banda al 95\,\%, y añade el historial de precisión verificado contra cortes ya
-publicados; fuera del horizonte validado no ofrece estimación. La misma consulta funciona en
+publicados; fuera del horizonte validado no ofrece estimación. En la respuesta capturada, el
+asistente llama «banda de confianza» a lo que el sistema calcula como intervalo de predicción
+(acota el valor futuro de la serie, no un parámetro): es una imprecisión de redacción del modelo
+generativo, no del pronóstico. La misma consulta funciona en
 inglés; las preguntas comparativas producen la espera actual por país o la trayectoria histórica
 de cada país con su pronóstico, las preguntas sobre un boletín devuelven el resumen de movimientos
 y la tabla completa de fechas, y las conceptuales se responden desde el glosario del proyecto. Como
@@ -3957,30 +4045,30 @@ documento son las de los capítulos de resultados, no las del portal.
 
 \begin{figure}[tbp]
 \centering
-\begin{minipage}[b]{0.485\textwidth}\centering
-\includegraphics[width=\linewidth, trim=0 0 0 112, clip]{web_bot_calor.png}\\[2pt]
-{\footnotesize (a) Herramienta de la consola: mapa de calor}
-\end{minipage}\hfill
-\begin{minipage}[b]{0.485\textwidth}\centering
-\includegraphics[width=\linewidth, trim=0 681 877 0, clip]{web_bot_diff.png}\\[2pt]
+\includegraphics[width=0.6\linewidth, trim=0 0 0 112, clip]{web_bot_calor.png}\\[2pt]
+{\footnotesize (a) Herramienta de la consola: mapa de calor}\\[8pt]
+\includegraphics[width=\linewidth, trim=0 876 842 0, clip]{web_bot_diff.png}\\[2pt]
 {\footnotesize (b) Comparación de dos boletines (fragmento)}
-\end{minipage}\\[10pt]
-\begin{minipage}[b]{0.485\textwidth}\centering
-\includegraphics[width=\linewidth, trim=18 1087 188 139, clip]{web_bot_pronostico_mx.png}\\[2pt]
-{\footnotesize (c) Pregunta de pronóstico}
-\end{minipage}\hfill
-\begin{minipage}[b]{0.485\textwidth}\centering
-\includegraphics[width=\linewidth, trim=25 74 195 144, clip]{web_bot_glosario.png}\\[2pt]
-{\footnotesize (d) Pregunta conceptual}
-\end{minipage}
-\caption[VisaBot: consola y conversaciones]{Asistente VisaBot: (a) años de espera por país y
+\caption[VisaBot: herramientas de la consola]{Consola de VisaBot: (a) años de espera por país y
 categoría en la tabla FAD familiar, dibujados por una herramienta de la consola; (b) comparación de
 los boletines de noviembre de 2025 y noviembre de 2026 en la tabla FAD, que marca avances,
-retrocesos y cambios de estado; (c) respuesta a «¿Cuándo avanza México F4?», con el último corte
-real, la proyección a doce meses, su banda al 95\,\% y la precisión verificada; (d) respuesta a
-«¿Qué diferencia hay entre Final Action Dates y Dates for Filing?», construida desde el glosario y
-la tarjeta de modelo. Fuente: capturas de \url{https://visapredictai.com/asistente/}.}
+retrocesos y cambios de estado (fragmento: categorías familiares en México, India y China). Fuente:
+capturas de \url{https://visapredictai.com/asistente/}.}
 \label{fig:web_bot}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\linewidth, trim=20 1111 6 0, clip]{web_bot_pronostico_mx.png}\\[2pt]
+{\footnotesize (a) Pregunta de pronóstico}\\[8pt]
+\includegraphics[width=\linewidth, trim=20 0 6 0, clip]{web_bot_glosario.png}\\[2pt]
+{\footnotesize (b) Pregunta conceptual}
+\caption[VisaBot: conversaciones]{Conversaciones reales con VisaBot: (a) respuesta a «¿Cuándo
+avanza México F4?», con el último corte real, la proyección a doce meses, su banda al 95\,\% y la
+precisión verificada; (b) respuesta a «¿Qué diferencia hay entre Final Action Dates y Dates for
+Filing?», construida desde el glosario y la tarjeta de modelo. Fuente: capturas de
+\url{https://visapredictai.com/asistente/}.}
+\label{fig:web_bot_conv}
 \end{figure}
 
 \barreraflotantes
@@ -4510,7 +4598,7 @@ del objetivo predictivo del sistema.}
 \begin{figure}[hbp]
 \centering
 \includegraphics[width=\textwidth]{results_backtest_grid_DFF.pdf}
-\caption[Backtest por categoría sobre el conjunto reservado (DFF)]{Backtest del pronóstico sobre el
+\caption[Validación por categoría sobre el conjunto reservado (DFF)]{Validación del pronóstico sobre el
 conjunto reservado de 24 meses para las 25 combinaciones país$\times$categoría de la tabla DFF,
 análogo al de la Figura~\ref{fig:grid_fad}. Las series prácticamente constantes (p.\,ej., varias
 de Filipinas) aparecen como líneas planas que el modelo reproduce con error casi nulo; las de
