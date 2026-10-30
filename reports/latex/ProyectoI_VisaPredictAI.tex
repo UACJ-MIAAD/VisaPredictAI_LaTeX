@@ -1823,8 +1823,8 @@ media positiva y por tanto extrapolable por los modelos.}
 \centering
 \includegraphics[width=0.77\textwidth]{fe_gaps.pdf}
 \caption[Política de huecos (MNAR)]{Ausencias de México/EB-4 religiosos/FAD, la serie con las
-corridas sin fecha más largas: interpolación descriptiva de huecos de hasta tres meses,
-Kalman sobre los largos y huecos largos sin rellenar. Ningún relleno entra al entrenamiento,
+corridas sin fecha más largas: interpolación descriptiva de los huecos de hasta tres meses e imputación
+de Kalman, solo descriptiva, en los dos tramos largos, que para el modelado quedan sin rellenar. Ningún relleno entra al entrenamiento,
 cuya rejilla arrastra la última observación publicada.}
 \label{fig:fe_gaps}
 \end{figure}
@@ -1905,20 +1905,17 @@ catálogo de \factNModels{} modelos, con su justificación. Los árboles operan 
 diferencia; Chronos es zero-shot.}
 \label{tab:modelos}
 \label{tab:modelos_a6}
-\begin{tabular}{p{2.9cm} l l}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3.1cm} >{\raggedright\arraybackslash}p{5.2cm}
+  >{\raggedright\arraybackslash}p{4.6cm}}
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{Familia} & \textbf{Modelos} & \textbf{Rol} \\ \midrule
-Referencia & Naïve-1 (paseo aleatorio), deriva, & Piso operativo; denominador \\
- & naïve estacional & de MASE ($m=1$ y $m=12$) \\
+Referencia & Naïve-1 (paseo aleatorio), deriva, naïve estacional & Piso operativo; denominador de MASE ($m=1$ y $m=12$) \\
 Estadísticos \cita{24} & ARIMA, SARIMA & Tendencia/estacionalidad lineal \\
-Suavizamiento y estado \cita{25}\textendash\cita{28} & ETS amortiguado, Theta, Kalman, & Tendencia parsimoniosa \\
- & tendencia lineal local (LLT) & \\
+Suavizamiento y estado \cita{25}\textendash\cita{28} & ETS amortiguado, Theta, Kalman, tendencia lineal local (LLT) & Tendencia parsimoniosa \\
 Aditivo \cita{29} & Prophet & Tendencia con cambios de régimen \\
 Árboles sobre deltas \cita{30}\textendash\cita{32} & XGBoost, LightGBM, CatBoost & Rezagos + regresores, extrapolación \\
-Lineales/profundos \cita{33}\textendash\cita{40} & DLinear, NLinear, RLinear, TiDE, & No linealidad y capacidad alta \\
- & LSTM, DeepAR, ARIMA-LSTM, & \\
- & N-BEATS, N-HiTS, TFT & \\
+Lineales/profundos \cita{33}\textendash\cita{40} & DLinear, NLinear, RLinear, TiDE, LSTM, DeepAR, ARIMA-LSTM, N-BEATS, N-HiTS, TFT & No linealidad y capacidad alta \\
 Foundation \textit{(zero-shot)} \cita{41} & Chronos & Transferencia sin entrenamiento \\ \bottomrule
 \end{tabular}
 \end{table}
