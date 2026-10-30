@@ -66,7 +66,14 @@ def test_a7_reconcilia_una_vista_extremo_a_extremo_distinta_del_flujo_de_modelad
     texto = _texto()
     assert texto.count(r"\label{fig:arquitectura}") == 1
     assert texto.count(r"\label{fig:arquitectura_a7}") == 1
-    assert texto.count(r"\label{tab:flujo_a7}") == 1
+    # Consolidación 1.3.2 (29-oct-2026): tab:flujo_a7 se fundió en el pie de fig:arquitectura_a7,
+    # que conserva la condición para continuar de cada etapa.
+    fin = texto.index(r"\label{fig:arquitectura_a7}")
+    pie = _normalizar(texto[texto.rindex(r"\caption[Arquitectura general", 0, fin):fin])
+    for condicion in ("asociado al mes esperado", "registro de limpieza aceptado",
+                      "dependencias DVC coherentes", "ningún dato posterior altera una fila",
+                      "conjunto reservado intacto", "procedencia verificable"):
+        assert condicion in pie, condicion
     assert "Esta vista extremo a extremo complementa" in texto
     assert "detalla exclusivamente el flujo interno de modelado" in texto
 

@@ -21,23 +21,33 @@ def _normalizada() -> str:
 
 
 def test_a9_conserva_a8_y_anade_los_artefactos_del_segundo_avance() -> None:
+    """Consolidación 1.4.1 (29-oct-2026): la orquestación de A9 se narra en prosa; sus parámetros
+    entran en tab:config_a10 y sus módulos en la prosa de pruebas; la tabla de avances lo identifica."""
     seccion = _seccion_implementacion()
-    for etiqueta in (
-        "fig:implementacion_a8",
-        "alg:implementacion_a8",
-        "fig:orquestacion_a9",
-        "alg:orquestacion_a9",
-        "tab:registro_a9",
-        "tab:parametros_a9",
-        "tab:modulos_a9",
-    ):
+    for etiqueta in ("fig:implementacion_a8", "alg:implementacion_a8", "tab:avances_a10",
+                     "tab:config_a10"):
         assert seccion.count(rf"\label{{{etiqueta}}}") == 1
+    normal = _normalizada()
+    avances = normal[normal.index(r"\label{tab:avances_a10}"):]
+    assert r"\textbf{A9} & Integrar componentes sin mezclar procedencias" in avances[: avances.index(r"\end{table}")]
+    for mecanismo in ("Un registro canónico sustituye las listas distintas",
+                      "Un área de preparación aislada por campaña",
+                      "Los recibos de cobertura se recalculan al leer",
+                      r"una verificación previa (\textit{preflight}) bloquea la ejecución"):
+        assert mecanismo in normal, mecanismo
+    configuracion = normal[normal.index(r"\label{tab:config_a10}"):]
+    configuracion = configuracion[: configuracion.index(r"\end{table}")]
+    for condicion in ("Identificador único", "promoción atómica; detención inmediata",
+                      "Cobertura exacta de claves", "rechaza faltantes, extras o archivos de otra campaña"):
+        assert condicion in configuracion, condicion
+    assert ("se organiza en módulos de configuración y registro, recorrido temporal, transporte y "
+            "cobertura, exportación y promoción, y verificación previa y lanzamiento") in normal
 
 
 def test_a9_distingue_persistencia_fuente_y_obligatoriedad() -> None:
     seccion = _normalizada()
     assert "SARIMA se incluye entre los modelos persistibles" in seccion
-    assert "ETS y Theta no conservan un estado reutilizable" in seccion
+    assert "sus envoltorios automáticos no conservan un estado reutilizable" in seccion
     assert "Esta limitación técnica no los vuelve opcionales" in seccion
 
 
