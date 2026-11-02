@@ -319,31 +319,8 @@ que cuantifican su propia incertidumbre; no constituyen asesoría legal migrator
 promesa sobre la resolución de un trámite individual, y así se comunica en el demostrador.
 
 La arquitectura sigue un flujo modular que transforma el almacén de datos en
-pronósticos con intervalos de predicción. En la Figura~\ref{fig:arquitectura} se
+pronósticos con intervalos de predicción. En la \hyperref[fig:arquitectura]{Figura~\ref*{fig:arquitectura}} se
 muestra el esquema. El sistema consta de cinco módulos:
-
-\begin{enumerate}[leftmargin=*]
-\item \textbf{Carga de series.} Lee del almacén dimensional (capa \textit{gold},
-DuckDB) la vista entrenable, que ya restringe las observaciones a $e=F$ y separa
-FAD de DFF. Entrega cada serie $y_{p,c,b,t}$ con índice mensual.
-\item \textbf{Preprocesamiento.} Regulariza la frecuencia mensual rellenando los
-huecos (meses $C$/$U$) de forma estrictamente causal con la última observación
-publicada; escala al rango $[0,1]$ con extremos calculados solo sobre el tramo de
-entrenamiento y construye los regresores de calendario del año fiscal.
-\item \textbf{Catálogo de modelos.} Un repertorio de \factNModels{} modelos tras una interfaz común: tres
-líneas base de referencia (naïve-1 o paseo aleatorio, deriva y naïve estacional) y seis
-familias: estadísticos (ARIMA, SARIMA), suavizamiento y espacio de estados (ETS
-amortiguado, Theta, Kalman, tendencia lineal local), aditivo (Prophet), árboles sobre
-deltas (XGBoost, LightGBM, CatBoost), lineales y redes profundas (DLinear, NLinear,
-RLinear, TiDE, LSTM, DeepAR, ARIMA-LSTM, N-BEATS, N-HiTS, TFT) y un \textit{foundation
-model} zero-shot (Chronos).
-\item \textbf{Validación walk-forward.}\cita{2} Validación temporal con ventana
-expansible y paso mensual que evalúa cada modelo sin fuga de información, reservando
-los últimos 24 meses como un conjunto reservado independiente (\textit{hold-out}).
-\item \textbf{Cuantificación de incertidumbre.} Genera intervalos de predicción al
-95\,\% por dos mecanismos (probabilístico nativo y conforme dividido) y reporta su
-cobertura empírica.
-\end{enumerate}
 
 \begin{figure}[htbp]
 \centering
@@ -412,6 +389,30 @@ familias del catálogo de \factNModels{} modelos.}
 \label{fig:arquitectura}
 \end{figure}
 
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Carga de series.} Lee del almacén dimensional (capa \textit{gold},
+DuckDB) la vista entrenable, que ya restringe las observaciones a $e=F$ y separa
+FAD de DFF. Entrega cada serie $y_{p,c,b,t}$ con índice mensual.
+\item \textbf{Preprocesamiento.} Regulariza la frecuencia mensual rellenando los
+huecos (meses $C$/$U$) de forma estrictamente causal con la última observación
+publicada; escala al rango $[0,1]$ con extremos calculados solo sobre el tramo de
+entrenamiento y construye los regresores de calendario del año fiscal.
+\item \textbf{Catálogo de modelos.} Un repertorio de \factNModels{} modelos tras una interfaz común: tres
+líneas base de referencia (naïve-1 o paseo aleatorio, deriva y naïve estacional) y seis
+familias: estadísticos (ARIMA, SARIMA), suavizamiento y espacio de estados (ETS
+amortiguado, Theta, Kalman, tendencia lineal local), aditivo (Prophet), árboles sobre
+deltas (XGBoost, LightGBM, CatBoost), lineales y redes profundas (DLinear, NLinear,
+RLinear, TiDE, LSTM, DeepAR, ARIMA-LSTM, N-BEATS, N-HiTS, TFT) y un \textit{foundation
+model} zero-shot (Chronos).
+\item \textbf{Validación walk-forward.}\cita{2} Validación temporal con ventana
+expansible y paso mensual que evalúa cada modelo sin fuga de información, reservando
+los últimos 24 meses como un conjunto reservado independiente (\textit{hold-out}).
+\item \textbf{Cuantificación de incertidumbre.} Genera intervalos de predicción al
+95\,\% por dos mecanismos (probabilístico nativo y conforme dividido) y reporta su
+cobertura empírica.
+\end{enumerate}
+
+
 % ------------------------------------------------------------
 \section{1.1 Recolección de datos}
 
@@ -431,12 +432,12 @@ Para asegurar la reproducibilidad y la resiliencia ante la rotación de boletine
 viejos del portal oficial, cada boletín se congela como instantánea HTML en un
 respaldo versionado, del cual el procesamiento parte de forma reproducible.
 
-La Figura~\ref{fig:fuente} muestra un boletín real (julio de 2026) tal como se publica: un
+La \hyperref[fig:fuente]{Figura~\ref*{fig:fuente}} muestra un boletín real (julio de 2026) tal como se publica: un
 encabezado institucional y, para cada tabla, una matriz con las categorías migratorias en las
 filas y los países o áreas de cargabilidad en las columnas. Cada celda contiene uno de tres
 valores: una \textbf{fecha de prioridad} en formato \texttt{DDMMMYY} (p.\,ej., \texttt{01FEB18}),
 la marca \textbf{\textit{Current}} (\texttt{C}, sin rezago ese mes) o \textbf{\textit{Unavailable}}
-(\texttt{U}, sin números disponibles). La Figura~\ref{fig:tabla_pub} reproduce, con esa misma
+(\texttt{U}, sin números disponibles). La \hyperref[fig:tabla_pub]{Figura~\ref*{fig:tabla_pub}} reproduce, con esa misma
 estructura, la tabla \textit{Final Action Dates} de preferencia por empleo del mismo boletín,
 donde conviven los tres regímenes. Esta distinción $C/F/U$ es central: solo las celdas con
 fecha ($e=F$) constituyen el objetivo predictivo.
@@ -482,7 +483,7 @@ aplicaciones (\textit{application programming interface}, API) ni un archivo des
 el histórico consolidado. La publicación se realiza exclusivamente como páginas HTML
 independientes, una por mes, de modo que la obtención de la serie se resolvió mediante un
 proceso propio de extracción web y no mediante el consumo de un servicio. La
-Tabla~\ref{tab:inventario} resume el inventario de fuentes con su tipo de acceso, formato,
+\hyperref[tab:inventario]{Tabla~\ref*{tab:inventario}} resume el inventario de fuentes con su tipo de acceso, formato,
 frecuencia y uso.
 
 \begin{table}[htbp]
@@ -521,7 +522,7 @@ política pública.
 \subsection{1.1.2 Obtención de los datos y conversión al formato adecuado}
 
 La extracción se realiza por \textit{web scraping} de instantáneas congeladas
-(Figura~\ref{fig:pipeline_datos}). Primero, cada boletín se \textbf{congela} como instantánea HTML
+(\hyperref[fig:pipeline_datos]{Figura~\ref*{fig:pipeline_datos}}). Primero, cada boletín se \textbf{congela} como instantánea HTML
 en un respaldo versionado (política \textit{skip-if-exists}), lo que aísla el proyecto de la
 rotación de boletines viejos del portal oficial. Después, un \textbf{parser sin conexión}, con una
 detección de columnas robusta a veinte años de deriva de formato, conserva el dato crudo de cada
@@ -587,11 +588,11 @@ calidad. El conjunto resultante comprende \textbf{\factNSeriesStructural{} serie
 filas} en el rango \textbf{dic-2001 a 2026}, con una cobertura a nivel de boletín
 del 100\,\% (\factNMonths{} de \factNMonths{} meses; los cinco boletines retirados de la fuente oficial se
 recuperaron manualmente del archivo histórico y se integraron a las instantáneas congeladas).
-La Figura~\ref{fig:csv_panel} muestra el panel en formato \textit{tidy} (largo): cada fila es una
+La \hyperref[fig:csv_panel]{Figura~\ref*{fig:csv_panel}} muestra el panel en formato \textit{tidy} (largo): cada fila es una
 observación (país, categoría, tabla, mes) con su régimen, su fecha de prioridad y la variable
 objetivo \texttt{days\_since\_base}; las celdas $C$ y $U$ se conservan como anotación, sin fecha.
 Ese panel se materializa en el almacén cuyo núcleo en estrella muestra la
-Figura~\ref{fig:schema_er} (doce tablas: siete dimensiones, dos tablas de hechos y tres de
+\hyperref[fig:schema_er]{Figura~\ref*{fig:schema_er}} (doce tablas: siete dimensiones, dos tablas de hechos y tres de
 gobernanza y procedencia, además de vistas/marts), sobre el que cualquier consulta es
 reproducible. La tabla de procedencia \texttt{source\_artifact} conserva la identidad y la huella de los
 archivos fuente y se vincula con los hechos mediante la migración de procedencia del almacén.
@@ -694,7 +695,7 @@ claves foráneas; la flecha discontinua, la vista de entrenamiento que se deriva
 \end{figure}
 
 \paragraph{Procedimiento detallado, etapa por etapa.} El flujo de la
-Figura~\ref{fig:pipeline_datos} se implementó como una cadena de siete pasos ejecutables:
+\hyperref[fig:pipeline_datos]{Figura~\ref*{fig:pipeline_datos}} se implementó como una cadena de siete pasos ejecutables:
 
 \begin{enumerate}[leftmargin=*, itemsep=1pt, topsep=2pt]
 \item \textbf{Descubrimiento del índice} con el cliente HTTP \texttt{requests} \cita{7} y Beautiful
@@ -721,7 +722,7 @@ ese estado en el feed de ingesta y la página del mes se obtiene a mano por la m
 como acota la Sección~2.3.
 \end{enumerate}
 
-La Tabla~\ref{tab:herramientas} resume las herramientas, los formatos y los artefactos
+La \hyperref[tab:herramientas]{Tabla~\ref*{tab:herramientas}} resume las herramientas, los formatos y los artefactos
 producidos en cada etapa.
 
 \begin{table}[htbp]
@@ -748,9 +749,9 @@ Automatización & Tarea programada de integración continua & Boletín nuevo a p
 \paragraph{Cantidad de datos obtenidos.} El proceso descrito produjo un panel de
 \factNObsFmt{} registros distribuidos en \factNSeriesStructural{} series y \factNMonths{}
 meses consecutivos, sin meses faltantes, con nueve variables por registro que documenta el
-Apéndice~A.5. La Tabla~\ref{tab:censo_obtencion} desglosa el volumen obtenido por
+Apéndice~A.5. La \hyperref[tab:censo_obtencion]{Tabla~\ref*{tab:censo_obtencion}} desglosa el volumen obtenido por
 artefacto y por bloque; el censo de las observaciones con fecha por bloque y tabla se
-detalla más adelante, en la Tabla~\ref{tab:eda_descriptiva}.
+detalla más adelante, en la \hyperref[tab:eda_descriptiva]{Tabla~\ref*{tab:eda_descriptiva}}.
 
 \begin{table}[htbp]
 \centering
@@ -784,7 +785,7 @@ descriptiva; una sola celda de las \factNObsFmt{} quedó sin poder interpretarse
 es igualmente favorable, pero por construcción: las guardas del proceso no reportan
 incidencias porque \textit{abortan} la construcción del panel cuando se violan, de modo que
 un valor distinto de cero en esas filas es inalcanzable y su presencia documenta la
-invariante vigente. La Tabla~\ref{tab:calidad_obtencion} presenta ambos grupos de
+invariante vigente. La \hyperref[tab:calidad_obtencion]{Tabla~\ref*{tab:calidad_obtencion}} presenta ambos grupos de
 indicadores.
 
 \begin{table}[htbp]
@@ -820,7 +821,7 @@ el sistema debe tolerar: ninguna etapa recorta ni suaviza valores extremos.
 
 \paragraph{Retos enfrentados y cómo se resolvieron.} La obtención de una serie de
 veinticinco años a partir de páginas HTML publicadas una por una planteó retos de acceso,
-de formato y de calidad. La Tabla~\ref{tab:retos} los enumera junto con su impacto potencial y
+de formato y de calidad. La \hyperref[tab:retos]{Tabla~\ref*{tab:retos}} los enumera junto con su impacto potencial y
 la solución adoptada.
 
 \begin{table}[htbp]
@@ -864,7 +865,7 @@ fijadas y las órdenes exactas que reproducen la cadena se detallan en el Apénd
 El reto central de la limpieza es que el boletín \textit{no publica solo fechas}: una celda
 puede contener una fecha de prioridad, la palabra \textit{Current}, la palabra
 \textit{Unavailable} o estar vacía, y cada caso significa algo distinto. La
-Figura~\ref{fig:cleansing} muestra la lógica que clasifica cada celda en uno de cuatro
+\hyperref[fig:cleansing]{Figura~\ref*{fig:cleansing}} muestra la lógica que clasifica cada celda en uno de cuatro
 \textbf{regímenes} ($e$) y la convierte (o la conserva como anotación) sin inventar valores.
 
 \begin{figure}[htbp]
@@ -952,10 +953,10 @@ evaluación, que permanece sobre celdas $F$.
 salvaguarda latente: la guarda de época rechaza toda fecha anterior a $t_0=$ 1-ene-1975 y la
 prioridad más antigua del panel es de 1979. Las erratas de la fuente (por ejemplo ``\texttt{4rd}''
 por F4 en marzo de 2003) se normalizan, y las celdas vacías se marcan con \texttt{UNK} y no con
-``\texttt{NA}'', que \texttt{pandas} coercionaría a \texttt{NaN} (Tabla~\ref{tab:retos}).
+``\texttt{NA}'', que \texttt{pandas} coercionaría a \texttt{NaN} (\hyperref[tab:retos]{Tabla~\ref*{tab:retos}}).
 \end{itemize}
 
-La Tabla~\ref{tab:cleansing} ilustra la conversión sobre celdas representativas.
+La \hyperref[tab:cleansing]{Tabla~\ref*{tab:cleansing}} ilustra la conversión sobre celdas representativas.
 
 \begin{table}[htbp]
 \centering
@@ -1003,11 +1004,11 @@ evidencia y no en supuestos. El análisis se organizó alrededor de seis pregunt
 \end{enumerate}
 
 Las respuestas se recapitulan, junto con la decisión de modelado que cada una induce, en la
-Tabla~\ref{tab:eda_sintesis}.
+\hyperref[tab:eda_sintesis]{Tabla~\ref*{tab:eda_sintesis}}.
 
 \paragraph{Variables analizadas y su papel en el análisis.} El EDA opera sobre las nueve
 variables del panel largo documentadas en el diccionario de datos (Apéndice~A.5). La
-Tabla~\ref{tab:eda_variables} distingue la variable dependiente, las cuatro dimensiones de corte o
+\hyperref[tab:eda_variables]{Tabla~\ref*{tab:eda_variables}} distingue la variable dependiente, las cuatro dimensiones de corte o
 de agregación, el índice temporal y las tres variables de equivalencia, régimen y trazabilidad,
 que gobiernan qué observación es utilizable pero no son insumo predictivo: confundir una
 anotación con un insumo es precisamente el tipo de error que el análisis exploratorio busca evitar.
@@ -1061,13 +1062,13 @@ programa a partir del panel versionado, nunca a mano.
 
 \paragraph{Panorama del panel completo.} Antes de profundizar en el piloto, el EDA
 censa el panel íntegro: las $\factNObsFmt$ observaciones de las \factNSeriesStructural{} series estructurales
-a lo largo de los \factNMonths{} boletines se condensan en la Figura~\ref{fig:eda_panel}, donde
+a lo largo de los \factNMonths{} boletines se condensan en la \hyperref[fig:eda_panel]{Figura~\ref*{fig:eda_panel}}, donde
 cada fila es una serie y cada celda un mes clasificado por su comportamiento. Dos
 rasgos dominan: el $\factPctTrainableF$\,\% de las celdas tiene fecha publicada (estado $F$, las
 $\factNObsFFmt$ observaciones entrenables) y, dentro de ellas, en el $\factPctFrozen$\,\% de los meses
 la fecha \textbf{no se movió}. El congelamiento es el comportamiento típico del
-sistema y la vara natural de cualquier pronóstico. La Tabla~\ref{tab:eda_descriptiva}
-resume el censo por bloque y tabla, y la Figura~\ref{fig:eda_completitud} muestra la
+sistema y la vara natural de cualquier pronóstico. La \hyperref[tab:eda_descriptiva]{Tabla~\ref*{tab:eda_descriptiva}}
+resume el censo por bloque y tabla, y la \hyperref[fig:eda_completitud]{Figura~\ref*{fig:eda_completitud}} muestra la
 radiografía de completitud serie por serie. La cobertura es escalonada: \factNSeriesStructural{} series
 estructurales $\rightarrow$ \factNSeriesWithF{} con al menos una fecha $\rightarrow$ \factNSeriesEvaluable{} plenamente
 evaluables $\rightarrow$ 25 piloto (familiar FAD), y es sobre este último nivel donde
@@ -1119,7 +1120,7 @@ no disponibles ($U$); el familiar es casi íntegramente entrenable.}
 \end{figure}
 
 Antes de la dinámica temporal conviene dimensionar la \textit{escala} del fenómeno. La
-Figura~\ref{fig:backlog_f4} ordena, en el boletín de julio de 2026, el atraso vigente de la cola
+\hyperref[fig:backlog_f4]{Figura~\ref*{fig:backlog_f4}} ordena, en el boletín de julio de 2026, el atraso vigente de la cola
 F4 (hermanos de ciudadanos) por área de cargabilidad: una petición presentada en México
 acumula más de veinticinco años de espera y ninguna de las cinco áreas baja de diecisiete,
 lo que ilustra tanto la magnitud del rezago como su marcada heterogeneidad entre países.
@@ -1135,7 +1136,7 @@ residual \textit{All Chargeability}, no un país.}
 \label{fig:backlog_f4}
 \end{figure}
 
-\paragraph{Vista panorámica.} La Figura~\ref{fig:eda_spaghetti} traza las 25 series
+\paragraph{Vista panorámica.} La \hyperref[fig:eda_spaghetti]{Figura~\ref*{fig:eda_spaghetti}} traza las 25 series
 familiares de ambas tablas a la vez: todas comparten una \textbf{tendencia creciente fuerte}
 (la fecha de prioridad avanza con los años), pero con pendientes muy distintas por área
 (México se estanca en varias categorías mientras India y Filipinas escalan con rapidez; en F3,
@@ -1153,7 +1154,7 @@ creciente con pendientes heterogéneas y retrocesos ocasionales.}
 \label{fig:eda_spaghetti}
 \end{figure}
 
-\paragraph{Distribución del objetivo y de sus incrementos.} La Figura~\ref{fig:eda_dist}
+\paragraph{Distribución del objetivo y de sus incrementos.} La \hyperref[fig:eda_dist]{Figura~\ref*{fig:eda_dist}}
 caracteriza la variable dependiente y su primera diferencia: la fecha de prioridad se
 extiende a lo largo de cuatro décadas, y el \textbf{avance mensual} se concentra en valores
 pequeños y positivos (mediana cercana a un mes) con una cola derecha de saltos grandes y una
@@ -1169,7 +1170,7 @@ revela la cola de retrogresión.}
 \end{figure}
 
 \paragraph{Forma de la distribución por grupo.} Los violines de las
-Figuras~\ref{fig:eda_violin_c} y~\ref{fig:eda_violin_cat} muestran que el avance es marcadamente
+\hyperref[fig:eda_violin_c]{Figuras~\ref*{fig:eda_violin_c}} y~\ref{fig:eda_violin_cat} muestran que el avance es marcadamente
 \textbf{asimétrico y de cola pesada} en todas las áreas y categorías: una moda cercana a cero
 (meses sin movimiento) y una cola derecha que recoge los avances grandes; las categorías de
 mayor demanda exhiben las colas más largas.
@@ -1193,7 +1194,7 @@ apreciar la forma.}
 \end{figure}
 
 \paragraph{Estructura de régimen y retrogresiones.} La radiografía de la
-Figura~\ref{fig:eda_completitud} muestra que las series familiares son mayoritariamente
+\hyperref[fig:eda_completitud]{Figura~\ref*{fig:eda_completitud}} muestra que las series familiares son mayoritariamente
 entrenables (estado $F$, $\ge 80$\,\%), salvo la categoría F2A, que pasa con frecuencia a
 \textit{Current} y presenta la menor continuidad ($\approx$80\,\%). Las retrogresiones se
 concentran en pocas series (México y Filipinas), pero son de gran magnitud (hasta varios años de
@@ -1201,7 +1202,7 @@ retroceso).
 
 A escala del panel completo, el censo registra \factNRetroEvents{} episodios de retrogresión (el
 $\factPctRetro$\,\% de los avances observados, frente al $1.8$\,\% del bloque familiar FAD).
-La Figura~\ref{fig:eda_retros} los sitúa todos en el tiempo: la mayoría son
+La \hyperref[fig:eda_retros]{Figura~\ref*{fig:eda_retros}} los sitúa todos en el tiempo: la mayoría son
 correcciones menores, pero unos pocos son abruptos, con retrocesos de hasta $12.8$
 años en un solo mes. Esta cola extrema es precisamente lo que el sistema
 \textbf{no} promete predecir (los cambios de régimen quedan fuera del objetivo),
@@ -1216,9 +1217,9 @@ el tamaño es proporcional a la magnitud. Se anotan los cinco episodios mayores.
 \label{fig:eda_retros}
 \end{figure}
 
-\paragraph{Estacionalidad y dependencia entre series.} La Figura~\ref{fig:eda_season} contrasta
+\paragraph{Estacionalidad y dependencia entre series.} La \hyperref[fig:eda_season]{Figura~\ref*{fig:eda_season}} contrasta
 el avance por mes calendario: la estacionalidad anual es débil, con un ligero efecto del inicio
-del año fiscal (octubre). La Figura~\ref{fig:eda_corr2} muestra la correlación entre los
+del año fiscal (octubre). La \hyperref[fig:eda_corr2]{Figura~\ref*{fig:eda_corr2}} muestra la correlación entre los
 incrementos de las 25 series; los bloques de alta correlación agrupan categorías que comparten
 la fecha mundial, lo que motiva el \textbf{entrenamiento global} explotado en el Cap.~de
 resultados.
@@ -1241,7 +1242,7 @@ mueven de forma conjunta.}
 \end{figure}
 
 \paragraph{La brecha entre las dos tablas.} Como FAD y DFF se modelan por separado,
-conviene dimensionar su distancia. La Figura~\ref{fig:eda_brecha} compara, serie por
+conviene dimensionar su distancia. La \hyperref[fig:eda_brecha]{Figura~\ref*{fig:eda_brecha}} compara, serie por
 serie, el atraso vigente según cada tabla en el boletín más reciente: el calendario
 de presentación (DFF) antecede sistemáticamente a la acción final (FAD), con una
 brecha mediana cercana a un año y un máximo de 4.2 años (China, EB-5 no reservada). La
@@ -1257,7 +1258,7 @@ con el atraso bajo FAD (acción final), para las series con ambas tablas publica
 \label{fig:eda_brecha}
 \end{figure}
 
-La descomposición STL (\textit{Seasonal-Trend decomposition using Loess})\cita{12} de una serie representativa (Figura~\ref{fig:eda_stl})
+La descomposición STL (\textit{Seasonal-Trend decomposition using Loess})\cita{12} de una serie representativa (\hyperref[fig:eda_stl]{Figura~\ref*{fig:eda_stl}})
 confirma una tendencia creciente dominante. La componente estacional es prácticamente
 nula desde 2012; sus picos anteriores no son estacionalidad, sino las retrogresiones de
 2002 a 2010, que la STL reparte entre esa componente y unos residuos volátiles concentrados
@@ -1271,7 +1272,7 @@ la prueba ADF pierde potencia precisamente bajo tendencia fuerte y muestras cort
 \cita{14}, que aplica un \textit{detrending} por mínimos cuadrados generalizados y
 alcanza la envolvente de potencia óptima; también confirma la no estacionariedad en
 nivel ($p=0.78$), reforzando de forma más robusta la elección $d=1$. La
-Figura~\ref{fig:eda_acf} muestra la autocorrelación de la serie diferenciada, que
+\hyperref[fig:eda_acf]{Figura~\ref*{fig:eda_acf}} muestra la autocorrelación de la serie diferenciada, que
 orienta el orden de los modelos ARIMA y SARIMA.
 
 \begin{figure}[htbp]
@@ -1295,68 +1296,11 @@ aplica la misma batería (ADF, KPSS, DF-GLS, más Ljung-Box sobre los incremento
 las \textbf{\factNSeriesEvaluable{} series plenamente evaluables} del panel. El veredicto es unánime en lo
 esencial: \factStationarityDifference{} series exigen diferenciación, \factStationarityMixed{} presentan señales mixtas (ADF y KPSS
 discrepan) y \textbf{ninguna} es estacionaria en nivel: el panel es integrado de
-orden~1 sin excepciones. La Tabla~\ref{tab:eda_estacionariedad} reporta el censo para
+orden~1 sin excepciones. La \hyperref[tab:eda_estacionariedad]{Tabla~\ref*{tab:eda_estacionariedad}} reporta el censo para
 las 25 series piloto. Ljung-Box a rezago 12 sobre los
 incrementos observados, sin regularizar la malla, rechaza el ruido blanco en la mayoría; con 24
 rezagos sobre la serie regularizada el rechazo es unánime. Las dos lecturas son complementarias y
 confirman estructura temporal aprovechable tras la diferenciación.
-
-\subsubsection{Bloque de empleo y sorteo de diversidad}
-
-El censo panorámico (Tabla~\ref{tab:eda_descriptiva} y
-Figura~\ref{fig:eda_completitud}) revela por qué el bloque de empleo requiere un
-tratamiento distinto: solo el $33$--$39$\,\% de sus celdas tiene fecha publicada
-(las categorías EB transitan con frecuencia a \textit{Current} o
-\textit{Unavailable}) y, cuando la hay, el congelamiento domina ($38$--$77$\,\% de
-los meses sin movimiento, con avance mediano de cero días). Sus retrogresiones son
-además más frecuentes que las familiares (261 episodios contra 128) y de gran
-magnitud (Figura~\ref{fig:eda_retros}). Estas propiedades justifican la cobertura
-escalonada: el bloque EB participa del almacén y del censo desde el primer día, y su
-evaluación predictiva se restringe a las series que superan el umbral de
-elegibilidad.
-
-Por último, el sorteo de diversidad (\textit{Diversity Visa}, DV) se explora como
-hecho descriptivo separado: su valor es un \textbf{número de rango} regional, no una
-fecha, por lo que queda fuera del objetivo predictivo. La Figura~\ref{fig:eda_dv} (Apéndice~A.6)
-muestra las $\factDvNRowsFmt$ observaciones del sorteo: el corte sube dentro de cada año fiscal y se
-reinicia en octubre (diente de sierra), con África sistemáticamente en los cortes
-más altos.
-
-\subsubsection{Catálogo de características por serie}
-
-Examinar 25 series una por una no escala. Por ello se adopta el enfoque de análisis
-basado en características (\textit{feature-based}) \cita{15}: se resume cada serie en
-un vector de descriptores numéricos comparables, de modo que el panel completo se
-analiza como una tabla. A partir de la descomposición STL $Y_t = T_t + S_t + R_t$ (tendencia,
-estacionalidad, residuo) se miden, según la formulación de descomposición de FPP3~\cita{16}, la
-fuerza de tendencia y la de estacionalidad,
-\begin{equation}
-F_T = \max\!\left(0,\; 1 - \frac{\operatorname{Var}(R_t)}{\operatorname{Var}(T_t + R_t)}\right),
-\qquad
-F_S = \max\!\left(0,\; 1 - \frac{\operatorname{Var}(R_t)}{\operatorname{Var}(S_t + R_t)}\right),
-\end{equation}
-ambas en $[0,1]$: cerca de 1, la componente explica casi toda la variación más allá del ruido;
-cerca de 0, es despreciable. Los demás descriptores son:
-\begin{itemize}[leftmargin=*, itemsep=1pt, topsep=2pt]
-\item \textbf{Entropía espectral} $H = -\sum_k p_k \log p_k / \log K$, sobre el periodograma
-normalizado $\{p_k\}$ de $K$ frecuencias: $H \to 0$ señala una señal estructurada y predecible;
-$H \to 1$, ruido blanco sin estructura aprovechable.
-\item \textbf{Autocorrelación} de rezago 1 del nivel (ACF1; cercana a 1, alta persistencia) y de la
-serie diferenciada ($ACF1_\Delta$, cuyo signo orienta el término de media móvil de un ARIMA).
-\item \textbf{Orden de diferenciación} $d$: se diferencia mientras la prueba KPSS rechace la
-estacionariedad (FPP3 §9.1); alimenta el parámetro $d$ de ARIMA.
-\item \textbf{Atípicos}: residuos de la STL con $z$-score robusto (mediana y desviación absoluta
-mediana, criterio de Iglewicz-Hoaglin) mayor que 3 en valor absoluto; cuantifica la carga de
-anomalías (en este dominio, las retrogresiones).
-\item \textbf{Ruido blanco}: $p$-valor de Ljung-Box sobre $2m=24$ rezagos (FPP3 §2.9), con hipótesis
-nula de ruido blanco; un $p$ pequeño confirma estructura temporal modelable.
-\item \textbf{Asimetría y curtosis} de los avances mensuales: sesgo (las retrogresiones producen
-colas izquierdas) y peso de las colas (eventos extremos).
-\end{itemize}
-Las medidas de estabilidad y \textit{lumpiness} (varianza de medias y de varianzas por bloque) se
-calculan en el módulo pero se omiten de la tabla por depender de la escala en días; quedan en el
-registro reproducible. Las Tablas~\ref{tab:features_estructura} y~\ref{tab:features_anomalias}
-reportan los descriptores de las 25 series, rederivados hasta noviembre de 2026.
 
 \begin{table}[htbp]
 \centering
@@ -1401,6 +1345,64 @@ Resto del mundo F4 & 0.90 & $<$0.01 & 0.40 & 0.445 & diferenciar \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\subsubsection{Bloque de empleo y sorteo de diversidad}
+
+El censo panorámico (\hyperref[tab:eda_descriptiva]{Tabla~\ref*{tab:eda_descriptiva}} y
+\hyperref[fig:eda_completitud]{Figura~\ref*{fig:eda_completitud}}) revela por qué el bloque de empleo requiere un
+tratamiento distinto: solo el $33$--$39$\,\% de sus celdas tiene fecha publicada
+(las categorías EB transitan con frecuencia a \textit{Current} o
+\textit{Unavailable}) y, cuando la hay, el congelamiento domina ($38$--$77$\,\% de
+los meses sin movimiento, con avance mediano de cero días). Sus retrogresiones son
+además más frecuentes que las familiares (261 episodios contra 128) y de gran
+magnitud (\hyperref[fig:eda_retros]{Figura~\ref*{fig:eda_retros}}). Estas propiedades justifican la cobertura
+escalonada: el bloque EB participa del almacén y del censo desde el primer día, y su
+evaluación predictiva se restringe a las series que superan el umbral de
+elegibilidad.
+
+Por último, el sorteo de diversidad (\textit{Diversity Visa}, DV) se explora como
+hecho descriptivo separado: su valor es un \textbf{número de rango} regional, no una
+fecha, por lo que queda fuera del objetivo predictivo. La \hyperref[fig:eda_dv]{Figura~\ref*{fig:eda_dv}} (Apéndice~A.6)
+muestra las $\factDvNRowsFmt$ observaciones del sorteo: el corte sube dentro de cada año fiscal y se
+reinicia en octubre (diente de sierra), con África sistemáticamente en los cortes
+más altos.
+
+\subsubsection{Catálogo de características por serie}
+
+Examinar 25 series una por una no escala. Por ello se adopta el enfoque de análisis
+basado en características (\textit{feature-based}) \cita{15}: se resume cada serie en
+un vector de descriptores numéricos comparables, de modo que el panel completo se
+analiza como una tabla. A partir de la descomposición STL $Y_t = T_t + S_t + R_t$ (tendencia,
+estacionalidad, residuo) se miden, según la formulación de descomposición de FPP3~\cita{16}, la
+fuerza de tendencia y la de estacionalidad,
+\begin{equation}
+F_T = \max\!\left(0,\; 1 - \frac{\operatorname{Var}(R_t)}{\operatorname{Var}(T_t + R_t)}\right),
+\qquad
+F_S = \max\!\left(0,\; 1 - \frac{\operatorname{Var}(R_t)}{\operatorname{Var}(S_t + R_t)}\right),
+\end{equation}
+ambas en $[0,1]$: cerca de 1, la componente explica casi toda la variación más allá del ruido;
+cerca de 0, es despreciable. Los demás descriptores son:
+\begin{itemize}[leftmargin=*, itemsep=1pt, topsep=2pt]
+\item \textbf{Entropía espectral} $H = -\sum_k p_k \log p_k / \log K$, sobre el periodograma
+normalizado $\{p_k\}$ de $K$ frecuencias: $H \to 0$ señala una señal estructurada y predecible;
+$H \to 1$, ruido blanco sin estructura aprovechable.
+\item \textbf{Autocorrelación} de rezago 1 del nivel (ACF1; cercana a 1, alta persistencia) y de la
+serie diferenciada ($ACF1_\Delta$, cuyo signo orienta el término de media móvil de un ARIMA).
+\item \textbf{Orden de diferenciación} $d$: se diferencia mientras la prueba KPSS rechace la
+estacionariedad (FPP3 §9.1); alimenta el parámetro $d$ de ARIMA.
+\item \textbf{Atípicos}: residuos de la STL con $z$-score robusto (mediana y desviación absoluta
+mediana, criterio de Iglewicz-Hoaglin) mayor que 3 en valor absoluto; cuantifica la carga de
+anomalías (en este dominio, las retrogresiones).
+\item \textbf{Ruido blanco}: $p$-valor de Ljung-Box sobre $2m=24$ rezagos (FPP3 §2.9), con hipótesis
+nula de ruido blanco; un $p$ pequeño confirma estructura temporal modelable.
+\item \textbf{Asimetría y curtosis} de los avances mensuales: sesgo (las retrogresiones producen
+colas izquierdas) y peso de las colas (eventos extremos).
+\end{itemize}
+Las medidas de estabilidad y \textit{lumpiness} (varianza de medias y de varianzas por bloque) se
+calculan en el módulo pero se omiten de la tabla por depender de la escala en días; quedan en el
+registro reproducible. Las \hyperref[tab:features_estructura]{Tablas~\ref*{tab:features_estructura}} y~\ref{tab:features_anomalias}
+reportan los descriptores de las 25 series, rederivados hasta noviembre de 2026.
+
 
 \begin{table}[htbp]
 \centering
@@ -1480,7 +1482,7 @@ RoW & F4 & 45 & 0.000 & $-0.29$ & 53.5 \\
 \end{tabular}
 \end{table}
 
-\paragraph{Lectura de las Tablas~\ref{tab:features_estructura} y~\ref{tab:features_anomalias}.} El panel
+\paragraph{Lectura de las \hyperref[tab:features_estructura]{Tablas~\ref*{tab:features_estructura}} y~\ref{tab:features_anomalias}.} El panel
 presenta tendencia fuerte: la fuerza $F_T$ supera 0.99 en la mayoría de
 las series; entre las menores se encuentran MX/F3 con $F_T=0.776$, MX/F1 con
 $0.936$ y PH/F3 con $0.967$. La fuerza de
@@ -1489,7 +1491,7 @@ series exactamente en 0). Esta descripción no demuestra ausencia de estacionali
 ni explica por sí sola las diferencias predictivas entre SARIMA y ARIMA. La autocorrelación de
 nivel ACF1 ronda 0.98 a 0.99 (persistencia alta, coherente con la tendencia), y el
 orden de diferenciación es $d=1$ salvo dos series mexicanas que requieren $d=2$. La
-Figura~\ref{fig:eda_features} visualiza las diferencias entre series en estos dos
+\hyperref[fig:eda_features]{Figura~\ref*{fig:eda_features}} visualiza las diferencias entre series en estos dos
 descriptores, con predominio de tendencia frente a estacionalidad. En cuanto a anomalías y
 forma, Ljung-Box (24 rezagos) rechaza el ruido blanco en las 25 series ($p < 0.001$ en todas):
 hay estructura temporal que un modelo puede aprovechar. La distribución de los avances es
@@ -1517,7 +1519,7 @@ duraderos) se detectan con el algoritmo PELT (\textit{Pruned Exact Linear Time})
 MAD locales). Aplicado a México/F3/FAD, el método identifica \textbf{solo 3 cambios de
 régimen}, una medida distinta de los 84 residuos atípicos. Las anomalías puntuales
 aparecen tanto en 2002--2008 como en fechas posteriores
-(Figura~\ref{fig:eda_changepoints}). Los diagnósticos distinguen fenómenos, pero no
+(\hyperref[fig:eda_changepoints]{Figura~\ref*{fig:eda_changepoints}}). Los diagnósticos distinguen fenómenos, pero no
 atribuyen por sí solos los residuos atípicos a cambios de régimen. Su efecto
 predictivo debe contrastarse mediante validación temporal y métricas robustas.
 
@@ -1591,12 +1593,12 @@ incompatible con la validación walk-forward. Las convoluciones aleatorias (ROCK
 firmas de camino (\textit{path signatures}) aportan sobre todo en escenarios multivariados, mientras
 que aquí el objetivo es univariado. Son decisiones fundamentadas, no omisiones.
 
-\paragraph{Estructura cruzada del panel.} La matriz de la Figura~\ref{fig:eda_corr2} muestra
+\paragraph{Estructura cruzada del panel.} La matriz de la \hyperref[fig:eda_corr2]{Figura~\ref*{fig:eda_corr2}} muestra
 también el co-movimiento entre áreas: en F3, India, China y \textit{All Chargeability} se mueven
 casi al unísono (correlación $\approx 1$), pues comparten el frente mundial cuando no están
 rezagadas, mientras que México y Filipinas evolucionan de forma independiente por sus rezagos
 propios. La correlación cruzada a retardos de $\pm 6$ meses sobre el bloque familiar FAD completo
-(Figura~\ref{fig:eda_leadlag}) muestra que en \textbf{todas} las parejas de áreas la mejor
+(\hyperref[fig:eda_leadlag]{Figura~\ref*{fig:eda_leadlag}}) muestra que en \textbf{todas} las parejas de áreas la mejor
 correlación ocurre en el retardo cero: el co-movimiento, donde existe, es contemporáneo y ningún
 área anticipa a otra. Esto descarta usar un país como indicador adelantado de otro y refuerza la
 decisión de modelar cada serie con su propia dinámica, con la opción de modelos globales que
@@ -1614,7 +1616,7 @@ máximo ocurre en el retardo cero: el co-movimiento es contemporáneo.}
 \subsubsection{Síntesis: hallazgos del análisis y decisiones que inducen}
 
 Un análisis exploratorio no termina en la descripción: termina cuando cada hallazgo se
-traduce en una decisión verificable sobre el modelado. La Tabla~\ref{tab:eda_sintesis}
+traduce en una decisión verificable sobre el modelado. La \hyperref[tab:eda_sintesis]{Tabla~\ref*{tab:eda_sintesis}}
 recapitula los doce hallazgos principales, la evidencia que los sostiene y su consecuencia para la
 fase siguiente. Leídos en conjunto, describen un panel de series fuertemente tendenciales, sin
 ciclo anual, integradas de orden uno, con distribuciones de avance asimétricas y de cola pesada,
@@ -1634,41 +1636,41 @@ su validación.}
 \textbf{Hallazgo} & \textbf{Evidencia} & \textbf{Consecuencia para el modelado} \\ \midrule
 Congelamiento típico: el $\factPctFrozen$\,\% de los meses no registra movimiento (28\,\% en
 familiar FAD, 66\,\% en familiar DFF) &
-Tabla~\ref{tab:eda_descriptiva}, Figura~\ref{fig:eda_panel} &
+\hyperref[tab:eda_descriptiva]{Tabla~\ref*{tab:eda_descriptiva}}, \hyperref[fig:eda_panel]{Figura~\ref*{fig:eda_panel}} &
 El pronóstico ingenuo de un paso es un piso exigente: toda comparación lo incluye y ningún modelo
 es útil sin superarlo \\
 Los faltantes son régimen, no ruido: solo el $\factPctTrainableF$\,\% de las celdas tiene fecha
 (32--38\,\% en empleo) &
-Tabla~\ref{tab:eda_descriptiva}, Figura~\ref{fig:eda_completitud} &
+\hyperref[tab:eda_descriptiva]{Tabla~\ref*{tab:eda_descriptiva}}, \hyperref[fig:eda_completitud]{Figura~\ref*{fig:eda_completitud}} &
 Entrenamiento solo sobre $e=F$; $C$ y $U$ como anotación; cobertura evaluable escalonada y
 declarada de antemano \\
 Tendencia dominante y estacionalidad casi nula ($F_T>0.99$ en la mayoría, $F_S<0.23$ en todas) &
-Tabla~\ref{tab:features_estructura}, Figura~\ref{fig:eda_features} &
+\hyperref[tab:features_estructura]{Tabla~\ref*{tab:features_estructura}}, \hyperref[fig:eda_features]{Figura~\ref*{fig:eda_features}} &
 No se espera que SARIMA mejore a ARIMA; las pruebas de raíz unitaria estacional sobran \\
 Ninguna serie es estacionaria en nivel: \factStationarityDifference{} de las
 \factNSeriesEvaluable{} evaluables exigen diferenciación y \factStationarityMixed{} dan señales
 mixtas &
-Tabla~\ref{tab:eda_estacionariedad} &
+\hyperref[tab:eda_estacionariedad]{Tabla~\ref*{tab:eda_estacionariedad}} &
 Integración de orden uno: se modela la primera diferencia ($d=1$; $d=2$ en dos series
 mexicanas) \\
 Estructura aprovechable tras diferenciar: Ljung-Box rechaza el ruido blanco en las 25 series
 piloto &
-Tabla~\ref{tab:features_anomalias}, Figura~\ref{fig:eda_acf} &
+\hyperref[tab:features_anomalias]{Tabla~\ref*{tab:features_anomalias}}, \hyperref[fig:eda_acf]{Figura~\ref*{fig:eda_acf}} &
 Los modelos autorregresivos tienen señal; el orden se orienta con la autocorrelación de la serie
 diferenciada \\
 Avances asimétricos y de cola pesada (asimetría negativa en 20 de las 25 series, curtosis de
 hasta 104) &
-Figuras~\ref{fig:eda_dist}, \ref{fig:eda_violin_c} y~\ref{fig:eda_violin_cat} &
+\hyperref[fig:eda_dist]{Figuras~\ref*{fig:eda_dist}}, \ref{fig:eda_violin_c} y~\ref{fig:eda_violin_cat} &
 Sin supuesto gaussiano: métricas robustas e intervalos por cuantiles empíricos, no por
 desviación estándar \\
 Retrogresiones raras pero extremas: \factNRetroEvents{} episodios ($\factPctRetro$\,\% de los
 movimientos), de hasta $12.8$ años en un mes &
-Figura~\ref{fig:eda_retros} &
+\hyperref[fig:eda_retros]{Figura~\ref*{fig:eda_retros}} &
 Fuera de lo que el sistema promete predecir, pero la validación debe demostrar que el modelo los
 tolera sin degradarse \\
 Atípicos mayoritariamente estructurales: en México/F3, 3 cambios de régimen frente a 84
 observaciones atípicas &
-Figura~\ref{fig:eda_changepoints} &
+\hyperref[fig:eda_changepoints]{Figura~\ref*{fig:eda_changepoints}} &
 No se recortan ni se imputan como ruido; validación progresiva con ventanas móviles que respeta
 el orden temporal \\
 BDS rechaza que la serie diferenciada sea independiente e idénticamente distribuida
@@ -1678,12 +1680,12 @@ Se incluyen modelos no lineales para contrastarlo empíricamente con el mismo pr
 que los lineales \\
 Co-movimiento contemporáneo: en todas las parejas la mejor correlación cruzada ocurre en el
 retardo cero &
-Figuras~\ref{fig:eda_corr2} y~\ref{fig:eda_leadlag} &
+\hyperref[fig:eda_corr2]{Figuras~\ref*{fig:eda_corr2}} y~\ref{fig:eda_leadlag} &
 Ningún área es indicador adelantado de otra; se conserva la opción de modelos globales dentro del
 grupo mundial \\
 Tablas no intercambiables: la brecha entre DFF y FAD tiene mediana cercana a un año y llega a
 4.2 años &
-Figura~\ref{fig:eda_brecha} &
+\hyperref[fig:eda_brecha]{Figura~\ref*{fig:eda_brecha}} &
 FAD y DFF se entrenan y se evalúan por separado, y nunca se comparan como si midieran lo mismo \\
 Con este protocolo, de \feFactSelIn{} descriptores candidatos
 \ifnum\feFactSelRelevant=0 ninguno supera\else solo \feFactSelRelevant{} supera\fi{}
@@ -1709,15 +1711,15 @@ esta sección (censo estadístico, figuras y un reporte ejecutivo en PDF), junto
 versionado de \feFactNCleanDecisions{} decisiones de limpieza y \feFactNFeDecisions{} de
 características (cada una con el módulo que la implementa y la falla que previene, el registro de
 limpieza de cada consolidación y el resultado vigente de la selección), se regenera de forma
-automática con cada boletín nuevo dentro del mismo proceso continuo que actualiza la base de
-datos, con verificaciones que impiden publicar un análisis incompleto o inconsistente con la
+automática con cada boletín nuevo (llegue por el congelado automático o por la carga manual del
+Apéndice~A.1) dentro del mismo proceso continuo que actualiza la base de datos, con verificaciones que impiden publicar un análisis incompleto o inconsistente con la
 fuente única de cifras del proyecto. Todo ello es consultable públicamente desde la aplicación de
 demostración (Apéndice~A).
 
 \subsection{1.2.2 Preprocesamiento de datos}
 
 El preprocesamiento construye, a partir de cada serie con fecha, la \textbf{matriz de
-características} que alimenta a los modelos (Figura~\ref{fig:fe_pipeline}). Aplica cinco
+características} que alimenta a los modelos (\hyperref[fig:fe_pipeline]{Figura~\ref*{fig:fe_pipeline}}). Aplica cinco
 transformaciones, todas diseñadas para evitar la fuga de información (\textit{leakage}):
 
 \begin{figure}[htbp]
@@ -1766,7 +1768,7 @@ entrenamiento.}
 estacionaria, y los árboles y las redes \textit{no extrapolan tendencias sobre niveles}: se
 saturan en el máximo observado. Por ello el objetivo se modela sobre la \textbf{primera
 diferencia} (el avance mensual) y se reintegra a un paso. La transformación vuelve la serie
-estacionaria y extrapolable (Figura~\ref{fig:fe_diff}); es la palanca que rescata a los
+estacionaria y extrapolable (\hyperref[fig:fe_diff]{Figura~\ref*{fig:fe_diff}}); es la palanca que rescata a los
 modelos de alta capacidad.
 
 \begin{figure}[htbp]
@@ -1805,9 +1807,9 @@ máscara.
 rejilla se completa con el mismo relleno causal hacia adelante: todo mes sin fecha
 arrastra la última observación publicada, sin usar jamás el extremo futuro del hueco
 (el tope de interpolación de tres meses gobierna hoy solo la rejilla descriptiva del
-EDA, no la de modelado). La Figura~\ref{fig:fe_gaps} ilustra la política sobre la
+EDA, no la de modelado). La \hyperref[fig:fe_gaps]{Figura~\ref*{fig:fe_gaps}} ilustra la política sobre la
 serie con las corridas de ausencia más largas del panel, y la
-Figura~\ref{fig:fe_regime} muestra su contraparte de evaluación: los meses en
+\hyperref[fig:fe_regime]{Figura~\ref*{fig:fe_regime}} muestra su contraparte de evaluación: los meses en
 régimen \textit{Current}/\textit{Unavailable} son anotación descriptiva y solo las
 fechas efectivamente publicadas se puntúan.
 
@@ -1843,7 +1845,7 @@ y coseno para no imponer un orden falso entre diciembre y enero.
 \end{itemize}
 
 Para verificar qué información usan efectivamente los modelos tabulares, la
-Figura~\ref{fig:fe_importance} reporta la importancia de características de un árbol de
+\hyperref[fig:fe_importance]{Figura~\ref*{fig:fe_importance}} reporta la importancia de características de un árbol de
 potenciación de gradiente (LightGBM) entrenado sobre el avance mensual, medida por el número de divisiones en que interviene cada
 variable: los avances de los meses $t-1$ y $t-3$ encabezan el orden casi empatados, seguidos de los
 demás rezagos cortos y del rezago anual ($t-12$), mientras que los regresores de calendario
@@ -1875,7 +1877,7 @@ identificadores ya están definidos. FAD y DFF se modelan por separado, y el ent
 ni en etiquetas objetivo.
 
 \paragraph{Criterios de selección.} Se comparan los \textbf{\factNModels{} modelos} de la
-Tabla~\ref{tab:modelos}: tres líneas base de referencia y seis familias complementarias,
+\hyperref[tab:modelos]{Tabla~\ref*{tab:modelos}}: tres líneas base de referencia y seis familias complementarias,
 elegidas por su adecuación al carácter temporal de los datos, su capacidad para generalizar
 fuera de la muestra, la diversidad de sus supuestos y un costo computacional compatible con la
 actualización mensual. El naïve estacional repite el valor de doce meses atrás y es el
@@ -1885,19 +1887,11 @@ publicado, es decir, un paseo aleatorio) es el piso operativo que cualquier mode
 justificar, y la deriva (\textit{drift}) le añade el avance medio histórico. Incluirlas no es
 un formalismo: en un panel donde el $\factPctFrozen$\,\% de los avances mensuales es nulo (en
 las colas familiares, del $28$\,\% de meses congelados en FAD al $66$\,\% en DFF,
-Tabla~\ref{tab:eda_descriptiva}), ``no moverse'' es una predicción formidable a un paso, y
+\hyperref[tab:eda_descriptiva]{Tabla~\ref*{tab:eda_descriptiva}}), ``no moverse'' es una predicción formidable a un paso, y
 omitirla dejaría a toda la comparación sin su referencia mínima. Como las series distan de ser
 estacionales, se reporta en paralelo la MASE escalada por el naïve-1 ($m=1$); se conserva
 $m=12$ como métrica principal por comparabilidad con la práctica estándar y con las campañas
 previas del proyecto (la definición formal y su referencia se dan en §2.1).
-
-Las series son fechas que avanzan con tendencia fuerte, estacionalidad anual casi nula y
-retrogresiones ocasionales. Por ello se contrasta el espectro completo, desde modelos lineales
-parsimoniosos (ARIMA, SARIMA, ETS, Theta, tendencia lineal local) hasta modelos de alta
-capacidad (árboles de potenciación de gradiente sobre la \textit{primera diferencia}, condición
-para que extrapolen la tendencia, y redes profundas), más un \textit{foundation model}
-preentrenado (Chronos) evaluado en modo zero-shot. Cada familia aporta un \textit{sesgo
-inductivo} distinto, que permite anticipar y luego contrastar cuál encaja con este régimen.
 
 \begin{table}[htbp]
 \centering
@@ -1921,6 +1915,15 @@ Lineales/profundos \cita{33}\textendash\cita{40} & DLinear, NLinear, RLinear, Ti
 Foundation \textit{(zero-shot)} \cita{41} & Chronos & Transferencia sin entrenamiento \\ \bottomrule
 \end{tabular}
 \end{table}
+
+Las series son fechas que avanzan con tendencia fuerte, estacionalidad anual casi nula y
+retrogresiones ocasionales. Por ello se contrasta el espectro completo, desde modelos lineales
+parsimoniosos (ARIMA, SARIMA, ETS, Theta, tendencia lineal local) hasta modelos de alta
+capacidad (árboles de potenciación de gradiente sobre la \textit{primera diferencia}, condición
+para que extrapolen la tendencia, y redes profundas), más un \textit{foundation model}
+preentrenado (Chronos) evaluado en modo zero-shot. Cada familia aporta un \textit{sesgo
+inductivo} distinto, que permite anticipar y luego contrastar cuál encaja con este régimen.
+
 
 \paragraph{Estadísticos lineales: ARIMA y SARIMA \cita{24}.} Modelan la serie como una
 combinación lineal de sus valores y errores pasados (SARIMA añade términos estacionales) y se
@@ -1969,7 +1972,7 @@ millones de series, evaluado \textit{sin ajuste alguno} a estos datos, mide cuá
 transferencia de conocimiento frente a la escasez: aporta un pronóstico razonable sin entrenar
 y ocupa la zona media-baja de la tabla, pero no supera a las redes locales correctamente
 especificadas ni se acerca a los parsimoniosos o al piso ingenuo. Las cifras de cada familia se
-reportan en la Tabla~\ref{tab:comparacion_modelos} (§2.2).
+reportan en la \hyperref[tab:comparacion_modelos]{Tabla~\ref*{tab:comparacion_modelos}} (§2.2).
 
 \paragraph{Técnicas no seleccionadas.} Los algoritmos evolutivos, los métodos de enjambre y
 la optimización multiobjetivo no se usan como predictores: buscan soluciones en espacios de
@@ -1989,13 +1992,13 @@ pronostica en línea después de cada consulta: una nueva fuente entra al flujo,
 produce una versión trazable de datos y modelos, y sólo entonces genera artefactos estáticos
 para consulta. Así se reduce la complejidad operativa, se evita que un cálculo parcial llegue
 al usuario y cada resultado se reproduce a partir del código, los datos y la configuración que
-lo originaron. La arquitectura de la Figura~\ref{fig:arquitectura_a7} separa ocho componentes
+lo originaron. La arquitectura de la \hyperref[fig:arquitectura_a7]{Figura~\ref*{fig:arquitectura_a7}} separa ocho componentes
 con responsabilidades explícitas: el portal oficial es la fuente; la instantánea congelada, la
 evidencia primaria; el panel y el almacén, las capas de datos procesados; la matriz de
 características alimenta al catálogo de modelos; la evaluación temporal decide qué resultados
 son admisibles; y la publicación expone únicamente artefactos versionados. El seguimiento, las
 pruebas y los controles de procedencia atraviesan todo el flujo, y cada paso posee una condición
-que impide avanzar cuando el resultado no es confiable (pie de la figura). Esta vista extremo a extremo complementa la Figura~\ref{fig:arquitectura}, que detalla exclusivamente el flujo interno de modelado.
+que impide avanzar cuando el resultado no es confiable (pie de la figura). Esta vista extremo a extremo complementa la \hyperref[fig:arquitectura]{Figura~\ref*{fig:arquitectura}}, que detalla exclusivamente el flujo interno de modelado.
 
 \begin{figure}[htbp]
 \centering
@@ -2127,7 +2130,7 @@ técnicas compiten antes de seleccionarse y los resultados se acreditan antes de
 \paragraph{Alcance y aporte de cada avance.} Esta etapa convierte el diseño de las
 secciones~1.3.1 y~1.3.2 en una cadena ejecutable de preparación, ajuste, pronóstico,
 evaluación y persistencia. Se construyó en tres avances sucesivos, A8, A9 y A10, cuyo aporte
-resume la Tabla~\ref{tab:avances_a10}: el primero construyó el recorrido por modelo; el segundo
+resume la \hyperref[tab:avances_a10]{Tabla~\ref*{tab:avances_a10}}: el primero construyó el recorrido por modelo; el segundo
 integró productores y consumidores bajo una identidad de campaña; y el tercero cerró las
 transiciones, la persistencia, la recuperación y las superficies de consumo. El objetivo de la implementación no es declarar un modelo definitivo, sino demostrar que las familias
 seleccionadas comparten un protocolo temporal, que sus parámetros quedan gobernados y que
@@ -2144,9 +2147,9 @@ sección 1.4.1. Cada avance conserva los contratos del anterior y añade una fro
 \toprule
 \rowcolor{uacjblue!15}
 \textbf{Avance} & \textbf{Problema resuelto} & \textbf{Aporte principal} & \textbf{Puerta de aceptación} \\ \midrule
-\textbf{A8} & Convertir el diseño en cálculo reproducible & Representación causal, registro de modelos, recorrido temporal (Figura~\ref{fig:implementacion_a8}, Algoritmo~\ref{alg:implementacion_a8}), parámetros gobernados, métricas y promoción atómica & Pruebas unitarias, causalidad y maestro dorado \\
+\textbf{A8} & Convertir el diseño en cálculo reproducible & Representación causal, registro de modelos, recorrido temporal (\hyperref[fig:implementacion_a8]{Figura~\ref*{fig:implementacion_a8}}, \hyperref[alg:implementacion_a8]{Algoritmo~\ref*{alg:implementacion_a8}}), parámetros gobernados, métricas y promoción atómica & Pruebas unitarias, causalidad y maestro dorado \\
 \textbf{A9} & Integrar componentes sin mezclar procedencias & Registro canónico, preparación aislada por campaña, transporte de ETS y Theta, cobertura multisemilla y verificación previa & Verificación previa, recibos recalculados al leer, conjuntos exactos de claves y pruebas de sustitución \\
-\textbf{A10} & Cerrar el ciclo de vida del resultado & Sello de arranque, estados de campaña (Figura~\ref{fig:estados_a10}), persistencia según capacidad, clasificación de fallos, consumo y cierre (Algoritmo~\ref{alg:cierre_a10}) & Verificación del sello, transacción y autorización humana de publicación \\ \bottomrule
+\textbf{A10} & Cerrar el ciclo de vida del resultado & Sello de arranque, estados de campaña (\hyperref[fig:estados_a10]{Figura~\ref*{fig:estados_a10}}), persistencia según capacidad, clasificación de fallos, consumo y cierre (\hyperref[alg:cierre_a10]{Algoritmo~\ref*{alg:cierre_a10}}) & Verificación del sello, transacción y autorización humana de publicación \\ \bottomrule
 \end{tabular}
 \end{table}
 
@@ -2155,7 +2158,7 @@ validado y el almacén DuckDB de la sección~1.3.2 \cita{42}. Una capa de acceso
 serie; otra construye su representación mensual causal; un registro canónico asigna a cada
 identificador lógico su familia, fuente de pronóstico y política de persistencia; y un motor de
 recorrido temporal aplica la misma partición y las mismas métricas a todos los candidatos
-(Figura~\ref{fig:implementacion_a8}, cuyas flechas son productos explícitos y verificables).
+(\hyperref[fig:implementacion_a8]{Figura~\ref*{fig:implementacion_a8}}, cuyas flechas son productos explícitos y verificables).
 
 \begin{figure}[htbp]
 \centering
@@ -2214,7 +2217,7 @@ los árboles predicen el avance mensual, no el nivel. La identidad de un candida
 lógico, no su clase de biblioteca, y la persistencia no se equipara con evaluación: si un
 envoltorio no expone un estado reutilizable, se conserva el pronóstico del recorrido temporal
 con su contexto en lugar de inventar un modelo serializado. El
-Algoritmo~\ref{alg:implementacion_a8} expresa el recorrido implementado. La rejilla esperada se deriva del panel y del registro antes de entrenar; por eso un archivo con menos filas no puede
+\hyperref[alg:implementacion_a8]{Algoritmo~\ref*{alg:implementacion_a8}} expresa el recorrido implementado. La rejilla esperada se deriva del panel y del registro antes de entrenar; por eso un archivo con menos filas no puede
 autodeclararse completo. Los últimos 24 meses forman el conjunto reservado independiente, y la
 selección y el ajuste de hiperparámetros ocurren sólo en la región anterior: Optuna \cita{51}
 busca con el protocolo anidado de la sección~1.4.4, de modo que el conjunto reservado nunca interviene en esas decisiones; las redes globales eligen su configuración una sola vez y luego
@@ -2259,7 +2262,7 @@ conjunto reservado $H=24$ y semilla $s$
 \endgroup
 
 \paragraph{Configuración gobernada.} Los valores se concentran en un módulo de configuración y
-no se repiten dentro de cada algoritmo. La Tabla~\ref{tab:config_a10} reúne los parámetros
+no se repiten dentro de cada algoritmo. La \hyperref[tab:config_a10]{Tabla~\ref*{tab:config_a10}} reúne los parámetros
 matemáticos del primer avance y los de ejecución y aceptación que añadieron los otros dos,
 separados de los hiperparámetros de cada candidato para que una decisión de gobernanza no se
 confunda con una búsqueda estadística. Los valores de aceptación no se optimizan junto con el
@@ -2356,7 +2359,7 @@ igualdad byte a byte con el sello registrado: si cambió una entrada, un entorno
 lista de módulos, la ejecución termina sin crear resultados, y cualquier archivo de cálculo no
 declarado mantiene el árbol sucio y bloquea el arranque.
 
-Una campaña avanza después por estados explícitos, como muestra la Figura~\ref{fig:estados_a10}.
+Una campaña avanza después por estados explícitos, como muestra la \hyperref[fig:estados_a10]{Figura~\ref*{fig:estados_a10}}.
 \texttt{running} indica que las precondiciones fueron aceptadas y que los productores pueden
 escribir únicamente en preparación; \texttt{computed} acredita que terminó el cálculo esperado, con
 esquema, cobertura, \textit{hashes} y procedencia verificados; \texttt{validated} exige además una
@@ -2442,7 +2445,7 @@ final hasta verificar y registrar la identidad común. Las superficies de consum
 portal) se derivan de la misma versión después de la promoción, sin recalcular un modelo ni
 recurrir a un archivo antiguo.
 
-\paragraph{Cierre operacional.} El Algoritmo~\ref{alg:cierre_a10} reúne el recorrido final, con
+\paragraph{Cierre operacional.} El \hyperref[alg:cierre_a10]{Algoritmo~\ref*{alg:cierre_a10}} reúne el recorrido final, con
 tres puertas humanas separadas: una verificación de sólo lectura del estado sellado antes de ejecutar
 la campaña, una revisión humana acreditada antes de considerarla validada y una autorización
 explícita antes de publicarla. Omitir cualquiera convertiría una preparación local en un resultado
@@ -2495,7 +2498,7 @@ panel $P$ y árbol servido $V$
 
 \paragraph{Pruebas, herramientas y mantenimiento.} Las comprobaciones se distribuyen por nivel
 para que ninguna prueba sintética acredite una ruta que el lanzador nunca invoca
-(Tabla~\ref{tab:pruebas_a10}). Las pruebas de sustitución (una serie sustituida con el mismo
+(\hyperref[tab:pruebas_a10]{Tabla~\ref*{tab:pruebas_a10}}). Las pruebas de sustitución (una serie sustituida con el mismo
 conteo, un faltante compensado con un duplicado, un único origen cambiado, una escala degenerada,
 otra campaña mezclada, un archivo alterado tras acreditarlo) deben fallar antes de la evaluación o
 la publicación. Los controles benignos son tan importantes como las sustituciones: un objetivo no evaluable se conserva con
@@ -2537,7 +2540,7 @@ lectura sobre el mismo estado que se pretendía ejecutar y, en particular, sobre
 el sello comparado al arrancar, la transacción y los artefactos que una publicación posterior
 consumiría. Esa frontera separó la finalización del software de la obtención de evidencia
 experimental nueva. La campaña causal se ejecutó después, en octubre de 2026, una vez superada esa
-verificación. Su corte publicado siguió el orden del Algoritmo~\ref{alg:cierre_a10}: primero se
+verificación. Su corte publicado siguió el orden del \hyperref[alg:cierre_a10]{Algoritmo~\ref*{alg:cierre_a10}}: primero se
 reconcilió con sus complementos acreditados (Apéndice~A.3); después, una revisión humana del
 candidato reconciliado la validó y, cuando el candidato cambió, la revalidó con una revisión
 nueva; sólo entonces se publicó. Sus resultados son los que reporta el capítulo de resultados.
@@ -2547,7 +2550,7 @@ nueva; sólo entonces se publicó. Sus resultados son los que reporta el capítu
 
 La partición temporal (ventanas iniciales por tabla, paso mensual y conjunto reservado de 24
 meses) y la frecuencia de reentrenamiento de cada familia son las de la
-Tabla~\ref{tab:config_a10}. La selección de hiperparámetros se realiza dentro de cada ventana de
+\hyperref[tab:config_a10]{Tabla~\ref*{tab:config_a10}}. La selección de hiperparámetros se realiza dentro de cada ventana de
 entrenamiento, nunca sobre el conjunto de prueba, para impedir la fuga de información.
 
 \paragraph{Configuraciones comparadas y alcance de la atribución.} Las variantes se organizaron
@@ -2638,14 +2641,14 @@ el procesamiento (con captura asistida cuando la fuente bloquea el acceso) y con
 trazabilidad de cada resultado.
 
 \paragraph{Arquitectura de datos en medallón.} Corresponde a los componentes 2 a 4 de la
-Figura~\ref{fig:arquitectura_a7}: \textbf{bronce} conserva las instantáneas HTML crudas en un
+\hyperref[fig:arquitectura_a7]{Figura~\ref*{fig:arquitectura_a7}}: \textbf{bronce} conserva las instantáneas HTML crudas en un
 almacenamiento versionado (S3), la \textit{fuente de verdad} que resiste la rotación de boletines
 en el portal oficial; \textbf{plata} es el panel \textit{tidy} limpio; y \textbf{oro} es el
 almacén dimensional en estrella, cuyas restricciones de clave e integridad actúan como contrato de
 calidad y del que se deriva el mart de entrenamiento, sólo con observaciones en estado $F$.
 
 \paragraph{Automatización de doble disparador.} Dos flujos de \textit{GitHub Actions} mantienen el
-sistema (Tabla~\ref{tab:mlops_ci}). En cada \texttt{push}, la \textbf{integración continua}
+sistema (\hyperref[tab:mlops_ci]{Tabla~\ref*{tab:mlops_ci}}). En cada \texttt{push}, la \textbf{integración continua}
 ejecuta \texttt{ruff}, \texttt{mypy} y \texttt{pytest} con un piso de cobertura del 65\,\% antes
 de integrar a \texttt{main}. En días hábiles, un \textbf{pipeline de datos} dirigido por S3
 congela únicamente el boletín nuevo (\textit{skip-if-exists}); si lo hay, reconstruye el panel y
@@ -2655,7 +2658,7 @@ una incidencia. Mientras la fuente rechace la descarga automática, el boletín 
 semiautomática de la Sección~2.3 y recorre las mismas puertas.
 
 \paragraph{Seguimiento de experimentos y versionado.} Cada corrida se registra de forma
-\textbf{independiente del entorno} (Figura~\ref{fig:mlops_stack}, en el apéndice): el módulo de
+\textbf{independiente del entorno} (\hyperref[fig:mlops_stack]{Figura~\ref*{fig:mlops_stack}}, en el apéndice): el módulo de
 seguimiento escribe un archivo \textit{JSONL} sin dependencias pesadas (lo que resuelve el
 conflicto entre la versión de \texttt{pandas} que exige MLflow y la del entorno de modelado) y un
 sincronizador lo ingiere a una base MLflow consultable por web. Los datos, los modelos y la base
@@ -2679,7 +2682,7 @@ serie y tabla, sin sustituirlos por otro modelo ni eliminar en silencio los caso
 \subsection{1.5.2 Validación de generalización y estabilidad del sistema}
 
 La generalización se evalúa sobre el conjunto de 24 meses reservado, que ningún modelo vio
-durante el ajuste ni la selección; en la Figura~\ref{fig:holdout}, el pronóstico de un modelo
+durante el ajuste ni la selección; en la \hyperref[fig:holdout]{Figura~\ref*{fig:holdout}}, el pronóstico de un modelo
 parsimonioso representativo (ETS amortiguado) para México/F3/FAD sigue la trayectoria real y
 converge hacia el final del horizonte. La estabilidad se examinó con semillas controladas,
 comparación de familias, evaluación multi-horizonte y particiones por estabilidad previas. La segmentación no produjo ningún enrutador que superara el gate en los tres
@@ -2776,9 +2779,9 @@ decidir con evidencia prospectiva multi-horizonte (§2.2 y Apéndice~A.3). La ca
 queda como trabajo de despliegue futuro, y la significancia de las diferencias se contrasta con
 pruebas fijadas de antemano (§2.2).
 
-El Algoritmo~\ref{alg:walkforward} resume la validación: en cada origen del conjunto reservado
+El \hyperref[alg:walkforward]{Algoritmo~\ref*{alg:walkforward}} resume la validación: en cada origen del conjunto reservado
 el modelo se entrena \textit{solo} con el pasado, predice un paso y deriva su intervalo de los
-errores de calibración anteriores. La Tabla~\ref{tab:notacion} reúne la notación.
+errores de calibración anteriores. La \hyperref[tab:notacion]{Tabla~\ref*{tab:notacion}} reúne la notación.
 
 \begin{algorithm}[htbp]
 \caption{Validación \textit{walk-forward} sin fuga con intervalo de predicción conforme}
@@ -2822,7 +2825,7 @@ $\mathrm{CD}$ & diferencia crítica de la prueba de Nemenyi \\
 \barreraflotantes
 \section{2.2 Validación de los resultados}
 
-La Tabla~\ref{tab:comparacion_modelos} presenta el desempeño promedio de los \factNModels{}
+La \hyperref[tab:comparacion_modelos]{Tabla~\ref*{tab:comparacion_modelos}} presenta el desempeño promedio de los \factNModels{}
 modelos sobre las 25 series y contiene el hallazgo central del proyecto. Por la métrica de
 selección encabezan los árboles optimizados (LightGBM, CatBoost y XGBoost), seguidos de la
 deriva, TFT y Theta (el listón parsimonioso de selección). En el conjunto reservado el orden se
@@ -2895,7 +2898,7 @@ pre-registrada por tabla), el conjunto de confianza de modelos (Model Confidence
 y el ranking de Friedman-Nemenyi \cita{57} sobre las 25 series, fijados de antemano.
 
 \paragraph{Resultados sobre la tabla DFF.} El mismo protocolo se aplicó por separado a las 25
-series DFF de preferencia familiar (Tabla~\ref{tab:comparacion_dff}). \textbf{Naïve-1 y Theta
+series DFF de preferencia familiar (\hyperref[tab:comparacion_dff]{Tabla~\ref*{tab:comparacion_dff}}). \textbf{Naïve-1 y Theta
 empatan exactamente a la cabeza} (MASE de selección $0.083$ y del conjunto reservado
 $\factNaiveOneDffMean$): la variante automática de Theta colapsa a un comportamiento casi
 idéntico al paseo aleatorio, una ratificación independiente del piso. Les siguen ETS
@@ -2955,7 +2958,7 @@ Naïve estacional & 1.053 & 0.974 & 2.83 & 2.23 & 25 \\
 La significancia se formaliza con la prueba de Friedman sobre los rangos de los modelos en las
 series (25 en FAD; 14 distintas en DFF tras descontar las pseudo-réplicas del corte mundial),
 seguida de la prueba de Nemenyi \cita{57}. El \textbf{diagrama de diferencia crítica}
-(Figura~\ref{fig:cd}) muestra que Friedman rechaza la igualdad ($p<0.001$) en ambas tablas y
+(\hyperref[fig:cd]{Figura~\ref*{fig:cd}}) muestra que Friedman rechaza la igualdad ($p<0.001$) en ambas tablas y
 une con una barra los modelos cuyo rango no se distingue. \textbf{El naïve-1 obtiene el mejor
 rango promedio} en FAD ($\factFriedmanRankNaiveOneFad$) y en DFF
 ($\factFriedmanRankNaiveOneDff$), seguido de ETS, LightGBM y Theta en FAD y de Theta y ETS en
@@ -2996,7 +2999,7 @@ inverso es XGBoost en DFF familiar, aceptado porque su media mejora ($11$\,\%) a
 empeora y solo el $29$\,\% de las series mejora; la reversión por serie conserva el default en
 las demás. En empleo se aceptaron \textbf{$\factTuningAcceptedEmployment$ de sus 6 grupos}, con
 mejoras de media de hasta $30$\,\% (XGBoost y LightGBM en FAD). La optimización lleva a los
-árboles a encabezar la selección en FAD (Tabla~\ref{tab:comparacion_modelos}), pero
+árboles a encabezar la selección en FAD (\hyperref[tab:comparacion_modelos]{Tabla~\ref*{tab:comparacion_modelos}}), pero
 \textit{cierra la brecha sin cambiar el veredicto}: en el conjunto reservado quedan a la altura
 de ETS y Theta ($\factEtsFadMean$--$\factThetaFadMean$) y por encima del piso del naïve-1.
 
@@ -3032,12 +3035,44 @@ hiperparámetros por arquitectura, ejecutadas en una \textbf{GPU en la nube} (in
 NVIDIA A10G); el Apéndice~A.4 documenta la infraestructura reproducible y extiende la
 evaluación a horizontes de hasta cinco años. En la campaña causal, las configuraciones globales
 re-derivadas (cinco semillas) quedan entre $0.175$ y $0.18$ en FAD
-(Tabla~\ref{tab:global_deep}), a la altura de los mejores modelos por serie, y la
+(\hyperref[tab:global_deep]{Tabla~\ref*{tab:global_deep}}), a la altura de los mejores modelos por serie, y la
 \textbf{optimización con la arquitectura en el espacio de búsqueda} (búsqueda única con parada
 temprana, sin tocar el conjunto reservado, y la ganadora reentrenada con cinco semillas) lleva a
 \textbf{AutoBiTCN a MASE $=\factAutobitcnFadMean$}, \textit{por debajo} del par ETS-Theta
 ($\factEtsFadMean$--$\factThetaFadMean$), pero \textbf{sin alcanzar al naïve-1}
 ($\factNaiveOneFadMean$).
+
+\begin{table}[htbp]
+\centering
+\caption[Barrido de modelos profundos globales de frontera (FAD)]{Barrido de las arquitecturas
+profundas de frontera re-derivadas en la campaña causal, entrenadas de forma global sobre las 25
+series FAD familiares (mejor configuración por modelo y técnica; medias de cinco semillas). KAN,
+TimesNet y TimeMixer se exploraron en campañas previas y no se re-derivaron, por lo que se omiten;
+DeepAR diverge numéricamente y también se omite. MASE del conjunto reservado; el listón
+parsimonioso es ETS/Theta $=\factEtsFadMean$--$\factThetaFadMean$ y el piso ingenuo es el naïve-1
+($\factNaiveOneFadMean$). El mejor profundo optimizado queda por debajo del listón parsimonioso pero
+por encima del piso (validación multi-semilla más abajo).}
+\label{tab:global_deep}
+% MASE de vp_model.eval_neuralforecast.eval_global_deep('FAD') restringida a las variantes del tar
+% sellado de la campaña causal (camp_levels, camp_diff, camp_diffls, camp_auto; cinco semillas),
+% mejor técnica por modelo. Hoja de hechos de la reconciliación G7 (oct-2026). Sigue hand-built
+% (pendiente #27): generarla exige mapear las variantes de reports/campaign/global_* a estas filas.
+\begin{tabular}{lcc}
+\toprule
+\rowcolor{uacjblue!15}
+\textbf{Modelo / configuración} & \textbf{Técnica} & \textbf{\shortstack{MASE\\reservado}} \\ \midrule
+PatchTST & global, nivel & 0.175 \\
+BiTCN & global, diferencia & 0.178 \\
+BiTCN & + norma por serie & 0.179 \\
+TiDE & global, diferencia & 0.180 \\
+N-HiTS & global, nivel & 0.180 \\
+AutoTiDE & + optimización (arquitectura, Optuna) & 0.162 \\ \midrule
+\rowcolor{uacjyellow!25}
+AutoBiTCN & + optimización (arquitectura, Optuna) & \textbf{\factAutobitcnFadMean} \\ \midrule
+ETS / Theta \textit{(listón)} & estadístico, por serie & \textit{\factEtsFadMean--\factThetaFadMean} \\
+Naïve-1 \textit{(piso)} & línea base, por serie & \textit{\factNaiveOneFadMean} \\ \bottomrule
+\end{tabular}
+\end{table}
 
 El mejor clásico ajustado completa la lectura: el \textbf{Auto-ARIMA con selección de orden por
 AICc}, re-especificado de forma justa (deriva acorde al orden de integración, reentrenamiento
@@ -3059,7 +3094,7 @@ la excepción: su parametrización probabilística sobre incrementos no se estab
 por detrás de las redes deterministas. Se sondearon además, fuera del catálogo, un potenciador
 de gradiente global con variables estáticas y de dominio, un modelo \textit{hurdle} que separa
 la probabilidad de movimiento de su magnitud y las variantes automáticas de suavizamiento
-(AutoETS, AutoTheta, AutoCES): ninguno rompió el piso. La Figura~\ref{fig:hero} muestra el caso
+(AutoETS, AutoTheta, AutoCES): ninguno rompió el piso. La \hyperref[fig:hero]{Figura~\ref*{fig:hero}} muestra el caso
 más elocuente: los pronósticos a un paso emitidos en los 24 meses reservados para México/F1/FAD
 (la cola familiar que más avanzó: casi dos años de fecha de prioridad ganados en el boletín de
 noviembre de 2024 y cinco en todo el lapso), donde el modelo sigue los saltos y
@@ -3108,7 +3143,7 @@ esperable con series cortas que se declara en lugar de presentarse como exacta.
 nivel de error en línea tras cada origen, con su tasa de adaptación elegida solo sobre el tramo
 de calibración. Sobre el mismo ganador profundo y sin fuga, la cobertura del intervalo al
 $95$\,\% subió de $0.84$ a $\factAciCoverageDff$ en DFF y de $0.85$ a $\factAciCoverageFad$ en
-FAD (Figura~\ref{fig:coverage}). La mejora es \textbf{incompleta}: los intervalos de confianza de
+FAD (\hyperref[fig:coverage]{Figura~\ref*{fig:coverage}}). La mejora es \textbf{incompleta}: los intervalos de confianza de
 esas coberturas ($[0.88,\,0.94]$ en DFF y $[0.83,\,0.90]$ en FAD) no alcanzan el nominal, sobre
 todo en FAD, donde los saltos son mayores. El mecanismo \textbf{está desplegado}: la tasa se
 actualiza con cada corte a partir de los aciertos y fallos del registro prospectivo, y así el
@@ -3138,7 +3173,7 @@ conforme adaptativa sí aporta) y en la coherencia transversal; la ventaja a hor
 frente al naïve-1 sigue pendiente de contraste (limitación~iv).
 
 \paragraph{La evidencia por horizonte: el registro de evaluación prospectiva.} La
-Tabla~\ref{tab:prospectivo_horizonte} resume cómo crece el error con el horizonte en el registro
+\hyperref[tab:prospectivo_horizonte]{Tabla~\ref*{tab:prospectivo_horizonte}} resume cómo crece el error con el horizonte en el registro
 (\factProspNScoredFmt{} pronósticos generados solo con la información disponible hasta su origen
 y calificados contra el corte publicado después). Las añadas históricas son un
 \textit{backfill} sin fuga (reproducen lo que el sistema habría pronosticado en cada origen);
@@ -3150,14 +3185,6 @@ forma ordenada mientras la cobertura del intervalo al $95$\,\% desciende. El reg
 al naïve-1, cuya predicción es \textit{constante}, sobre los mismos pares, de modo que la ventaja
 a horizontes largos frente a esa línea base no está contrastada (limitación~iv). En conjunto el
 registro promedia MASE $\factProspMase$ y MAE $\factProspMaeDays$ días.
-
-\paragraph{Evidencia servida en vivo.} En el corte de octubre de 2026 se habían calificado 323
-pronósticos servidos en vivo, casi todos a uno a tres meses: MAE de 180 días, MASE de 0.53 y
-cobertura del intervalo al $95$\,\% de 0.80 (intervalo de confianza del $95$\,\%
-$[0.76,\,0.84]$), por debajo del nominal. Por pares contra la sombra naïve-1, el campeón FAD
-obtiene MASE 0.466 frente a 0.482 (196 pares) y el campeón DFF 0.617 frente a 0.593 (127 pares):
-diferencias descriptivas que alimentan la decisión prospectiva de promoción, no una prueba
-confirmatoria.
 
 \begin{table}[htbp]
 \centering
@@ -3182,44 +3209,22 @@ y la cobertura empírica del intervalo al $95$\,\% desciende de 0.97 a 0.88.}
 \end{tabular}
 \end{table}
 
-\begin{table}[htbp]
-\centering
-\caption[Barrido de modelos profundos globales de frontera (FAD)]{Barrido de las arquitecturas
-profundas de frontera re-derivadas en la campaña causal, entrenadas de forma global sobre las 25
-series FAD familiares (mejor configuración por modelo y técnica; medias de cinco semillas). KAN,
-TimesNet y TimeMixer se exploraron en campañas previas y no se re-derivaron, por lo que se omiten;
-DeepAR diverge numéricamente y también se omite. MASE del conjunto reservado; el listón
-parsimonioso es ETS/Theta $=\factEtsFadMean$--$\factThetaFadMean$ y el piso ingenuo es el naïve-1
-($\factNaiveOneFadMean$). El mejor profundo optimizado queda por debajo del listón parsimonioso pero
-por encima del piso (validación multi-semilla más abajo).}
-\label{tab:global_deep}
-% MASE de vp_model.eval_neuralforecast.eval_global_deep('FAD') restringida a las variantes del tar
-% sellado de la campaña causal (camp_levels, camp_diff, camp_diffls, camp_auto; cinco semillas),
-% mejor técnica por modelo. Hoja de hechos de la reconciliación G7 (oct-2026). Sigue hand-built
-% (pendiente #27): generarla exige mapear las variantes de reports/campaign/global_* a estas filas.
-\begin{tabular}{lcc}
-\toprule
-\rowcolor{uacjblue!15}
-\textbf{Modelo / configuración} & \textbf{Técnica} & \textbf{\shortstack{MASE\\reservado}} \\ \midrule
-PatchTST & global, nivel & 0.175 \\
-BiTCN & global, diferencia & 0.178 \\
-BiTCN & + norma por serie & 0.179 \\
-TiDE & global, diferencia & 0.180 \\
-N-HiTS & global, nivel & 0.180 \\
-AutoTiDE & + optimización (arquitectura, Optuna) & 0.162 \\ \midrule
-\rowcolor{uacjyellow!25}
-AutoBiTCN & + optimización (arquitectura, Optuna) & \textbf{\factAutobitcnFadMean} \\ \midrule
-ETS / Theta \textit{(listón)} & estadístico, por serie & \textit{\factEtsFadMean--\factThetaFadMean} \\
-Naïve-1 \textit{(piso)} & línea base, por serie & \textit{\factNaiveOneFadMean} \\ \bottomrule
-\end{tabular}
-\end{table}
+\paragraph{Evidencia servida en vivo.} En el corte de octubre de 2026 se habían calificado 323
+pronósticos servidos en vivo, casi todos a uno a tres meses: MAE de 180 días, MASE de 0.53 y
+cobertura del intervalo al $95$\,\% de 0.80 (intervalo de confianza del $95$\,\%
+$[0.76,\,0.84]$), por debajo del nominal. Por pares contra la sombra naïve-1, el campeón FAD
+obtiene MASE 0.466 frente a 0.482 (196 pares) y el campeón DFF 0.617 frente a 0.593 (127 pares):
+diferencias descriptivas que alimentan la decisión prospectiva de promoción, no una prueba
+confirmatoria.
+
+
 
 \paragraph{Validación por categoría: el pronóstico sobre el lapso reservado.} La validación sobre
-las \textbf{25 combinaciones país$\times$categoría} de cada tabla (Figura~\ref{fig:grid_fad} y, en el Apéndice~A.6,
-Figura~\ref{fig:grid_dff}) muestra cómo el modelo sigue la trayectoria escalonada de cada cola
+las \textbf{25 combinaciones país$\times$categoría} de cada tabla (\hyperref[fig:grid_fad]{Figura~\ref*{fig:grid_fad}} y, en el Apéndice~A.6,
+\hyperref[fig:grid_dff]{Figura~\ref*{fig:grid_dff}}) muestra cómo el modelo sigue la trayectoria escalonada de cada cola
 \textit{dentro del conjunto reservado} (sombreado), con su intervalo al $95$\,\%: reproduce
 tanto las series que avanzan con rapidez (F2A) como las estancadas (varias F3/F4), y su banda se
-ensancha donde la fecha da saltos. La Tabla~\ref{tab:fcst} lo traduce a días: contrasta, en el
+ensancha donde la fecha da saltos. La \hyperref[tab:fcst]{Tabla~\ref*{tab:fcst}} lo traduce a días: contrasta, en el
 último mes con fecha publicada del conjunto reservado, la fecha real con la pronosticada y su
 diferencia $\Delta$, junto al MAE de todo el lapso. El modelo es \textbf{casi exacto} en las
 categorías estancadas (México~F3 y F4 y Filipinas~F1 y F2B en DFF, con $\Delta=0$ y un MAE de a
@@ -3295,14 +3300,14 @@ a las categorías EB-1 a EB-5. La cobertura es \textit{escalonada}: muchas combi
 país$\times$categoría carecen de objetivo predictivo porque permanecen casi siempre en
 \textit{Current} o \textit{Unavailable} o son demasiado cortas; resultan evaluables 30 series en
 FAD y 16 en DFF, concentradas en China, India y EB-2/EB-3. El desempeño \textbf{replica el
-hallazgo central} (Tabla~\ref{tab:comparacion_eb}): en la selección, la deriva, TFT, LightGBM,
+hallazgo central} (\hyperref[tab:comparacion_eb]{Tabla~\ref*{tab:comparacion_eb}}): en la selección, la deriva, TFT, LightGBM,
 XGBoost y el naïve-1 quedan prácticamente empatados en FAD, y en DFF el naïve-1 y Theta empatan
 a la cabeza; CatBoost aparenta el menor error, pero solo converge en 17 de las 30 series FAD y en
 12 de las 16 DFF. Las series EB, más cortas y con congelamientos más largos, castigan además a
 los modelos rígidos (Theta en FAD). En el conjunto reservado, el naïve-1 obtiene la menor MASE
 media entre los modelos que cubren las 30 series FAD ($0.162$) y empata con Theta en DFF
 ($0.049$): la misma inversión selección$\rightarrow$conjunto reservado de la
-Tabla~\ref{tab:comparacion_modelos}. Su contraste formal por categoría de empleo queda para la
+\hyperref[tab:comparacion_modelos]{Tabla~\ref*{tab:comparacion_modelos}}. Su contraste formal por categoría de empleo queda para la
 evaluación extendida; la evidencia ya sugiere que las conclusiones no son un artefacto de las
 categorías familiares.
 
@@ -3370,7 +3375,7 @@ de la fuente, la fecha desde la que rige y su causa; esta prosa no repite esos v
 estado que cambia no debe quedar tecleado en un documento.
 
 La ingesta del mes adopta entonces una modalidad \textbf{manual-automatizada}
-(Figura~\ref{fig:ingesta_pdf_asistida}): el operador deposita el PDF oficial en una carpeta de
+(\hyperref[fig:ingesta_pdf_asistida]{Figura~\ref*{fig:ingesta_pdf_asistida}}): el operador deposita el PDF oficial en una carpeta de
 entrada y la orden local \texttt{make bulletin MONTH=AAAA-MM} extrae el texto con Poppler,
 identifica las cuatro matrices y valida el mes, las etiquetas, los estados y las 150 celdas.
 Conserva el PDF, el texto extraído y el HTML contractual, reconstruye el panel y DuckDB en un
@@ -3455,7 +3460,7 @@ al menos \cohortFactRouterMargen{} en MASE, contraste bilateral con corrección 
 evaluados.
 
 El veredicto es negativo y se conserva: de \cohortFactRouterCeldas{} celdas,
-\cohortFactRouterGana{} ganan (Tabla~\ref{tab:cohortes} y Figura~\ref{fig:cohortes}).
+\cohortFactRouterGana{} ganan (\hyperref[tab:cohortes]{Tabla~\ref*{tab:cohortes}} y \hyperref[fig:cohortes]{Figura~\ref*{fig:cohortes}}).
 \begin{table}[htbp]
 \centering
 \caption[Enrutado por cohorte contra el naïve-1 de cada cohorte]{Enrutado por cohorte frente al
@@ -3540,7 +3545,7 @@ tres horizontes (§2.3).
 aleatorio no ofrece: (a) \textbf{horizontes de 1 a 12 meses}, evaluados con un registro de
 \factProspNScoredFmt{} predicciones con información truncada a su origen (\textit{backfill} sin
 fuga; la evidencia en vivo se acumula desde julio de 2026; MASE $\factProspMase$, MAE
-$\factProspMaeDays$ días; Tabla~\ref{tab:prospectivo_horizonte}); (b) \textbf{intervalos de
+$\factProspMaeDays$ días; \hyperref[tab:prospectivo_horizonte]{Tabla~\ref*{tab:prospectivo_horizonte}}); (b) \textbf{intervalos de
 predicción ajustados por horizonte} (cuantiles empíricos e inferencia conforme adaptativa) con
 cobertura medida y declarada, aun bajo el nominal (§2.2); (c)
 \textbf{coherencia transversal} por proyección al cono del dominio (cero violaciones
@@ -3875,14 +3880,14 @@ flujo completo del proyecto: la extracción del \textit{Visa Bulletin} a partir 
 HTML congeladas (procesamiento sin red), la construcción del panel multiserie $y_{p,c,b,t}$, el
 almacén dimensional en DuckDB con su esquema estrella, el módulo de modelado \texttt{vp\_model}
 con los \factNModels{} modelos del repertorio y la red profunda global, y la suite de pruebas con
-integración continua y piso de cobertura. Un \texttt{README} bilingüe y un \texttt{Makefile}
+integración continua y piso de cobertura. Un \texttt{README} y un \texttt{Makefile}
 reproducen, paso a paso y con semilla fija, cada figura y tabla de este documento desde cero.
 
 \paragraph{Entorno y órdenes de la cadena de datos.} La obtención, la conversión y el análisis
-corren sobre Python 3.14 con las versiones fijadas de la Tabla~\ref{tab:entorno}, declaradas con
+corren sobre Python 3.14 con las versiones fijadas de la \hyperref[tab:entorno]{Tabla~\ref*{tab:entorno}}, declaradas con
 versión exacta en el archivo de proyecto, de modo que una instalación limpia reproduce el mismo
 entorno. La cadena se reproduce con seis órdenes, en este orden: \texttt{make freeze} congela los
-boletines nuevos (único paso con red); \texttt{make scrape} parsea las instantáneas HTML sin
+boletines nuevos (único paso con red; con la fuente bloqueada, la carga manual descrita abajo); \texttt{make scrape} parsea las instantáneas HTML sin
 conexión; \texttt{make panel} consolida el panel y su registro de limpieza; \texttt{make db}
 construye el almacén DuckDB y el Parquet; \texttt{make audit} verifica cobertura y claves; y
 \texttt{make eda-all} produce el censo del EDA, las figuras por serie y la galería. Como
@@ -3919,6 +3924,23 @@ DVC \cita{43}                  & \textit{fijada por perfil} & Grafo de dependenc
 \end{tabular}
 \end{table}
 
+\paragraph{Carga de boletines: el congelado automático y la carga manual.} \texttt{make freeze} es
+el paso que la tarea programada de días hábiles (Apéndice~A.3) ejecuta para descargar y congelar
+cada boletín nuevo sin intervención. Desde agosto de 2026 el cortafuegos de aplicación del sitio
+del Departamento de Estado responde con un rechazo (HTTP 403) a esa descarga automática, de modo
+que el congelado ya no obtiene la página del mes: la tarea registra la fuente como bloqueada en
+el feed de ingesta (\texttt{reports/governance/ingestion\_state.json}), que declara el estado
+vigente, desde cuándo rige y su causa, y no fabrica ni reutiliza datos. Desde entonces cada
+boletín se \textbf{carga de forma manual} por una de dos órdenes gobernadas:
+\texttt{make ingest-manual FILE=\ldots} valida e ingiere la página HTML que una persona
+descargó del sitio oficial, y \texttt{make bulletin MONTH=AAAA-MM} parte del PDF oficial del
+boletín (Sección~2.3, \hyperref[fig:ingesta_pdf_asistida]{Figura~\ref*{fig:ingesta_pdf_asistida}}). Ambas conservan el congelado
+inmutable en S3 sin sobrescribir una fuente previa, las sumas de verificación y las mismas
+puertas de calidad y de publicación: cambia cómo se obtiene la fuente, no cómo se valida. Por
+esta vía entraron los boletines de agosto a noviembre de 2026, y mientras el bloqueo persista la
+actualización del panel depende de esa intervención humana.
+
+
 \paragraph{Capa de modelado.} El código de modelado vive en el módulo \texttt{vp\_model}; toda su
 configuración (constantes del protocolo de validación, hiperparámetros y semilla) está
 centralizada en un único archivo, sin valores incrustados dispersos. Se instala con
@@ -3931,7 +3953,7 @@ resultados. Cada corrida escribe sus métricas en
 hiperparámetros) en un registro append-only (\texttt{reports/eval/experiment\_runs.jsonl}), de
 modo que cualquier resultado de este documento puede atarse al código exacto que lo generó y
 reconstruirse. La capa de modelado se prueba en integración continua con un piso de cobertura
-propio. La Tabla~\ref{tab:hparams} reúne los hiperparámetros principales, \textit{fijados antes}
+propio. La \hyperref[tab:hparams]{Tabla~\ref*{tab:hparams}} reúne los hiperparámetros principales, \textit{fijados antes}
 del conjunto de prueba para evitar cualquier ajuste retrospectivo a la métrica del conjunto
 reservado.
 
@@ -3964,7 +3986,7 @@ Multi-semilla & 5 semillas (inicialización + búsqueda) \\
 \barreraflotantes
 \section{A.2 Portal de divulgación del proyecto}
 
-El dominio \texttt{visapredictai.com} corresponde a un proyecto personal del autor y \textbf{no
+El dominio \href{https://visapredictai.com}{\texttt{visapredictai.com}} corresponde a un proyecto personal del autor y \textbf{no
 forma parte del entregable académico evaluado}; el demostrador académico oficial se ejecuta desde
 el repositorio público (Sección~A.1), sin dependencia operativa del dominio, y cualquier cifra
 cuantitativa de este documento se refiere exclusivamente al sistema entregado con el repositorio.
@@ -3973,7 +3995,7 @@ de cada artefacto y, si alguno no coincide, conserva el corte anterior. Las capt
 27 y el 28 de octubre de 2026 sobre el corte de noviembre de 2026; las cifras que muestran son las
 del portal en esa fecha.
 
-Las Figuras~\ref{fig:portal_visapredict} y~\ref{fig:portal_galeria} recorren el portal. La página de inicio presenta el
+Las \hyperref[fig:portal_visapredict]{Figuras~\ref*{fig:portal_visapredict}} y~\ref{fig:portal_galeria} recorren el portal. La página de inicio presenta el
 problema, el acceso al pronóstico y los indicadores del panel, que se generan en la construcción
 del sitio desde los artefactos del corte y no se escriben a mano. La sección de ingeniería
 contiene el mapa del sistema, que recorre once componentes desde la fuente hasta la operación
@@ -4026,7 +4048,7 @@ indica. La consola añade un panel de contexto (país, categoría, tabla y mes) 
 dibujan, con los mismos datos del portal, el pronóstico con zoom, la evolución de fechas, la
 comparación y la carrera entre países, el mapa de calor y el radar de la espera, y la comparación
 celda por celda de dos boletines, que resalta sólo lo que se movió
-(Figura~\ref{fig:web_bot}). Las conversaciones de la Figura~\ref{fig:web_bot_conv} son reales, en producción, capturadas
+(\hyperref[fig:web_bot]{Figura~\ref*{fig:web_bot}}). Las conversaciones de la \hyperref[fig:web_bot_conv]{Figura~\ref*{fig:web_bot_conv}} son reales, en producción, capturadas
 el 28 de octubre de 2026 con el modelo generativo activo: cada respuesta cita sus fuentes y, cuando
 la pregunta lo pide, añade una gráfica o tabla con los datos del corte. Ante una pregunta de
 pronóstico, el asistente lee el último corte real, la proyección a doce meses del modelo
@@ -4083,7 +4105,7 @@ retroalimentación que califica las predicciones contra la realidad conforme lle
 boletines. Cada elemento corresponde a un archivo del repositorio público (Sección~A.1): el grafo
 vive en \texttt{dvc.yaml}, la política de promoción en \texttt{vp\_model/promotion.py}, la
 máquina de estados de las campañas en su registro de decisión de arquitectura y los flujos de
-integración en \texttt{.github/workflows/}. La Tabla~\ref{tab:mlops_pilares} enumera los seis
+integración en \texttt{.github/workflows/}. La \hyperref[tab:mlops_pilares]{Tabla~\ref*{tab:mlops_pilares}} enumera los seis
 componentes de la plataforma, cada uno reproducible con un \'unico comando.
 
 \begin{table}[htbp]
@@ -4117,7 +4139,7 @@ artefactos cuyo CI terminó en verde. El guardián de consistencia atraviesa las
 compara la misma cifra en el documento, el artículo, el portal, el asistente y la tarjeta de
 modelo, y detiene la integración si difieren~\cita{49}\cita{50}.
 
-\paragraph{Grafo reproducible de datos.} La Figura~\ref{fig:mlops_dag} muestra el grafo que
+\paragraph{Grafo reproducible de datos.} La \hyperref[fig:mlops_dag]{Figura~\ref*{fig:mlops_dag}} muestra el grafo que
 declara \texttt{dvc.yaml}~\cita{43}. Su raíz es la carpeta de instantáneas congeladas, de modo
 que ninguna etapa del grafo accede a la red (el único paso con red queda fuera de él).
 \texttt{scrape} extrae las tablas sin conexión; \texttt{panel} aplica la limpieza y deja el
@@ -4215,7 +4237,7 @@ estudios completos.
 
 \paragraph{Almac\'en dimensional en estrella.} El panel se carga en un almac\'en dimensional en
 estrella implementado sobre la base de datos anal\'itica embebida DuckDB~\cita{42}. El modelo (ya
-presentado en la Figura~\ref{fig:schema_er}) comprende doce tablas: siete dimensiones, dos tablas
+presentado en la \hyperref[fig:schema_er]{Figura~\ref*{fig:schema_er}}) comprende doce tablas: siete dimensiones, dos tablas
 de hechos y tres de gobernanza y procedencia (la versi\'on del esquema, la bit\'acora de
 ejecuci\'on ampliada y el linaje de artefactos fuente, que ata cada mes del panel al HTML
 congelado que lo public\'o, con su suma de verificaci\'on), adem\'as de vistas y \textit{marts},
@@ -4230,7 +4252,7 @@ dato (el mes del bolet\'in que public\'o la celda y, ante una actualizaci\'on re
 reloj del sistema, de modo que una reconstrucci\'on sin cambios las reproduce byte-id\'enticas; el
 reloj real queda confinado a la bit\'acora \texttt{etl\_run}. Un \textit{mart} de resumen por serie
 reproduce desde el almacén el censo de observaciones entrenables por bloque y tabla de la
-Tabla~\ref{tab:eda_descriptiva}.
+\hyperref[tab:eda_descriptiva]{Tabla~\ref*{tab:eda_descriptiva}}.
 
 \paragraph{Ciclo de vida y gate de promoción.} La evaluación retrospectiva (validación temporal
 más conjunto reservado, con la prueba de Wilcoxon y la corrección de Holm a un paso) sólo declara
@@ -4255,7 +4277,7 @@ anterior. Los experimentos se registran como corridas trazables~\cita{49}.
 \paragraph{La campaña como transacción.} Una campaña de modelado vuelve a calcular el veredicto
 completo y puede durar más de un día. Para que un fallo a mitad de camino no deje artefactos
 mezclados, cada campaña es una transacción con la máquina de estados que la sección~1.4.1
-presenta en la Figura~\ref{fig:estados_a10}: sólo el estado \textit{validada} autoriza publicar, y
+presenta en la \hyperref[fig:estados_a10]{Figura~\ref*{fig:estados_a10}}: sólo el estado \textit{validada} autoriza publicar, y
 una interrupción abrupta deja la campaña \textit{en curso}, que también bloquea. Al validarse, la
 evidencia del cálculo se copia de forma inmutable y su hash viaja con la campaña, de modo que la
 publicación lee exactamente lo que se revisó.
@@ -4317,7 +4339,7 @@ sella el corte con un manifiesto de \textit{release} con suma de verificaci\'on 
 artefacto. La entrega espera el CI verde de ese SHA exacto; sólo entonces dispara la
 reconstrucción del portal, que verifica cada hash del manifiesto y conserva el corte anterior si
 algo no coincide~\cita{50}. Un vigilante semanal comprueba que producción sirva el mes vigente y
-que la última corrida exitosa sea reciente. La Tabla~\ref{tab:mlops_ci} resume los flujos. El
+que la última corrida exitosa sea reciente. La \hyperref[tab:mlops_ci]{Tabla~\ref*{tab:mlops_ci}} resume los flujos. El
 registro prospectivo es inmutable: la a\~nada 2026-07 corresponde al congelado del 3 de julio con
 el m\'etodo de bandas previo, de modo que la primera a\~nada calificada con las bandas por cuantil
 por horizonte fue la de 2026-08. Los descriptores del panel de este documento corresponden a la
@@ -4398,7 +4420,7 @@ corte añadiendo el avance medio histórico. Sobre el retrospectivo rodante comp
 domina al paseo aleatorio con significancia estadística en casi todos los horizontes, con un
 margen que se ensancha del orden del $13$\,\% a un mes hasta cerca del $47$\,\% a cinco años en
 las \textit{Final Action Dates}; en las \textit{Dates for Filing} la ventaja aparece desde los tres
-meses (a un mes el naïve-1 sigue siendo el campeón) y deja de ser significativa a cuatro y cinco años (Tabla~\ref{tab:horizonte}). El
+meses (a un mes el naïve-1 sigue siendo el campeón) y deja de ser significativa a cuatro y cinco años (\hyperref[tab:horizonte]{Tabla~\ref*{tab:horizonte}}). El
 sentido de dominio es transparente: las fechas de prioridad avanzan a un ritmo casi constante, de
 modo que extrapolar la pendiente media supera a repetir el último valor, y la brecha crece con el
 horizonte.
@@ -4430,7 +4452,7 @@ tabla anterior se regenera con el pipeline y no se teclea a mano.
 El panel largo \texttt{visa\_panel\_long.csv} es la salida de la conversión descrita en la
 sección~1.1.2 y la fuente abierta de la que se derivan el almacén y el archivo columnar.
 Cada fila es una observación del grano (área de cargabilidad, categoría, tabla, mes de
-boletín) y consta de las nueve variables de la Tabla~\ref{tab:diccionario}, ilustradas con
+boletín) y consta de las nueve variables de la \hyperref[tab:diccionario]{Tabla~\ref*{tab:diccionario}}, ilustradas con
 una fila real del corte de julio de 2026.
 
 \begin{table}[htbp]
@@ -4464,7 +4486,7 @@ es $F$; \texttt{days\_is\_datediff} recalcula la resta contra la época base y r
 cualquier fila cuya variable dependiente no corresponda a su fecha; y una verificación
 adicional impide valores negativos, que delatarían una fecha anterior a $t_0$.
 
-El catálogo de categorías con sus observaciones (Tabla~\ref{tab:catalogo}, Apéndice~A.6) explica
+El catálogo de categorías con sus observaciones (\hyperref[tab:catalogo]{Tabla~\ref*{tab:catalogo}}, Apéndice~A.6) explica
 por qué las \factNSeriesStructural{} series estructurales no equivalen al producto cartesiano de las
 dimensiones (cinco áreas de cargabilidad, veintiuna categorías y dos tablas).
 
@@ -4475,7 +4497,7 @@ colapsadas, fechas de boletín imparseables, fechas de prioridad imparseables y 
 la época base) y los saltos superiores a ocho años. El registro del corte operativo de noviembre
 de 2026 (añada \factPanelVintage{}) declara \factNObsFmt{} filas, \factNSeriesStructural{} series y
 \factNObsFFmt{} filas con fecha; sus conteos por régimen, sus guardas y sus saltos son los de la
-Tabla~\ref{tab:calidad_obtencion}. Los cuatro contadores en cero corresponden a guardas que
+\hyperref[tab:calidad_obtencion]{Tabla~\ref*{tab:calidad_obtencion}}. Los cuatro contadores en cero corresponden a guardas que
 \textbf{abortan} la construcción cuando se violan, de modo que su valor no puede ser distinto de
 cero en un panel publicado: documentan la invariante vigente, no una ausencia casual de
 incidencias. El campo \texttt{vintage} es la clave de versión de la añada y sustituye
@@ -4495,7 +4517,7 @@ de operaciones, la serie del sorteo de diversidad y las trayectorias de \textit{
 Filing}.
 
 El panel cubre cinco áreas de cargabilidad y veintiuna categorías migratorias. La
-Tabla~\ref{tab:catalogo} presenta el catálogo con el número de observaciones de cada
+\hyperref[tab:catalogo]{Tabla~\ref*{tab:catalogo}} presenta el catálogo con el número de observaciones de cada
 categoría, que explica por qué las \factNSeriesStructural{} series estructurales no
 equivalen al producto cartesiano de las dimensiones: varias subcategorías nacieron o
 desaparecieron a lo largo del periodo (por ejemplo, las reservas de EB-5 creadas en 2022 o
@@ -4597,7 +4619,7 @@ del objetivo predictivo del sistema.}
 \includegraphics[width=\textwidth]{results_backtest_grid_DFF.pdf}
 \caption[Validación por categoría sobre el conjunto reservado (DFF)]{Validación del pronóstico sobre el
 conjunto reservado de 24 meses para las 25 combinaciones país$\times$categoría de la tabla DFF,
-análogo al de la Figura~\ref{fig:grid_fad}. Las series prácticamente constantes (p.\,ej., varias
+análogo al de la \hyperref[fig:grid_fad]{Figura~\ref*{fig:grid_fad}}. Las series prácticamente constantes (p.\,ej., varias
 de Filipinas) aparecen como líneas planas que el modelo reproduce con error casi nulo; las de
 movimiento rápido muestran bandas de predicción más anchas.}
 \label{fig:grid_dff}

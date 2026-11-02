@@ -30,7 +30,7 @@ def _floats_and_first_refs(lines: list[str]) -> tuple[dict[str, int], dict[str, 
                 floats.setdefault(label, begin)
         if re.search(rf"\\end\{{{FLOAT}\}}", line):
             begin = None
-        for ref in re.findall(r"\\ref\{((?:fig|tab|alg):[^}]+)\}", line):
+        for ref in re.findall(r"\\ref\*?\{((?:fig|tab|alg):[^}]+)\}", line):
             refs.setdefault(ref, n)
     return floats, refs
 
