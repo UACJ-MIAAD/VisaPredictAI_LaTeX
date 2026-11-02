@@ -39,9 +39,22 @@ def test_flafter_is_loaded() -> None:
     assert any(re.match(r"\\usepackage\{flafter\}", line.strip()) for line in _lines())
 
 
-def test_no_float_forces_here() -> None:
-    specs = re.findall(rf"\\begin\{{{FLOAT}\}}\[([^\]]*)\]", "\n".join(_lines()))
-    assert specs and all("H" not in s for s in specs)
+# The EDA cites several large figures with little text between them; only there is each float pinned
+# ([H]) right after the paragraph that cites it, so the queue cannot push them pages away.
+PINNED = {
+    "tab:eda_descriptiva", "fig:eda_panel", "fig:eda_completitud", "fig:backlog_f4", "fig:eda_spaghetti",
+    "fig:eda_dist", "fig:eda_violin_c", "fig:eda_violin_cat", "fig:eda_retros", "fig:eda_season",
+    "fig:eda_corr2", "fig:eda_brecha", "fig:eda_stl", "fig:eda_acf", "tab:eda_estacionariedad",
+}
+
+
+def test_only_the_eda_pins_floats_here() -> None:
+    text = "\n".join(_lines())
+    blocks = re.findall(rf"\\begin\{{({FLOAT})\}}\[([^\]]*)\](.*?)\\end\{{\1\}}", text, re.S)
+    assert blocks
+    pinned = {lab for _, spec, body in blocks if "H" in spec
+              for lab in re.findall(r"\\label\{((?:fig|tab|alg):[^}]+)\}", body)}
+    assert pinned == PINNED
 
 
 def test_every_float_is_written_after_its_first_reference() -> None:

@@ -135,6 +135,8 @@
 % cabía a la página siguiente y dejaba el pie de la anterior en blanco. flafter impide que un
 % flotante suba al tope de la página por encima del párrafo que lo menciona: cada flotante se
 % escribe después de su primera referencia, así que siempre aparece después de ella.
+% Excepción: en el EDA un párrafo cita varias figuras grandes con poco texto entre ellas y la cola
+% las alejaba hasta cinco páginas; ahí cada flotante va fijo ([H]) justo tras el párrafo que lo cita.
 \renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}
 \renewcommand{\textfraction}{0.07}\renewcommand{\floatpagefraction}{0.88}
 \setcounter{topnumber}{3}\setcounter{totalnumber}{5}
@@ -1074,7 +1076,7 @@ estructurales $\rightarrow$ \factNSeriesWithF{} con al menos una fecha $\rightar
 evaluables $\rightarrow$ 25 piloto (familiar FAD), y es sobre este último nivel donde
 el EDA profundiza.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.72\textwidth]{eda3_g01_panel.pdf}
 \caption[El panel completo en una sola imagen]{Las $\factNObsFmt$ observaciones del panel en
@@ -1085,7 +1087,7 @@ mes (por ejemplo, DFF antes de octubre de 2015).}
 \label{fig:eda_panel}
 \end{figure}
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \footnotesize
 \caption[Censo descriptivo del panel]{Censo descriptivo del panel por bloque y tabla:
@@ -1108,7 +1110,7 @@ Empleo & DFF & 64 & 2\,275 & 39\,\% & 0 & 77\,\% & 58 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.78\textwidth]{eda3_g11_completitud.pdf}
 \caption[Radiografía de completitud de las \factNSeriesStructural{} series]{Composición de régimen
@@ -1125,7 +1127,7 @@ F4 (hermanos de ciudadanos) por área de cargabilidad: una petición presentada 
 acumula más de veinticinco años de espera y ninguna de las cinco áreas baja de diecisiete,
 lo que ilustra tanto la magnitud del rezago como su marcada heterogeneidad entre países.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{latam_backlog_f4.pdf}
 \caption[Atraso de la cola F4 por área de cargabilidad]{Atraso vigente de la cola familiar
@@ -1145,7 +1147,7 @@ abruptos} (retrogresiones), como los de México y Filipinas entre 2002 y 2008. E
 propiedades (tendencia dominante, heterogeneidad por serie y saltos ocasionales) gobiernan el
 modelado.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{eda2_spaghetti.pdf}
 \caption[Trayectoria de las 25 series]{Fecha de prioridad de las 25 series de preferencia
@@ -1160,7 +1162,7 @@ extiende a lo largo de cuatro décadas, y el \textbf{avance mensual} se concentr
 pequeños y positivos (mediana cercana a un mes) con una cola derecha de saltos grandes y una
 cola izquierda de retrogresiones ($1.8$\,\% en el bloque familiar FAD).
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{eda2_distributions.pdf}
 \caption[Distribución del objetivo y los incrementos]{(a) Histograma de la variable objetivo
@@ -1175,7 +1177,7 @@ revela la cola de retrogresión.}
 (meses sin movimiento) y una cola derecha que recoge los avances grandes; las categorías de
 mayor demanda exhiben las colas más largas.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.86\textwidth]{eda2_violin_country.pdf}
 \caption[Avance mensual por área (violín)]{Distribución del avance mensual de la fecha por área
@@ -1184,7 +1186,7 @@ la forma.}
 \label{fig:eda_violin_c}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.86\textwidth]{eda2_violin_category.pdf}
 \caption[Avance mensual por categoría (violín)]{Distribución del avance mensual por categoría
@@ -1208,7 +1210,7 @@ años en un solo mes. Esta cola extrema es precisamente lo que el sistema
 \textbf{no} promete predecir (los cambios de régimen quedan fuera del objetivo),
 pero sí debe tolerar sin degradarse.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{eda3_g04_retros.pdf}
 \caption[Cronología de las retrogresiones del panel]{Las \factNRetroEvents{} retrogresiones del panel
@@ -1224,7 +1226,7 @@ incrementos de las 25 series; los bloques de alta correlación agrupan categorí
 la fecha mundial, lo que motiva el \textbf{entrenamiento global} explotado en el Cap.~de
 resultados.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.86\textwidth]{eda2_seasonality.pdf}
 \caption[Estacionalidad por mes calendario]{Avance mensual de la fecha por mes del boletín
@@ -1232,7 +1234,7 @@ resultados.
 \label{fig:eda_season}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.82\textwidth]{eda2_corr.pdf}
 \caption[Correlación entre series]{Matriz de correlación (con agrupamiento jerárquico) entre
@@ -1249,7 +1251,7 @@ brecha mediana cercana a un año y un máximo de 4.2 años (China, EB-5 no reser
 brecha no es constante entre series, lo que confirma que las dos tablas son procesos
 relacionados pero no intercambiables.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.92\textwidth]{eda3_g05_brecha.pdf}
 \caption[Brecha FAD-DFF por serie]{Atraso vigente por serie según la tabla que se
@@ -1275,7 +1277,7 @@ nivel ($p=0.78$), reforzando de forma más robusta la elección $d=1$. La
 \hyperref[fig:eda_acf]{Figura~\ref*{fig:eda_acf}} muestra la autocorrelación de la serie diferenciada, que
 orienta el orden de los modelos ARIMA y SARIMA.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.72\textwidth]{eda_stl_mexico_F3_FAD.png}
 \caption[Descomposición STL]{Descomposición STL de México/F3/FAD en tendencia,
@@ -1283,7 +1285,7 @@ componente estacional y residuo (en años).}
 \label{fig:eda_stl}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=0.85\textwidth]{eda_acfpacf_mexico_F3_FAD.png}
 \caption[ACF y PACF]{Funciones de autocorrelación (ACF) y autocorrelación parcial
@@ -1302,7 +1304,7 @@ incrementos observados, sin regularizar la malla, rechaza el ruido blanco en la 
 rezagos sobre la serie regularizada el rechazo es unánime. Las dos lecturas son complementarias y
 confirman estructura temporal aprovechable tras la diferenciación.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \footnotesize
 \caption[Censo de estacionariedad del piloto]{Censo de estacionariedad de las 25 series
