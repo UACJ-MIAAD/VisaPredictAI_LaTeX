@@ -20,6 +20,7 @@
 \usepackage{graphicx}
 \graphicspath{{Figures/}}
 \usepackage{float}
+\usepackage{flafter}                      % ningún flotante antes del punto del texto que lo introduce
 \usepackage[table]{xcolor}
 \usepackage{titlesec}
 \usepackage{tocloft}
@@ -130,8 +131,10 @@
 % E5: cifras de la épica de cohortes, derivadas de reports/governance/e5_facts.json
 \input{cohorts_facts}
 
-% Flotantes: [tbp] con fracciones holgadas en lugar de [H]; [H] empujaba cada figura que no
-% cabía a la página siguiente y dejaba el pie de la anterior en blanco.
+% Flotantes: [htbp] con fracciones holgadas en lugar de [H]; [H] empujaba cada figura que no
+% cabía a la página siguiente y dejaba el pie de la anterior en blanco. flafter impide que un
+% flotante suba al tope de la página por encima del párrafo que lo menciona: cada flotante se
+% escribe después de su primera referencia, así que siempre aparece después de ella.
 \renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}
 \renewcommand{\textfraction}{0.07}\renewcommand{\floatpagefraction}{0.75}
 \setcounter{topnumber}{3}\setcounter{totalnumber}{5}
@@ -345,7 +348,7 @@ los últimos 24 meses como un conjunto reservado independiente (\textit{hold-out
 cobertura empírica.
 \end{enumerate}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 % Geometría: fila 1 con cinco tarjetas idénticas de 2.76 x 1.72 cm y paso de 3.06 cm (ancho
 % total 15.0 cm, menor que \textwidth); encabezado azul de 0.82 cm con número grande y título,
@@ -441,7 +444,7 @@ estructura, la tabla \textit{Final Action Dates} de preferencia por empleo del m
 donde conviven los tres regímenes. Esta distinción $C/F/U$ es central: solo las celdas con
 fecha ($e=F$) constituyen el objetivo predictivo.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.74\textwidth]{data_source_page.png}
 \caption[Página oficial del Visa Bulletin]{Boletín de visas de julio de 2026 publicado por el
@@ -450,7 +453,7 @@ Es la fuente primaria y autoritativa del proyecto.}
 \label{fig:fuente}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.94\textwidth]{data_bulletin_table.pdf}
 \caption[Estructura publicada y regímenes $C/F/U$]{Tabla \textit{Final Action Dates} de
@@ -485,7 +488,7 @@ proceso propio de extracción web y no mediante el consumo de un servicio. La
 Tabla~\ref{tab:inventario} resume el inventario de fuentes con su tipo de acceso, formato,
 frecuencia y uso.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Inventario de fuentes de datos]{Inventario de fuentes: tipo de acceso, formato de
@@ -529,7 +532,7 @@ celda tal cual se publicó, lo clasifica en el régimen $e \in \{F, C, U, \text{
 las celdas con fecha ($e=F$), calcula la variable dependiente $y_{p,c,b,t}$ como el número de días
 desde la época base $t_0 = $ 1-ene-1975.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 % Geometría: cinco tarjetas idénticas de 2.76 x 2.36 cm con paso de 3.06 cm (ancho total
 % 15.0 cm, menor que \textwidth). Encabezado azul de 0.58 cm con número grande y título;
@@ -596,7 +599,7 @@ gobernanza y procedencia, además de vistas/marts), sobre el que cualquier consu
 reproducible. La tabla de procedencia \texttt{source\_artifact} conserva la identidad y la huella de los
 archivos fuente y se vincula con los hechos mediante la migración de procedencia del almacén.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{data_csv_panel.pdf}
 \caption[Panel largo ordenado resultante]{Muestra del panel largo \texttt{visa\_panel\_long.csv}:
@@ -605,7 +608,7 @@ variable objetivo \texttt{days\_since\_base}, definida solo cuando el estado es 
 \label{fig:csv_panel}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 % Geometría: cuatro columnas en 15.0 cm (centros 1.65, 5.6, 9.55, 13.35 cm). Cada tabla es un
 % nodo de 3.3 cm (hechos 3.6 cm) con encabezado de color y cuerpo blanco en \scriptsize; los
@@ -724,7 +727,7 @@ como acota la Sección~2.3.
 La Tabla~\ref{tab:herramientas} resume las herramientas, los formatos y los artefactos
 producidos en cada etapa.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Herramientas, formatos y artefactos por etapa]{Herramientas, conversión de formato y
@@ -752,7 +755,7 @@ Apéndice~A.5. La Tabla~\ref{tab:censo_obtencion} desglosa el volumen obtenido p
 artefacto y por bloque; el censo de las observaciones con fecha por bloque y tabla se
 detalla más adelante, en la Tabla~\ref{tab:eda_descriptiva}.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Cantidad de datos obtenidos]{Volumen del conjunto obtenido tras la extracción y la
@@ -787,7 +790,7 @@ un valor distinto de cero en esas filas es inalcanzable y su presencia documenta
 invariante vigente. La Tabla~\ref{tab:calidad_obtencion} presenta ambos grupos de
 indicadores.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Calidad del conjunto obtenido]{Indicadores de calidad del panel: interpretación de
@@ -823,7 +826,7 @@ veinticinco años a partir de páginas HTML publicadas una por una planteó reto
 de formato y de calidad. La Tabla~\ref{tab:retos} los enumera junto con su impacto potencial y
 la solución adoptada.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Retos enfrentados y soluciones]{Retos enfrentados en el acceso, la extracción, la
@@ -867,7 +870,7 @@ puede contener una fecha de prioridad, la palabra \textit{Current}, la palabra
 Figura~\ref{fig:cleansing} muestra la lógica que clasifica cada celda en uno de cuatro
 \textbf{regímenes} ($e$) y la convierte (o la conserva como anotación) sin inventar valores.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 % Geometría: cuatro columnas de 3.45 cm con paso de 3.85 cm (ancho total 15.0 cm, menor que
 % \textwidth). Fila 0: barra de entrada de ancho completo. Fila 1: tres decisiones sobre las
@@ -957,7 +960,7 @@ por F4 en marzo de 2003) se normalizan, y las celdas vacías se marcan con \text
 
 La Tabla~\ref{tab:cleansing} ilustra la conversión sobre celdas representativas.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Conversión de celdas representativas]{De la celda cruda al registro del panel. Solo el
@@ -1012,7 +1015,7 @@ de agregación, el índice temporal y las tres variables de equivalencia, régim
 que gobiernan qué observación es utilizable pero no son insumo predictivo: confundir una
 anotación con un insumo es precisamente el tipo de error que el análisis exploratorio busca evitar.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Variables del panel en el análisis exploratorio]{Papel de cada una de las nueve
@@ -1073,7 +1076,7 @@ estructurales $\rightarrow$ \factNSeriesWithF{} con al menos una fecha $\rightar
 evaluables $\rightarrow$ 25 piloto (familiar FAD), y es sobre este último nivel donde
 el EDA profundiza.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.72\textwidth]{eda3_g01_panel.pdf}
 \caption[El panel completo en una sola imagen]{Las $\factNObsFmt$ observaciones del panel en
@@ -1084,7 +1087,7 @@ mes (por ejemplo, DFF antes de octubre de 2015).}
 \label{fig:eda_panel}
 \end{figure}
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Censo descriptivo del panel]{Censo descriptivo del panel por bloque y tabla:
@@ -1107,7 +1110,7 @@ Empleo & DFF & 64 & 2\,275 & 39\,\% & 0 & 77\,\% & 58 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.78\textwidth]{eda3_g11_completitud.pdf}
 \caption[Radiografía de completitud de las \factNSeriesStructural{} series]{Composición de régimen
@@ -1124,7 +1127,7 @@ F4 (hermanos de ciudadanos) por área de cargabilidad: una petición presentada 
 acumula más de veinticinco años de espera y ninguna de las cinco áreas baja de diecisiete,
 lo que ilustra tanto la magnitud del rezago como su marcada heterogeneidad entre países.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{latam_backlog_f4.pdf}
 \caption[Atraso de la cola F4 por área de cargabilidad]{Atraso vigente de la cola familiar
@@ -1144,7 +1147,7 @@ abruptos} (retrogresiones), como los de México y Filipinas entre 2002 y 2008. E
 propiedades (tendencia dominante, heterogeneidad por serie y saltos ocasionales) gobiernan el
 modelado.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{eda2_spaghetti.pdf}
 \caption[Trayectoria de las 25 series]{Fecha de prioridad de las 25 series de preferencia
@@ -1159,7 +1162,7 @@ extiende a lo largo de cuatro décadas, y el \textbf{avance mensual} se concentr
 pequeños y positivos (mediana cercana a un mes) con una cola derecha de saltos grandes y una
 cola izquierda de retrogresiones ($1.8$\,\% en el bloque familiar FAD).
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{eda2_distributions.pdf}
 \caption[Distribución del objetivo y los incrementos]{(a) Histograma de la variable objetivo
@@ -1174,7 +1177,7 @@ Figuras~\ref{fig:eda_violin_c} y~\ref{fig:eda_violin_cat} muestran que el avance
 (meses sin movimiento) y una cola derecha que recoge los avances grandes; las categorías de
 mayor demanda exhiben las colas más largas.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.86\textwidth]{eda2_violin_country.pdf}
 \caption[Avance mensual por área (violín)]{Distribución del avance mensual de la fecha por área
@@ -1183,7 +1186,7 @@ la forma.}
 \label{fig:eda_violin_c}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.86\textwidth]{eda2_violin_category.pdf}
 \caption[Avance mensual por categoría (violín)]{Distribución del avance mensual por categoría
@@ -1207,7 +1210,7 @@ años en un solo mes. Esta cola extrema es precisamente lo que el sistema
 \textbf{no} promete predecir (los cambios de régimen quedan fuera del objetivo),
 pero sí debe tolerar sin degradarse.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{eda3_g04_retros.pdf}
 \caption[Cronología de las retrogresiones del panel]{Las \factNRetroEvents{} retrogresiones del panel
@@ -1223,7 +1226,7 @@ incrementos de las 25 series; los bloques de alta correlación agrupan categorí
 la fecha mundial, lo que motiva el \textbf{entrenamiento global} explotado en el Cap.~de
 resultados.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.86\textwidth]{eda2_seasonality.pdf}
 \caption[Estacionalidad por mes calendario]{Avance mensual de la fecha por mes del boletín
@@ -1231,7 +1234,7 @@ resultados.
 \label{fig:eda_season}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.82\textwidth]{eda2_corr.pdf}
 \caption[Correlación entre series]{Matriz de correlación (con agrupamiento jerárquico) entre
@@ -1248,7 +1251,7 @@ brecha mediana cercana a un año y un máximo de 4.2 años (China, EB-5 no reser
 brecha no es constante entre series, lo que confirma que las dos tablas son procesos
 relacionados pero no intercambiables.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.92\textwidth]{eda3_g05_brecha.pdf}
 \caption[Brecha FAD-DFF por serie]{Atraso vigente por serie según la tabla que se
@@ -1274,7 +1277,7 @@ nivel ($p=0.78$), reforzando de forma más robusta la elección $d=1$. La
 Figura~\ref{fig:eda_acf} muestra la autocorrelación de la serie diferenciada, que
 orienta el orden de los modelos ARIMA y SARIMA.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.72\textwidth]{eda_stl_mexico_F3_FAD.png}
 \caption[Descomposición STL]{Descomposición STL de México/F3/FAD en tendencia,
@@ -1282,7 +1285,7 @@ componente estacional y residuo (en años).}
 \label{fig:eda_stl}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{eda_acfpacf_mexico_F3_FAD.png}
 \caption[ACF y PACF]{Funciones de autocorrelación (ACF) y autocorrelación parcial
@@ -1358,7 +1361,7 @@ calculan en el módulo pero se omiten de la tabla por depender de la escala en d
 registro reproducible. Las Tablas~\ref{tab:features_estructura} y~\ref{tab:features_anomalias}
 reportan los descriptores de las 25 series, rederivados hasta noviembre de 2026.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Censo de estacionariedad del piloto]{Censo de estacionariedad de las 25 series
@@ -1402,7 +1405,7 @@ Resto del mundo F4 & 0.90 & $<$0.01 & 0.40 & 0.445 & diferenciar \\
 \end{tabular}
 \end{table}
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Características estructurales de las series]{Estructura temporal de las 25 series FAD de preferencia familiar. $F_T$/$F_S$: fuerza de tendencia y estacionalidad; $H$: entropía espectral; $d$: orden de diferenciación. Códigos de área: CN China, IN India, MX México, PH Filipinas, RoW \textit{Resto del mundo} (\textit{All Chargeability}).}
@@ -1441,7 +1444,7 @@ RoW & F4 & 0.993 & 0.000 & 0.353 & 0.985 & $-0.130$ & 1 \\
 \end{tabular}
 \end{table}
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Anomalías y forma de las series]{Anomalías y forma de la distribución de los avances. Atípicos: residuos STL con $|z|>3$; LB$\,p$: p-valor de Ljung-Box (H0 ruido blanco); asimetría y curtosis de los avances mensuales.}
@@ -1497,7 +1500,7 @@ marcadamente no gaussiana: la asimetría es mayoritariamente negativa (las retro
 generan colas izquierdas) y la curtosis es extrema (entre 20.5 y 103.9), lo que señala eventos
 atípicos frecuentes.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.82\textwidth]{eda_features_FAD_family.png}
 \caption[Espacio de características]{Cada serie como un punto en el plano fuerza de
@@ -1521,7 +1524,7 @@ aparecen tanto en 2002--2008 como en fechas posteriores
 atribuyen por sí solos los residuos atípicos a cambios de régimen. Su efecto
 predictivo debe contrastarse mediante validación temporal y métricas robustas.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.86\textwidth]{eda_changepoints_mexico_F3_FAD.png}
 \caption[Cambios de régimen y anomalías puntuales]{Cambios de régimen (PELT, líneas
@@ -1602,7 +1605,7 @@ correlación ocurre en el retardo cero: el co-movimiento, donde existe, es conte
 decisión de modelar cada serie con su propia dinámica, con la opción de modelos globales que
 compartan información dentro del grupo mundial.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.62\textwidth]{eda3_g07_leadlag.pdf}
 \caption[Correlación cruzada con retardos entre áreas]{Mejor correlación cruzada de los
@@ -1621,7 +1624,7 @@ ciclo anual, integradas de orden uno, con distribuciones de avance asimétricas 
 con anomalías mayoritariamente estructurales y con un co-movimiento contemporáneo que no permite
 usar un área como indicador adelantado de otra.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Síntesis del análisis exploratorio]{Síntesis del análisis exploratorio: hallazgos, la
@@ -1720,7 +1723,7 @@ El preprocesamiento construye, a partir de cada serie con fecha, la \textbf{matr
 características} que alimenta a los modelos (Figura~\ref{fig:fe_pipeline}). Aplica cinco
 transformaciones, todas diseñadas para evitar la fuga de información (\textit{leakage}):
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 % Geometría: cinco tarjetas idénticas de 2.76 x 1.70 cm con paso de 3.06 cm (ancho total
 % 15.0 cm, menor que \textwidth). Encabezado azul de 0.82 cm con número grande y título de
@@ -1810,7 +1813,7 @@ en octubre, cuando se reinician las cuotas), codificadas de forma cíclica con s
 y coseno para no imponer un orden falso entre diciembre y enero.
 \end{itemize}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.73\textwidth]{fe_differencing.pdf}
 \caption[Diferenciación de la serie]{(a) Serie en niveles con tendencia fuerte (no
@@ -1819,7 +1822,7 @@ media positiva y por tanto extrapolable por los modelos.}
 \label{fig:fe_diff}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.77\textwidth]{fe_gaps.pdf}
 \caption[Política de huecos (MNAR)]{Ausencias de México/EB-4 religiosos/FAD, la serie con las
@@ -1829,7 +1832,7 @@ cuya rejilla arrastra la última observación publicada.}
 \label{fig:fe_gaps}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.77\textwidth]{fe_regime.pdf}
 \caption[Régimen administrativo y máscara de evaluación]{Régimen administrativo de
@@ -1847,7 +1850,7 @@ variable: los avances de los meses $t-1$ y $t-3$ encabezan el orden casi empatad
 demás rezagos cortos y del rezago anual ($t-12$), mientras que los regresores de calendario
 aportan una señal menor pero no nula, coherente con la débil estacionalidad observada en el EDA.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.71\textwidth]{fe_importance.pdf}
 \caption[Importancia de características]{Importancia (por número de divisiones) de las
@@ -1897,7 +1900,7 @@ para que extrapolen la tendencia, y redes profundas), más un \textit{foundation
 preentrenado (Chronos) evaluado en modo zero-shot. Cada familia aporta un \textit{sesgo
 inductivo} distinto, que permite anticipar y luego contrastar cuál encaja con este régimen.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Catálogo de modelos]{Las líneas base de referencia y las seis familias del
@@ -1995,7 +1998,7 @@ son admisibles; y la publicación expone únicamente artefactos versionados. El 
 pruebas y los controles de procedencia atraviesan todo el flujo, y cada paso posee una condición
 que impide avanzar cuando el resultado no es confiable (pie de la figura). Esta vista extremo a extremo complementa la Figura~\ref{fig:arquitectura}, que detalla exclusivamente el flujo interno de modelado.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 % Geometría: cuatro columnas de 3.45 cm con paso de 3.85 cm (ancho total 15.0 cm, menor que
 % \textwidth). Dos filas de cuatro tarjetas idénticas (3.45 x 1.45 cm: encabezado de color de
@@ -2132,7 +2135,7 @@ seleccionadas comparten un protocolo temporal, que sus parámetros quedan gobern
 ningún resultado parcial puede confundirse con una ejecución completa. Por eso la regeneración integral de resultados se mantuvo separada y sólo se ejecutó después de acreditar los insumos,
 el código y los entornos.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Aporte de cada avance de implementación]{Aporte de cada avance (A8, A9 y A10) a la
@@ -2155,7 +2158,7 @@ identificador lógico su familia, fuente de pronóstico y política de persisten
 recorrido temporal aplica la misma partición y las mismas métricas a todos los candidatos
 (Figura~\ref{fig:implementacion_a8}, cuyas flechas son productos explícitos y verificables).
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 % Geometría (misma retícula que la arquitectura general): fila 1 con cuatro tarjetas de
 % 3.45 x 1.45 cm y paso de 3.85 cm; fila 2, 0.5 cm más abajo, con tres tarjetas de 4.73 x 1.2 cm
@@ -2226,7 +2229,7 @@ se reentrenan con varias semillas.
 \algrenewcommand\algorithmicif{\textbf{si}}
 \algrenewcommand\algorithmicthen{\textbf{entonces}}
 \algrenewcommand\algorithmicend{\textbf{fin}}
-\begin{algorithm}[tbp]
+\begin{algorithm}[htbp]
 \caption{Implementación y acreditación del recorrido temporal}
 \label{alg:implementacion_a8}
 \begin{algorithmic}[1]
@@ -2263,7 +2266,7 @@ separados de los hiperparámetros de cada candidato para que una decisión de go
 confunda con una búsqueda estadística. Los valores de aceptación no se optimizan junto con el
 modelo: constituyen el protocolo bajo el cual una métrica o un pronóstico adquiere validez.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Configuración consolidada de la implementación]{Configuración matemática y
@@ -2363,7 +2366,7 @@ candidato nuevo requiere otra revisión que la revalida; y \texttt{published} au
 versión servida. Cualquier error conduce a \texttt{failed}; nunca se interpreta la mera existencia
 de un archivo como una transición válida.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 % Geometría: pseudoestado inicial (punto de 0.16 cm) y flecha hasta x = 0.5; cuatro estados
 % idénticos de 2.3 x 1.35 cm (encabezado de color de 0.55 cm con el nombre del estado, cuerpo
@@ -2454,7 +2457,7 @@ experimental sin acreditación suficiente.
 \algrenewcommand\algorithmicif{\textbf{si}}
 \algrenewcommand\algorithmicthen{\textbf{entonces}}
 \algrenewcommand\algorithmicend{\textbf{fin}}
-\begin{algorithm}[tbp]
+\begin{algorithm}[htbp]
 \caption{Cierre operacional y publicación acreditada}
 \label{alg:cierre_a10}
 \begin{algorithmic}[1]
@@ -2505,7 +2508,7 @@ cada uno probado en su frontera; la mantenibilidad se apoya en identificadores l
 derivadas del registro en lugar de listas duplicadas, y los lectores derivan la identidad en lugar
 de aceptar declaraciones del llamador.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Pruebas y evidencia del avance 3]{Capas de verificación empleadas en el cierre de la
@@ -2661,14 +2664,6 @@ de MLflow se versionan con DVC sobre S3 y Git versiona el código y los punteros
 único guion (\texttt{sync\_all.sh}) orquesta los tres, de modo que cualquier número de este
 documento puede atarse al \textit{commit}, la semilla y los datos exactos que lo generaron.
 
-\begin{figure}[tbp]
-\centering
-\includegraphics[width=0.6\textwidth]{results_holdout_mexico_F3_FAD.png}
-\caption[Pronóstico vs. real en el conjunto reservado]{Pronóstico del modelo ETS amortiguado frente a
-los valores reales sobre el conjunto reservado de 24 meses, México/F3/FAD.}
-\label{fig:holdout}
-\end{figure}
-
 % ------------------------------------------------------------
 \barreraflotantes
 \section{1.5 Pruebas y validación final}
@@ -2692,6 +2687,14 @@ comparación de familias, evaluación multi-horizonte y particiones por estabili
 horizontes (las \cohortFactRouterCeldas{} celdas conservan \cohortFactRouterGana{} ganadoras);
 el resultado exploratorio acota lo observado con esta regla y estos datos, sin demostrar que toda
 segmentación futura sea inútil.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{results_holdout_mexico_F3_FAD.png}
+\caption[Pronóstico vs. real en el conjunto reservado]{Pronóstico del modelo ETS amortiguado frente a
+los valores reales sobre el conjunto reservado de 24 meses, México/F3/FAD.}
+\label{fig:holdout}
+\end{figure}
 
 La reproducibilidad del CRPS se comprobó repitiendo la producción con el mismo flujo de semillas
 y entradas: la igualdad de bytes acredita repetibilidad del cálculo, no elimina ni cuantifica el
@@ -2778,7 +2781,7 @@ El Algoritmo~\ref{alg:walkforward} resume la validación: en cada origen del con
 el modelo se entrena \textit{solo} con el pasado, predice un paso y deriva su intervalo de los
 errores de calibración anteriores. La Tabla~\ref{tab:notacion} reúne la notación.
 
-\begin{algorithm}[tbp]
+\begin{algorithm}[htbp]
 \caption{Validación \textit{walk-forward} sin fuga con intervalo de predicción conforme}
 \label{alg:walkforward}
 \begin{algorithmic}[1]
@@ -2795,7 +2798,7 @@ errores de calibración anteriores. La Tabla~\ref{tab:notacion} reúne la notaci
 \end{algorithmic}
 \end{algorithm}
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Notación principal]{Notación principal empleada en el documento.}
@@ -2837,7 +2840,7 @@ CatBoost en 4, ARIMA-LSTM, naïve-1 y Theta en 2 cada uno, LightGBM en 1), pero 
 reservado el \textbf{naïve-1 gana en \factNaiveOneFadHoldoutWins{} de las 25 series} (NLinear
 y ARIMA en 3 cada uno; LLT, DLinear y Theta en 1).
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Comparación de los \factNModels{} modelos]{Desempeño promedio de los \factNModels{} modelos por
@@ -2908,7 +2911,7 @@ $0.109$. En ambas tablas, sobre sus mismas series, ETS y el naïve-1 tienen meno
 y SARIMA. Este contraste y la inviabilidad numérica de los modelos de mayor capacidad con pocos
 datos explican que el sistema evalúe cada tabla por separado, sin un modelo universal.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Comparación de los \factNModels{} modelos (DFF)]{Desempeño promedio sobre las 25 series DFF
@@ -2965,7 +2968,7 @@ China y el resto del mundo comparten fechas; sobre las 15 series distintas, la c
 campeón-retador mantiene la ventaja del naïve-1 (Holm $p=0.00042$). Es el resultado que ancla
 la narrativa del capítulo.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.68\textwidth]{results_cd_diagram.pdf}
 \caption[Diagrama de diferencia crítica (Friedman-Nemenyi)]{Rango promedio de cada modelo
@@ -3064,7 +3067,7 @@ noviembre de 2024 y cinco en todo el lapso), donde el modelo sigue los saltos y
 \textbf{ensancha su banda donde la trayectoria se vuelve impredecible}, para afilarla cuando la
 fecha se estabiliza.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{results_hero_forecast.pdf}
 \caption[Pronóstico a un paso sobre el lapso reservado (México/F1/FAD)]{Pronósticos a un
@@ -3112,7 +3115,7 @@ todo en FAD, donde los saltos son mayores. El mecanismo \textbf{está desplegado
 actualiza con cada corte a partir de los aciertos y fallos del registro prospectivo, y así el
 sistema reporta intervalos con cobertura medida y declarada.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{results_coverage_crps.pdf}
 \caption[Calibración de la cobertura y afilado de la distribución predictiva]{(a) Cobertura
@@ -3157,7 +3160,7 @@ obtiene MASE 0.466 frente a 0.482 (196 pares) y el campeón DFF 0.617 frente a 0
 diferencias descriptivas que alimentan la decisión prospectiva de promoción, no una prueba
 confirmatoria.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \caption[Desempeño por horizonte del registro de evaluación]{Registro de evaluación del
 sistema (\textit{backfill} sin fuga de información: pronósticos generados con la
@@ -3180,7 +3183,7 @@ y la cobertura empírica del intervalo al $95$\,\% desciende de 0.97 a 0.88.}
 \end{tabular}
 \end{table}
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \caption[Barrido de modelos profundos globales de frontera (FAD)]{Barrido de las arquitecturas
 profundas de frontera re-derivadas en la campaña causal, entrenadas de forma global sobre las 25
@@ -3229,7 +3232,7 @@ años aunque su MAE sobre el lapso se mantenga entre $51$ y $78$ días. Las áre
 sobre-suscritas (India, China) coinciden con \textit{Resto del mundo} cuando comparten la fecha
 mundial.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{results_backtest_grid_FAD.pdf}
 \caption[Validación por categoría sobre el conjunto reservado (FAD)]{Validación del pronóstico sobre el
@@ -3241,7 +3244,7 @@ muestra la fecha de prioridad.}
 \label{fig:grid_fad}
 \end{figure}
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \scriptsize
 \setlength{\tabcolsep}{3pt}
@@ -3304,7 +3307,7 @@ Tabla~\ref{tab:comparacion_modelos}. Su contraste formal por categoría de emple
 evaluación extendida; la evidencia ya sugiere que las conclusiones no son un artefacto de las
 categorías familiares.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Comparación en categorías de empleo (EB)]{Desempeño promedio (MASE de selección)
@@ -3377,7 +3380,7 @@ cadena. Los PDF sin texto utilizable o con matrices ambiguas se rechazan, sin ce
 transcripción silenciosa, y el proceso requiere las instantáneas históricas ya verificadas: el
 PDF de un mes no reconstruye por sí solo los meses anteriores.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[
   % Geometría: seis tarjetas idénticas de 2.30 x 2.44 cm en una sola fila, con paso de 2.54 cm
@@ -3468,7 +3471,7 @@ corto plazo, y el hallazgo se publica igual: un experimento que solo se reporta 
 la hipótesis deja de ser un experimento. Las cifras, la tabla y la figura se derivan del mismo
 archivo versionado y ninguna se teclea a mano.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \caption[Enrutado por cohorte contra el naïve-1 de cada cohorte]{Enrutado por cohorte frente al
 naïve-1 de la propia cohorte, por tabla, cohorte y horizonte. El efecto es positivo cuando el
@@ -3478,7 +3481,7 @@ los tres horizontes de la celda. Retrospectivo, con selección disjunta del conj
 \input{cohortes.tex}
 \end{table}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.78\linewidth]{e5_router_effect.pdf}
 \caption[Efecto del enrutado por cohorte y horizonte]{Efecto del enrutado frente al naïve-1 de
@@ -3888,7 +3891,7 @@ alternativa, \texttt{make repro} ejecuta el grafo de dependencias completo y rec
 etapas cuyas entradas cambiaron, y \texttt{make test} corre la batería de pruebas automatizadas de
 la capa de datos.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Entorno de ejecución]{Principales componentes y versiones fijadas del entorno de
@@ -3933,7 +3936,7 @@ propio. La Tabla~\ref{tab:hparams} reúne los hiperparámetros principales, \tex
 del conjunto de prueba para evitar cualquier ajuste retrospectivo a la métrica del conjunto
 reservado.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Hiperparámetros principales del protocolo]{Hiperparámetros principales de cada
@@ -3986,7 +3989,7 @@ prioridad estimada, y debajo, el panel de precisión verificada resume el error 
 horizonte y la cobertura observada del registro prospectivo, junto a una herramienta que indica si
 una fecha de prioridad dada quedaría al corriente dentro del horizonte.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.8\linewidth, trim=250 540 1080 330, clip]{web_home.png}\\[2pt]
 {\footnotesize (a) Inicio}\\[8pt]
@@ -3999,7 +4002,7 @@ de \url{https://visapredictai.com} (inicio y \texttt{/ingenieria/}).}
 \label{fig:portal_visapredict}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.85\linewidth, trim=250 180 1080 820, clip]{web_resultados_galeria.png}\\[2pt]
 {\footnotesize (a) Galería de pronósticos: series destacadas}\\[8pt]
@@ -4040,7 +4043,7 @@ toda salida de un modelo generativo, la redacción varía entre ejecuciones; las
 mostradas se contrastaron con los artefactos canónicos del corte, y las cifras que valen para este
 documento son las de los capítulos de resultados, no las del portal.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.6\linewidth, trim=0 0 0 112, clip]{web_bot_calor.png}\\[2pt]
 {\footnotesize (a) Herramienta de la consola: mapa de calor}\\[8pt]
@@ -4054,7 +4057,7 @@ capturas de \url{https://visapredictai.com/asistente/}.}
 \label{fig:web_bot}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth, trim=20 1111 6 0, clip]{web_bot_pronostico_mx.png}\\[2pt]
 {\footnotesize (a) Pregunta de pronóstico}\\[8pt]
@@ -4084,7 +4087,7 @@ máquina de estados de las campañas en su registro de decisión de arquitectura
 integración en \texttt{.github/workflows/}. La Tabla~\ref{tab:mlops_pilares} enumera los seis
 componentes de la plataforma, cada uno reproducible con un \'unico comando.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Componentes de la plataforma MLOps]{Los seis componentes de la plataforma, su
@@ -4132,7 +4135,7 @@ en Git como entregable descargable, y los binarios derivados se respaldan en alm
 objetos. Dos ejecuciones consecutivas confirman el determinismo (la segunda no recomputa nada) y
 un mismo \textit{rebuild} produce datos idénticos byte a byte.
 
-\begin{figure}[tbp]
+\begin{figure}[htbp]
 \centering
 % Geometría: ancho total 15.0 cm. Cadena principal en y = -1.36 cm (fila de eda_facts), nodos
 % de 1.1 cm de alto: instantáneas (x = 0 a 2.25), scrape (x = 2.57 a 4.37) y panel (x = 4.69 a
@@ -4326,7 +4329,7 @@ fuente siga siendo alcanzable de forma autom\'atica, y mientras su cortafuegos r
 del proceso desatendido, la ingesta del mes sigue el procedimiento manual gobernado, que conserva
 el congelado inmutable, las sumas de verificaci\'on y los mismos gates.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Flujos de integración y operación continua]{Flujos de integración y operación
@@ -4401,7 +4404,7 @@ sentido de dominio es transparente: las fechas de prioridad avanzan a un ritmo c
 modo que extrapolar la pendiente media supera a repetir el último valor, y la brecha crece con el
 horizonte.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \caption[Campeón por horizonte (retrospectivo rodante)]{Campeón por horizonte: MASE de la deriva y
 del naïve-1, su diferencia porcentual y la significancia de Holm, por tabla y horizonte.
@@ -4431,7 +4434,7 @@ Cada fila es una observación del grano (área de cargabilidad, categoría, tabl
 boletín) y consta de las nueve variables de la Tabla~\ref{tab:diccionario}, ilustradas con
 una fila real del corte de julio de 2026.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Diccionario de datos del panel]{Diccionario de las nueve variables del panel largo,
@@ -4499,7 +4502,7 @@ equivalen al producto cartesiano de las dimensiones: varias subcategorías nacie
 desaparecieron a lo largo del periodo (por ejemplo, las reservas de EB-5 creadas en 2022 o
 la categoría de traductores), de modo que solo existen en una fracción de los meses.
 
-\begin{table}[hbp]
+\begin{table}[htbp]
 \centering
 \footnotesize
 \caption[Catálogo de dimensiones observadas]{Categorías migratorias observadas en el panel,
@@ -4526,7 +4529,7 @@ Empleo & EB4\_TRANS & 40      & \multicolumn{2}{l}{\textbf{Total panel}}    & \t
 \end{tabular}
 \end{table}
 
-\begin{figure}[hbp]
+\begin{figure}[htbp]
 \centering
 % Geometría: tres columnas en una banda de 2.5 cm de alto (y entre -1.25 y 1.25; ancho total
 % 13.9 cm, menor que \textwidth, sin \resizebox). Izquierda: dos fuentes de 4.0 x 1.1 cm
@@ -4579,7 +4582,7 @@ sobre S3 y el código con Git, todo orquestado por un único guion.}
 \label{fig:mlops_stack}
 \end{figure}
 
-\begin{figure}[hbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{eda3_g10_dv.pdf}
 \caption[Rangos de corte del sorteo de diversidad]{Rango de corte del sorteo de
@@ -4590,7 +4593,7 @@ del objetivo predictivo del sistema.}
 \end{figure}
 
 
-\begin{figure}[hbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{results_backtest_grid_DFF.pdf}
 \caption[Validación por categoría sobre el conjunto reservado (DFF)]{Validación del pronóstico sobre el
