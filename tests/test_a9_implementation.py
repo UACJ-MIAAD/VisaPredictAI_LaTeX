@@ -62,6 +62,6 @@ def test_a9_exige_grilla_y_semillas_exactas_con_fallo_cerrado() -> None:
 def test_a9_fecha_la_campana_despues_del_avance_sin_anticiparla() -> None:
     seccion = _normalizada()
     assert "La campaña integral no formaba parte del segundo avance y entonces no se había iniciado" in seccion
-    assert "quedaba una auditoría independiente final" in seccion
+    assert "quedaba una verificación final" in seccion
     # el estado de entonces no se reescribe como si la campaña ya hubiera corrido
     assert "no se ha iniciado" not in seccion
