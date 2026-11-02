@@ -136,19 +136,16 @@
 % flotante suba al tope de la página por encima del párrafo que lo menciona: cada flotante se
 % escribe después de su primera referencia, así que siempre aparece después de ella.
 \renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}
-\renewcommand{\textfraction}{0.07}\renewcommand{\floatpagefraction}{0.75}
+\renewcommand{\textfraction}{0.07}\renewcommand{\floatpagefraction}{0.88}
 \setcounter{topnumber}{3}\setcounter{totalnumber}{5}
-% Barrera de flotantes: si al llegar a una sección quedan flotantes pendientes, se colocan
-% antes del título para que ninguno aparezca dentro de la sección siguiente. Primero se
-% cambia de página, de modo que los pendientes suban al tope de la siguiente junto al texto;
-% sólo si aún sobra alguno se vacían con \clearpage. El log registra cada disparo.
+% Barrera de flotantes: si al llegar a una sección quedan flotantes pendientes, se cambia de
+% página para que suban al tope de la siguiente, encima del título y junto al texto. No se vacían
+% con \clearpage: eso dejaba páginas con una sola figura. El log registra cada disparo.
 \makeatletter
 \newcommand{\barreraflotantes}{\par\begingroup\let\@elt\relax
   \edef\@tempa{\@botlist\@deferlist\@dbldeferlist}%
   \ifx\@tempa\@empty\else
     \typeout{barreraflotantes: flotantes pendientes en la linea \the\inputlineno}\newpage
-    \edef\@tempa{\@deferlist\@dbldeferlist}%
-    \ifx\@tempa\@empty\else\clearpage\fi
   \fi\endgroup}
 \makeatother
 \begin{document}
@@ -1771,6 +1768,16 @@ saturan en el máximo observado. Por ello el objetivo se modela sobre la \textbf
 diferencia} (el avance mensual) y se reintegra a un paso. La transformación vuelve la serie
 estacionaria y extrapolable (Figura~\ref{fig:fe_diff}); es la palanca que rescata a los
 modelos de alta capacidad.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.73\textwidth]{fe_differencing.pdf}
+\caption[Diferenciación de la serie]{(a) Serie en niveles con tendencia fuerte (no
+estacionaria). (b) Su primera diferencia (el avance mensual), estacionaria alrededor de una
+media positiva y por tanto extrapolable por los modelos.}
+\label{fig:fe_diff}
+\end{figure}
+
 \item \textbf{Huecos como mecanismo MNAR.} Los meses sin fecha no faltan al azar:
 corresponden a regímenes \textit{Current}/\textit{Unavailable}, donde estructuralmente
 no hay fecha que predecir. Es un mecanismo \textit{Missing Not At Random} (MNAR): la
@@ -1803,24 +1810,6 @@ serie con las corridas de ausencia más largas del panel, y la
 Figura~\ref{fig:fe_regime} muestra su contraparte de evaluación: los meses en
 régimen \textit{Current}/\textit{Unavailable} son anotación descriptiva y solo las
 fechas efectivamente publicadas se puntúan.
-\item \textbf{Escalado.} Los modelos de redes neuronales requieren entradas
-escaladas. El escalador normaliza cada serie al rango $[0,1]$ por mínimo y máximo,
-y ajusta esos extremos \textit{solo} sobre la ventana inicial de entrenamiento;
-calcularlos sobre el conjunto completo filtraría el futuro al pasado.
-\item \textbf{Regresores de calendario.} Para los modelos tabulares se construyen
-variables del mes y de la posición dentro del año fiscal estadounidense (que inicia
-en octubre, cuando se reinician las cuotas), codificadas de forma cíclica con seno
-y coseno para no imponer un orden falso entre diciembre y enero.
-\end{itemize}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.73\textwidth]{fe_differencing.pdf}
-\caption[Diferenciación de la serie]{(a) Serie en niveles con tendencia fuerte (no
-estacionaria). (b) Su primera diferencia (el avance mensual), estacionaria alrededor de una
-media positiva y por tanto extrapolable por los modelos.}
-\label{fig:fe_diff}
-\end{figure}
 
 \begin{figure}[htbp]
 \centering
@@ -1842,6 +1831,16 @@ fecha publicada y la evaluación puntúa únicamente esos meses; los rellenos de
 continuidad del entrenamiento nunca se califican.}
 \label{fig:fe_regime}
 \end{figure}
+
+\item \textbf{Escalado.} Los modelos de redes neuronales requieren entradas
+escaladas. El escalador normaliza cada serie al rango $[0,1]$ por mínimo y máximo,
+y ajusta esos extremos \textit{solo} sobre la ventana inicial de entrenamiento;
+calcularlos sobre el conjunto completo filtraría el futuro al pasado.
+\item \textbf{Regresores de calendario.} Para los modelos tabulares se construyen
+variables del mes y de la posición dentro del año fiscal estadounidense (que inicia
+en octubre, cuando se reinician las cuotas), codificadas de forma cíclica con seno
+y coseno para no imponer un orden falso entre diciembre y enero.
+\end{itemize}
 
 Para verificar qué información usan efectivamente los modelos tabulares, la
 Figura~\ref{fig:fe_importance} reporta la importancia de características de un árbol de
@@ -3456,7 +3455,26 @@ al menos \cohortFactRouterMargen{} en MASE, contraste bilateral con corrección 
 evaluados.
 
 El veredicto es negativo y se conserva: de \cohortFactRouterCeldas{} celdas,
-\cohortFactRouterGana{} ganan (Tabla~\ref{tab:cohortes} y Figura~\ref{fig:cohortes}). En la
+\cohortFactRouterGana{} ganan (Tabla~\ref{tab:cohortes} y Figura~\ref{fig:cohortes}).
+\begin{table}[htbp]
+\centering
+\caption[Enrutado por cohorte contra el naïve-1 de cada cohorte]{Enrutado por cohorte frente al
+naïve-1 de la propia cohorte, por tabla, cohorte y horizonte. El efecto es positivo cuando el
+enrutador mejora; la significancia es la del contraste bilateral tras la corrección de Holm sobre
+los tres horizontes de la celda. Retrospectivo, con selección disjunta del conjunto reservado.}
+\label{tab:cohortes}
+\input{cohortes.tex}
+\end{table}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\linewidth]{e5_router_effect.pdf}
+\caption[Efecto del enrutado por cohorte y horizonte]{Efecto del enrutado frente al naïve-1 de
+cada cohorte, por celda y horizonte. Las líneas discontinuas marcan el margen material exigido en
+ambos sentidos; las barras llenas señalan los contrastes que sobreviven a la corrección de Holm y
+las huecas, los que no.}
+\label{fig:cohortes}
+\end{figure}
+En la
 tabla de fechas de acción final el enrutador mejora de forma material en los tres horizontes de
 ambas cohortes, pero de las seis combinaciones de cohorte y horizonte
 \cohortFactRouterFadLargosSignificativos{} resultan significativas, todas a seis o doce meses, y
@@ -3471,25 +3489,6 @@ corto plazo, y el hallazgo se publica igual: un experimento que solo se reporta 
 la hipótesis deja de ser un experimento. Las cifras, la tabla y la figura se derivan del mismo
 archivo versionado y ninguna se teclea a mano.
 
-\begin{table}[htbp]
-\centering
-\caption[Enrutado por cohorte contra el naïve-1 de cada cohorte]{Enrutado por cohorte frente al
-naïve-1 de la propia cohorte, por tabla, cohorte y horizonte. El efecto es positivo cuando el
-enrutador mejora; la significancia es la del contraste bilateral tras la corrección de Holm sobre
-los tres horizontes de la celda. Retrospectivo, con selección disjunta del conjunto reservado.}
-\label{tab:cohortes}
-\input{cohortes.tex}
-\end{table}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.78\linewidth]{e5_router_effect.pdf}
-\caption[Efecto del enrutado por cohorte y horizonte]{Efecto del enrutado frente al naïve-1 de
-cada cohorte, por celda y horizonte. Las líneas discontinuas marcan el margen material exigido en
-ambos sentidos; las barras llenas señalan los contrastes que sobreviven a la corrección de Holm y
-las huecas, los que no.}
-\label{fig:cohortes}
-\end{figure}
 
 % ============================================================
 % 3. CONCLUSIONES

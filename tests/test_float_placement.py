@@ -51,3 +51,13 @@ def test_every_float_is_written_after_its_first_reference() -> None:
     assert set(floats.values()) == set(referenced.values())
     early = {k: (v, refs[k]) for k, v in referenced.items() if v < refs[k]}
     assert early == {}
+
+
+def test_no_page_is_left_holding_a_lone_float() -> None:
+    """A float page needs at least 85 % of the page filled, and the section barrier only turns the
+    page: forcing \\clearpage emptied pending floats one per page."""
+    text = "\n".join(_lines())
+    fraction = re.search(r"\\renewcommand\{\\floatpagefraction\}\{([0-9.]+)\}", text)
+    assert fraction and float(fraction.group(1)) >= 0.85
+    barrier = re.search(r"\\newcommand\{\\barreraflotantes\}\{(.*?)\n\\makeatother", text, re.S)
+    assert barrier and "\\clearpage" not in barrier.group(1)
