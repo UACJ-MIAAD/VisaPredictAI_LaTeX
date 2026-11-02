@@ -852,7 +852,7 @@ Reproducibilidad y volumen (51~MB) & Los artefactos deben poder reconstruirse & 
 
 El conjunto obtenido no se da por bueno por inspección visual: además de las guardas que
 abortan la construcción, la integración continua ejecuta en cada cambio la batería de
-pruebas de la capa de datos (Apéndice~A.3), una auditoría automática recorre el panel
+pruebas de la capa de datos (Apéndice~A.3), una verificación automática recorre el panel
 completo y reporta cobertura, duplicados, saltos y huecos, y un verificador de consistencia
 compara las cifras publicadas en el documento, en el repositorio y en el portal de
 divulgación para que una misma cifra no discrepe entre artefactos. El entorno con versiones
@@ -1042,7 +1042,7 @@ Ordena cada serie y define la malla, cuya continuidad se verifica \\
 Determina qué observación es entrenable; $C$ y $U$ no son objetivo y quedan fuera del
 entrenamiento \\
 \texttt{raw\_value} & Trazabilidad de la fuente &
-Fuera del análisis cuantitativo; permite auditar cualquier celda contra el boletín \\
+Fuera del análisis cuantitativo; permite verificar cualquier celda contra el boletín \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -2144,7 +2144,7 @@ sección 1.4.1. Cada avance conserva los contratos del anterior y añade una fro
 \textbf{Avance} & \textbf{Problema resuelto} & \textbf{Aporte principal} & \textbf{Puerta de aceptación} \\ \midrule
 \textbf{A8} & Convertir el diseño en cálculo reproducible & Representación causal, registro de modelos, recorrido temporal (Figura~\ref{fig:implementacion_a8}, Algoritmo~\ref{alg:implementacion_a8}), parámetros gobernados, métricas y promoción atómica & Pruebas unitarias, causalidad y maestro dorado \\
 \textbf{A9} & Integrar componentes sin mezclar procedencias & Registro canónico, preparación aislada por campaña, transporte de ETS y Theta, cobertura multisemilla y verificación previa & Verificación previa, recibos recalculados al leer, conjuntos exactos de claves y pruebas de sustitución \\
-\textbf{A10} & Cerrar el ciclo de vida del resultado & Sello de arranque, estados de campaña (Figura~\ref{fig:estados_a10}), persistencia según capacidad, clasificación de fallos, consumo y cierre (Algoritmo~\ref{alg:cierre_a10}) & Auditoría del sello, transacción y autorización humana de publicación \\ \bottomrule
+\textbf{A10} & Cerrar el ciclo de vida del resultado & Sello de arranque, estados de campaña (Figura~\ref{fig:estados_a10}), persistencia según capacidad, clasificación de fallos, consumo y cierre (Algoritmo~\ref{alg:cierre_a10}) & Verificación del sello, transacción y autorización humana de publicación \\ \bottomrule
 \end{tabular}
 \end{table}
 
@@ -2288,7 +2288,7 @@ Modelos globales & Cinco semillas, $s_1$--$s_5$ (valores 1 a 5), exactamente & S
 Persistencia SARIMA & Compresión nivel 3 & Menor tamaño sin perder el estado reutilizable. \\
 Campaña e identidad & Identificador único; código, panel, instantáneas, archivos de bloqueo y entornos & Separa preparación, recibos y promoción; bloquea la mezcla de procedencias. \\
 Escritura y fallo & Preparación con promoción atómica; detención inmediata & Nada parcial llega a los consumidores ni se agrega tras un fallo. \\
-Promoción & Cobertura exacta de claves y autorización & Prohíbe versiones parciales o no auditadas. \\ \bottomrule
+Promoción & Cobertura exacta de claves y autorización & Prohíbe versiones parciales o no verificadas. \\ \bottomrule
 \end{tabular}
 \end{table}
 
@@ -2436,12 +2436,12 @@ restaurar o adquirir la evidencia correcta; una salida incompleta conserva la pr
 agregar hasta corregir el productor y repetir su etapa; la contaminación se etiqueta, se aísla y se
 reconstruye desde entradas acreditadas; una mutación posterior invalida el recibo y obliga a
 regenerarlo; y una publicación sin enlace acreditado entre sello y transacción bloquea la promoción
-final hasta auditar y registrar la identidad común. Las superficies de consumo (CSV y JSON, tablas y figuras del documento y datos del
+final hasta verificar y registrar la identidad común. Las superficies de consumo (CSV y JSON, tablas y figuras del documento y datos del
 portal) se derivan de la misma versión después de la promoción, sin recalcular un modelo ni
 recurrir a un archivo antiguo.
 
 \paragraph{Cierre operacional.} El Algoritmo~\ref{alg:cierre_a10} reúne el recorrido final, con
-tres puertas humanas separadas: una auditoría independiente del estado sellado antes de ejecutar
+tres puertas humanas separadas: una verificación de sólo lectura del estado sellado antes de ejecutar
 la campaña, una revisión humana acreditada antes de considerarla validada y una autorización
 explícita antes de publicarla. Omitir cualquiera convertiría una preparación local en un resultado
 experimental sin acreditación suficiente.
@@ -2458,7 +2458,7 @@ experimental sin acreditación suficiente.
 \caption{Cierre operacional y publicación acreditada}
 \label{alg:cierre_a10}
 \begin{algorithmic}[1]
-\Require Sello registrado $S_0$ con dictamen de auditoría independiente, registro $\mathcal{M}$,
+\Require Sello registrado $S_0$ con dictamen de verificación de sólo lectura, registro $\mathcal{M}$,
 panel $P$ y árbol servido $V$
 \Ensure $V$ intacto o una nueva versión completa, acreditada y autorizada
 \State Reemitir la verificación previa viva $S_1$
@@ -2521,7 +2521,7 @@ Prueba de integración & El productor real alimenta al consumidor real & Ruta de
 Maestro dorado & Instrumentar no altera las métricas existentes & Campos numéricos invariantes antes y después \\
 Prueba metamórfica & Un dato futuro no modifica una entrada pasada & Igualdad de características en orígenes previos \\
 Prueba de sustitución & Sustituciones que conservan conteos o forma & Rechazo antes de agregación, promoción o publicación \\
-Auditoría independiente & Código, entorno, datos y protocolo concuerdan & Dictamen de sólo lectura sobre un único estado \\ \bottomrule
+Verificación de sólo lectura & Código, entorno, datos y protocolo concuerdan & Dictamen de sólo lectura sobre un único estado \\ \bottomrule
 \end{tabular}
 \end{table}
 
@@ -2530,12 +2530,12 @@ solución funcional, mantenible y evaluable. El estado de cada avance se declar�
 resultados. La campaña integral no formaba parte del segundo avance y entonces no se había
 iniciado; al cierre del tercer avance la implementación estaba verificada localmente, pero la
 campaña prolongada no se había ejecutado y la publicación quedaba fuera del avance. Antes de
-autorizarla quedaba una auditoría independiente final: se exigió una auditoría final de sólo
+autorizarla quedaba una verificación final: se exigió una verificación de sólo
 lectura sobre el mismo estado que se pretendía ejecutar y, en particular, sobre el vínculo entre
 el sello comparado al arrancar, la transacción y los artefactos que una publicación posterior
 consumiría. Esa frontera separó la finalización del software de la obtención de evidencia
 experimental nueva. La campaña causal se ejecutó después, en octubre de 2026, una vez superada esa
-auditoría. Su corte publicado siguió el orden del Algoritmo~\ref{alg:cierre_a10}: primero se
+verificación. Su corte publicado siguió el orden del Algoritmo~\ref{alg:cierre_a10}: primero se
 reconcilió con sus complementos acreditados (Apéndice~A.3); después, una revisión humana del
 candidato reconciliado la validó y, cuando el candidato cambió, la revalidó con una revisión
 nueva; sólo entonces se publicó. Sus resultados son los que reporta el capítulo de resultados.
@@ -2713,7 +2713,7 @@ pareada. Se separan entrenamiento, selección, confirmación y conjunto reservad
 aleatoria de meses correlacionados, y se distinguen el barrido exploratorio, la selección de
 configuraciones, la prueba final de la campaña causal y los experimentos por cohorte (con su
 propio pre-registro; sus corridas no aumentan el número de series independientes). Cada bloque
-conserva datos, semilla, parámetros, versión del código y salidas para repetirse y auditarse.
+conserva datos, semilla, parámetros, versión del código y salidas para repetirse y verificarse.
 
 El experimento somete a los \textbf{\factNModels{} modelos} al mismo protocolo walk-forward
 sobre las \textbf{25 series FAD de preferencia familiar} de las cinco áreas piloto (México,
@@ -3882,7 +3882,7 @@ versión exacta en el archivo de proyecto, de modo que una instalación limpia r
 entorno. La cadena se reproduce con seis órdenes, en este orden: \texttt{make freeze} congela los
 boletines nuevos (único paso con red); \texttt{make scrape} parsea las instantáneas HTML sin
 conexión; \texttt{make panel} consolida el panel y su registro de limpieza; \texttt{make db}
-construye el almacén DuckDB y el Parquet; \texttt{make audit} audita cobertura y claves; y
+construye el almacén DuckDB y el Parquet; \texttt{make audit} verifica cobertura y claves; y
 \texttt{make eda-all} produce el censo del EDA, las figuras por serie y la galería. Como
 alternativa, \texttt{make repro} ejecuta el grafo de dependencias completo y reconstruye solo las
 etapas cuyas entradas cambiaron, y \texttt{make test} corre la batería de pruebas automatizadas de
@@ -4073,7 +4073,7 @@ Filing?», construida desde el glosario y la tarjeta de modelo. Fuente: capturas
 
 El sistema no se limita al modelo: se sostiene sobre una plataforma de operaciones de
 aprendizaje autom\'atico (\textit{machine learning operations}, MLOps) que reproduce,
-versiona, eval\'ua, audita y publica el flujo completo de extremo a extremo, en
+versiona, eval\'ua, verifica y publica el flujo completo de extremo a extremo, en
 coherencia con la metodolog\'ia CRISP-DM~\cita{1}. Una cadena de datos congelados alimenta el
 almacén, el modelado, el campeón desplegado y el demostrador; la acompañan dos capas
 transversales (seguimiento y versionado, y guardarraíles automáticos) y un lazo de
@@ -4271,7 +4271,7 @@ base, se regenera con su linaje
 (\textit{commit} de Git y \textit{hash} del panel) para no quedar obsoleta.
 
 La receta desplegada no se fija a mano: es un \textbf{dato versionado} (un manifiesto) que
-solo cambia mediante un procedimiento auditado de campe\'on-retador. Este eval\'ua la receta
+solo cambia mediante un procedimiento verificado de campe\'on-retador. Este eval\'ua la receta
 en producci\'on frente a un conjunto de alternativas sobre el conjunto reservado, mediante una
 prueba de rangos con signo de Wilcoxon por serie con control del error por comparaciones
 m\'ultiples, y emite un veredicto: una alternativa solo se recomienda si supera al campe\'on
@@ -4321,7 +4321,7 @@ el m\'etodo de bandas previo, de modo que la primera a\~nada calificada con las 
 por horizonte fue la de 2026-08. Los descriptores del panel de este documento corresponden a la
 a\~nada \factPanelVintage{} (hash \factPanelHashShort); las m\'etricas retrospectivas, a la
 ventana causal del corte de septiembre de 2026, que los boletines posteriores no modifican. As\'i,
-el sistema se mantiene reproducible y auditado; la puesta al d\'ia, en cambio, depende de que la
+el sistema se mantiene reproducible y verificado; la puesta al d\'ia, en cambio, depende de que la
 fuente siga siendo alcanzable de forma autom\'atica, y mientras su cortafuegos rechace al cliente
 del proceso desatendido, la ingesta del mes sigue el procedimiento manual gobernado, que conserva
 el congelado inmutable, las sumas de verificaci\'on y los mismos gates.
