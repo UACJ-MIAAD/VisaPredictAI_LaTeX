@@ -990,7 +990,7 @@ aplicadas.
 (\textit{exploratory data analysis}, EDA) es la etapa de descubrimiento que antecede al
 modelado: busca comprender la estructura, la distribución, las relaciones y la calidad del panel
 obtenido en la sección~1.1, de modo que qué familias de modelos son admisibles, qué
-transformaciones hacen falta y qué esquema de validación es honesto quede fundamentado en
+transformaciones hacen falta y qué esquema de validación es adecuado quede fundamentado en
 evidencia y no en supuestos. El análisis se organizó alrededor de seis preguntas:
 
 \begin{enumerate}[leftmargin=*, itemsep=0pt, topsep=2pt]
@@ -1884,7 +1884,7 @@ justificar, y la deriva (\textit{drift}) le añade el avance medio histórico. I
 un formalismo: en un panel donde el $\factPctFrozen$\,\% de los avances mensuales es nulo (en
 las colas familiares, del $28$\,\% de meses congelados en FAD al $66$\,\% en DFF,
 Tabla~\ref{tab:eda_descriptiva}), ``no moverse'' es una predicción formidable a un paso, y
-omitirla dejaría sin piso honesto a toda la comparación. Como las series distan de ser
+omitirla dejaría a toda la comparación sin su referencia mínima. Como las series distan de ser
 estacionales, se reporta en paralelo la MASE escalada por el naïve-1 ($m=1$); se conserva
 $m=12$ como métrica principal por comparabilidad con la práctica estándar y con las campañas
 previas del proyecto (la definición formal y su referencia se dan en §2.1).
@@ -2143,7 +2143,7 @@ sección 1.4.1. Cada avance conserva los contratos del anterior y añade una fro
 \rowcolor{uacjblue!15}
 \textbf{Avance} & \textbf{Problema resuelto} & \textbf{Aporte principal} & \textbf{Puerta de aceptación} \\ \midrule
 \textbf{A8} & Convertir el diseño en cálculo reproducible & Representación causal, registro de modelos, recorrido temporal (Figura~\ref{fig:implementacion_a8}, Algoritmo~\ref{alg:implementacion_a8}), parámetros gobernados, métricas y promoción atómica & Pruebas unitarias, causalidad y maestro dorado \\
-\textbf{A9} & Integrar componentes sin mezclar procedencias & Registro canónico, preparación aislada por campaña, transporte de ETS y Theta, cobertura multisemilla y verificación previa & Verificación previa, recibos recalculados al leer, conjuntos exactos de claves y ataques adversariales \\
+\textbf{A9} & Integrar componentes sin mezclar procedencias & Registro canónico, preparación aislada por campaña, transporte de ETS y Theta, cobertura multisemilla y verificación previa & Verificación previa, recibos recalculados al leer, conjuntos exactos de claves y pruebas de sustitución \\
 \textbf{A10} & Cerrar el ciclo de vida del resultado & Sello de arranque, estados de campaña (Figura~\ref{fig:estados_a10}), persistencia según capacidad, clasificación de fallos, consumo y cierre (Algoritmo~\ref{alg:cierre_a10}) & Auditoría del sello, transacción y autorización humana de publicación \\ \bottomrule
 \end{tabular}
 \end{table}
@@ -2493,10 +2493,10 @@ panel $P$ y árbol servido $V$
 
 \paragraph{Pruebas, herramientas y mantenimiento.} Las comprobaciones se distribuyen por nivel
 para que ninguna prueba sintética acredite una ruta que el lanzador nunca invoca
-(Tabla~\ref{tab:pruebas_a10}). Los ataques adversariales (una serie sustituida con el mismo
+(Tabla~\ref{tab:pruebas_a10}). Las pruebas de sustitución (una serie sustituida con el mismo
 conteo, un faltante compensado con un duplicado, un único origen cambiado, una escala degenerada,
 otra campaña mezclada, un archivo alterado tras acreditarlo) deben fallar antes de la evaluación o
-la publicación. Los controles benignos son tan importantes como los ataques: un objetivo no evaluable se conserva con
+la publicación. Los controles benignos son tan importantes como las sustituciones: un objetivo no evaluable se conserva con
 \texttt{observed=false} y valor real nulo, mientras una predicción o escala no finita falla
 cerradamente. El código corre en Python 3.14 con perfiles de dependencias fijados, sobre las
 bibliotecas de la sección~1.3.2, y se organiza en módulos de configuración y registro, recorrido
@@ -2520,7 +2520,7 @@ Prueba contractual & Claves, \textit{hashes}, duplicados, cobertura e identidad 
 Prueba de integración & El productor real alimenta al consumidor real & Ruta del lanzador ejercitada sin atajos de fixture \\
 Maestro dorado & Instrumentar no altera las métricas existentes & Campos numéricos invariantes antes y después \\
 Prueba metamórfica & Un dato futuro no modifica una entrada pasada & Igualdad de características en orígenes previos \\
-Ataque adversarial & Sustituciones que conservan conteos o forma & Rechazo antes de agregación, promoción o publicación \\
+Prueba de sustitución & Sustituciones que conservan conteos o forma & Rechazo antes de agregación, promoción o publicación \\
 Auditoría independiente & Código, entorno, datos y protocolo concuerdan & Dictamen de sólo lectura sobre un único estado \\ \bottomrule
 \end{tabular}
 \end{table}
@@ -2695,7 +2695,7 @@ segmentación futura sea inútil.
 
 La reproducibilidad del CRPS se comprobó repitiendo la producción con el mismo flujo de semillas
 y entradas: la igualdad de bytes acredita repetibilidad del cálculo, no elimina ni cuantifica el
-error de aproximación de las muestras. Las pruebas de software (contratos, ataques y consistencia
+error de aproximación de las muestras. Las pruebas de software (contratos, sustituciones y consistencia
 cruzada) verifican la integridad del sistema, no su generalización, que exige observaciones nuevas.
 
 % ============================================================
@@ -3072,7 +3072,7 @@ paso del modelo profundo global (BiTCN) para México/F1/FAD, emitidos en cada un
 del lapso reservado (no un pronóstico a 24 meses),
 comparado con las fechas de prioridad reales (estado F). La banda anidada representa los
 intervalos de predicción al 50, 80 y 95\,\%: se abre en los saltos de la cola y se cierra al
-estabilizarse, una incertidumbre honesta y resuelta en el tiempo. El eje vertical
+estabilizarse. El eje vertical
 muestra la fecha de prioridad.}
 \label{fig:hero}
 \end{figure}
@@ -4382,18 +4382,16 @@ horizonte corto apuntaría siempre al congelamiento pos-pandemia y uno largo a u
 confundiendo la dificultad temporal con la longitud del pronóstico. Todo se mide solo sobre
 observaciones con fecha ($e=F$) y en la misma escala MASE del resto del proyecto.
 
-\paragraph{Un resultado honesto, no un titular.} Las primeras lecturas parecían favorables al
-aprendizaje profundo, pero una auditoría adversarial (revisores independientes cuyo encargo era
-refutar cada afirmación) mostró que eran \textbf{artefactos}, no habilidad. La aparente ventaja
-en las categorías por empleo provenía de la rampa determinista con que se codifican los meses
-\textit{Current} (fecha del boletín); la aparente fortaleza del paseo aleatorio a horizontes
-intermedios era la confusión entre época y horizonte recién descrita. Corregidos ambos, el
-veredicto sobre fechas reales es sobrio: en el pronóstico a corto y mediano plazo el paseo
-aleatorio sigue siendo el piso a vencer, y \textbf{ninguna arquitectura profunda de frontera lo
-bate de forma honesta}. La ganancia a horizonte largo, cuando aparece, no proviene de una red
-profunda sino de un modelo clásico.
+\paragraph{Resultado del experimento.} Las primeras cifras favorecían al aprendizaje profundo,
+pero al revisarlas se comprobó que provenían de dos efectos del protocolo y no de capacidad
+predictiva: la ventaja en las categorías por empleo venía de la rampa determinista con que se
+codifican los meses \textit{Current} (fecha del boletín), y la fortaleza del paseo aleatorio a
+horizontes intermedios, de la confusión entre época y horizonte recién descrita. Corregidos ambos
+efectos, sobre fechas reales el paseo aleatorio sigue siendo el piso a vencer en el pronóstico a
+corto y mediano plazo, y \textbf{ninguna arquitectura profunda de frontera lo supera}. La ganancia
+a horizonte largo, cuando aparece, proviene de un modelo clásico y no de una red profunda.
 
-\paragraph{Lo que sí quedó en pie.} Ese modelo clásico es la \textbf{deriva}: repetir el último
+\paragraph{La deriva a horizonte largo.} Ese modelo clásico es la \textbf{deriva}: repetir el último
 corte añadiendo el avance medio histórico. Sobre el retrospectivo rodante completo, la deriva
 domina al paseo aleatorio con significancia estadística en casi todos los horizontes, con un
 margen que se ensancha del orden del $13$\,\% a un mes hasta cerca del $47$\,\% a cinco años en
