@@ -23,7 +23,7 @@ def _seccion_a8() -> str:
 def test_a8_integra_sus_cuatro_artefactos_documentales() -> None:
     """Consolidación 1.4.1 (29-oct-2026): los parámetros de A8 viven en tab:config_a10; la tabla de
     herramientas salió porque repetía las bibliotecas citadas en 1.3.2, y el entorno y los módulos
-    quedan en prosa; la tabla de avances identifica el aporte de A8."""
+    quedan en prosa; la tabla de etapas identifica el aporte de la primera."""
     seccion = _seccion_a8()
     assert seccion.count(r"\label{fig:implementacion_a8}") == 1
     assert seccion.count(r"\label{alg:implementacion_a8}") == 1
@@ -35,7 +35,7 @@ def test_a8_integra_sus_cuatro_artefactos_documentales() -> None:
                       r"calendario en $t$; máscara en $t-1$", "nunca se sustituye por uno"):
         assert parametro in configuracion, parametro
     avances = seccion[seccion.index(r"\label{tab:avances_a10}"):]
-    assert r"\textbf{A8} & Convertir el diseño en cálculo reproducible" in avances[: avances.index(r"\end{table}")]
+    assert r"\textbf{1} & Convertir el diseño en cálculo reproducible" in avances[: avances.index(r"\end{table}")]
 
 
 def test_a8_declara_el_protocolo_temporal_sin_usar_el_holdout_para_seleccion() -> None:

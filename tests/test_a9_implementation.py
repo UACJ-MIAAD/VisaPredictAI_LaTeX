@@ -22,14 +22,14 @@ def _normalizada() -> str:
 
 def test_a9_conserva_a8_y_anade_los_artefactos_del_segundo_avance() -> None:
     """Consolidación 1.4.1 (29-oct-2026): la orquestación de A9 se narra en prosa; sus parámetros
-    entran en tab:config_a10 y sus módulos en la prosa de pruebas; la tabla de avances lo identifica."""
+    entran en tab:config_a10 y sus módulos en la prosa de pruebas; la tabla de etapas lo identifica."""
     seccion = _seccion_implementacion()
     for etiqueta in ("fig:implementacion_a8", "alg:implementacion_a8", "tab:avances_a10",
                      "tab:config_a10"):
         assert seccion.count(rf"\label{{{etiqueta}}}") == 1
     normal = _normalizada()
     avances = normal[normal.index(r"\label{tab:avances_a10}"):]
-    assert r"\textbf{A9} & Integrar componentes sin mezclar procedencias" in avances[: avances.index(r"\end{table}")]
+    assert r"\textbf{2} & Integrar componentes sin mezclar procedencias" in avances[: avances.index(r"\end{table}")]
     for mecanismo in ("Un registro canónico sustituye las listas distintas",
                       "Un área de preparación aislada por campaña",
                       "Los recibos de cobertura se recalculan al leer",
@@ -61,7 +61,7 @@ def test_a9_exige_grilla_y_semillas_exactas_con_fallo_cerrado() -> None:
 
 def test_a9_fecha_la_campana_despues_del_avance_sin_anticiparla() -> None:
     seccion = _normalizada()
-    assert "La campaña integral no formaba parte del segundo avance y entonces no se había iniciado" in seccion
+    assert "La campaña integral no formaba parte de la segunda etapa y entonces no se había iniciado" in seccion
     assert "quedaba una verificación final" in seccion
     # el estado de entonces no se reescribe como si la campaña ya hubiera corrido
     assert "no se ha iniciado" not in seccion

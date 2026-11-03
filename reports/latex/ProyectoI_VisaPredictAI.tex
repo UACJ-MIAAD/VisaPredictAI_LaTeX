@@ -2129,11 +2129,11 @@ técnicas compiten antes de seleccionarse y los resultados se acreditan antes de
 
 \subsection{1.4.1 Implementación del modelo}
 
-\paragraph{Alcance y aporte de cada avance.} Esta etapa convierte el diseño de las
+\paragraph{Alcance y etapas de la implementación.} Esta etapa convierte el diseño de las
 secciones~1.3.1 y~1.3.2 en una cadena ejecutable de preparación, ajuste, pronóstico,
-evaluación y persistencia. Se construyó en tres avances sucesivos, A8, A9 y A10, cuyo aporte
-resume la \hyperref[tab:avances_a10]{Tabla~\ref*{tab:avances_a10}}: el primero construyó el recorrido por modelo; el segundo
-integró productores y consumidores bajo una identidad de campaña; y el tercero cerró las
+evaluación y persistencia. Se construyó en tres etapas sucesivas, cuyo aporte
+resume la \hyperref[tab:avances_a10]{Tabla~\ref*{tab:avances_a10}}: la primera construyó el recorrido por modelo; la segunda
+integró productores y consumidores bajo una identidad de campaña; y la tercera cerró las
 transiciones, la persistencia, la recuperación y las superficies de consumo. El objetivo de la implementación no es declarar un modelo definitivo, sino demostrar que las familias
 seleccionadas comparten un protocolo temporal, que sus parámetros quedan gobernados y que
 ningún resultado parcial puede confundirse con una ejecución completa. Por eso la regeneración integral de resultados se mantuvo separada y sólo se ejecutó después de acreditar los insumos,
@@ -2142,16 +2142,16 @@ el código y los entornos.
 \begin{table}[htbp]
 \centering
 \footnotesize
-\caption[Aporte de cada avance de implementación]{Aporte de cada avance (A8, A9 y A10) a la
-sección 1.4.1. Cada avance conserva los contratos del anterior y añade una frontera distinta.}
+\caption[Etapas de la implementación]{Aporte de cada etapa de la implementación de la
+sección 1.4.1. Cada etapa conserva los contratos de la anterior y añade una frontera distinta.}
 \label{tab:avances_a10}
 \begin{tabular}{@{}>{\RaggedRight\arraybackslash}p{1.3cm}>{\RaggedRight\arraybackslash}p{3.3cm}>{\RaggedRight\arraybackslash}p{5.2cm}>{\RaggedRight\arraybackslash}p{3.8cm}@{}}
 \toprule
 \rowcolor{uacjblue!15}
-\textbf{Avance} & \textbf{Problema resuelto} & \textbf{Aporte principal} & \textbf{Puerta de aceptación} \\ \midrule
-\textbf{A8} & Convertir el diseño en cálculo reproducible & Representación causal, registro de modelos, recorrido temporal (\hyperref[fig:implementacion_a8]{Figura~\ref*{fig:implementacion_a8}}, \hyperref[alg:implementacion_a8]{Algoritmo~\ref*{alg:implementacion_a8}}), parámetros gobernados, métricas y promoción atómica & Pruebas unitarias, causalidad y maestro dorado \\
-\textbf{A9} & Integrar componentes sin mezclar procedencias & Registro canónico, preparación aislada por campaña, transporte de ETS y Theta, cobertura multisemilla y verificación previa & Verificación previa, recibos recalculados al leer, conjuntos exactos de claves y pruebas de sustitución \\
-\textbf{A10} & Cerrar el ciclo de vida del resultado & Sello de arranque, estados de campaña (\hyperref[fig:estados_a10]{Figura~\ref*{fig:estados_a10}}), persistencia según capacidad, clasificación de fallos, consumo y cierre (\hyperref[alg:cierre_a10]{Algoritmo~\ref*{alg:cierre_a10}}) & Verificación del sello, transacción y autorización humana de publicación \\ \bottomrule
+\textbf{Etapa} & \textbf{Problema resuelto} & \textbf{Aporte principal} & \textbf{Puerta de aceptación} \\ \midrule
+\textbf{1} & Convertir el diseño en cálculo reproducible & Representación causal, registro de modelos, recorrido temporal (\hyperref[fig:implementacion_a8]{Figura~\ref*{fig:implementacion_a8}}, \hyperref[alg:implementacion_a8]{Algoritmo~\ref*{alg:implementacion_a8}}), parámetros gobernados, métricas y promoción atómica & Pruebas unitarias, causalidad y maestro dorado \\
+\textbf{2} & Integrar componentes sin mezclar procedencias & Registro canónico, preparación aislada por campaña, transporte de ETS y Theta, cobertura multisemilla y verificación previa & Verificación previa, recibos recalculados al leer, conjuntos exactos de claves y pruebas de sustitución \\
+\textbf{3} & Cerrar el ciclo de vida del resultado & Sello de arranque, estados de campaña (\hyperref[fig:estados_a10]{Figura~\ref*{fig:estados_a10}}), persistencia según capacidad, clasificación de fallos, consumo y cierre (\hyperref[alg:cierre_a10]{Algoritmo~\ref*{alg:cierre_a10}}) & Verificación del sello, transacción y autorización humana de publicación \\ \bottomrule
 \end{tabular}
 \end{table}
 
@@ -2265,7 +2265,7 @@ conjunto reservado $H=24$ y semilla $s$
 
 \paragraph{Configuración gobernada.} Los valores se concentran en un módulo de configuración y
 no se repiten dentro de cada algoritmo. La \hyperref[tab:config_a10]{Tabla~\ref*{tab:config_a10}} reúne los parámetros
-matemáticos del primer avance y los de ejecución y aceptación que añadieron los otros dos,
+matemáticos de la primera etapa y los de ejecución y aceptación que añadieron las otras dos,
 separados de los hiperparámetros de cada candidato para que una decisión de gobernanza no se
 confunda con una búsqueda estadística. Los valores de aceptación no se optimizan junto con el
 modelo: constituyen el protocolo bajo el cual una métrica o un pronóstico adquiere validez.
@@ -2299,7 +2299,7 @@ Promoción & Cobertura exacta de claves y autorización & Prohíbe versiones par
 \end{tabular}
 \end{table}
 
-\paragraph{Integración acreditada.} El segundo avance unió esos componentes en una ejecución
+\paragraph{Integración acreditada.} La segunda etapa unió esos componentes en una ejecución
 gobernada: ya no bastaba que cada estimador produjera un valor, había que demostrar que todos
 los valores obligatorios procedían del mismo panel, código, entorno y campaña. Se incorporaron
 cuatro mecanismos. Un registro canónico sustituye las listas distintas de productores,
@@ -2349,7 +2349,7 @@ hecho de que existan y los mensajes nombran las claves ausentes y no esperadas. 
 el perfil de las redes recurrentes limita los hilos de cómputo (evita fallos de segmentación) y
 fija el orden de carga de las bibliotecas paralelas de XGBoost y PyTorch.
 
-\paragraph{Sello de arranque y máquina de estados.} El tercer avance convierte las piezas
+\paragraph{Sello de arranque y máquina de estados.} La tercera etapa convierte las piezas
 verificadas en un protocolo operacional. Antes de crear un artefacto, el lanzador comprueba un
 repositorio limpio y deriva la identidad desde fuentes vivas: revisión del código, suma del
 panel, inventario de instantáneas, archivos de bloqueo, entornos instalados y conjunto exacto de
@@ -2422,7 +2422,7 @@ de un archivo como una transición válida.
   \foreach \i in {1, 2, 3}
     \draw[reject] ([yshift=-1.35cm]s\i) -- ([yshift=-1.83cm]s\i);
 \end{tikzpicture}
-\caption[Máquina de estados de la campaña]{Máquina de estados del tercer avance. Sólo una
+\caption[Máquina de estados de la campaña]{Máquina de estados de la campaña. Sólo una
 campaña calculada, validada por revisión humana y autorizada puede publicarse; cualquier fallo
 conserva la evidencia y la versión servida anterior.}
 \label{fig:estados_a10}
@@ -2515,7 +2515,7 @@ de aceptar declaraciones del llamador.
 \begin{table}[htbp]
 \centering
 \footnotesize
-\caption[Pruebas y evidencia del avance 3]{Capas de verificación empleadas en el cierre de la
+\caption[Pruebas y evidencia de la implementación]{Capas de verificación empleadas en el cierre de la
 implementación. Ninguna capa sustituye a las demás.}
 \label{tab:pruebas_a10}
 \begin{tabular}{@{}p{3.4cm}p{5.0cm}p{4.8cm}@{}}
@@ -2532,11 +2532,11 @@ Verificación de sólo lectura & Código, entorno, datos y protocolo concuerdan 
 \end{tabular}
 \end{table}
 
-\paragraph{Cierre de la sección 1.4.1.} Con los tres avances, el diseño queda convertido en una
-solución funcional, mantenible y evaluable. El estado de cada avance se declaró sin anticipar
-resultados. La campaña integral no formaba parte del segundo avance y entonces no se había
-iniciado; al cierre del tercer avance la implementación estaba verificada localmente, pero la
-campaña prolongada no se había ejecutado y la publicación quedaba fuera del avance. Antes de
+\paragraph{Cierre de la sección 1.4.1.} Con las tres etapas, el diseño queda convertido en una
+solución funcional, mantenible y evaluable. El estado de cada etapa se declaró sin anticipar
+resultados. La campaña integral no formaba parte de la segunda etapa y entonces no se había
+iniciado; al cierre de la tercera la implementación estaba verificada localmente, pero la
+campaña prolongada no se había ejecutado y la publicación quedaba fuera de ese alcance. Antes de
 autorizarla quedaba una verificación final: se exigió una verificación de sólo
 lectura sobre el mismo estado que se pretendía ejecutar y, en particular, sobre el vínculo entre
 el sello comparado al arrancar, la transacción y los artefactos que una publicación posterior
