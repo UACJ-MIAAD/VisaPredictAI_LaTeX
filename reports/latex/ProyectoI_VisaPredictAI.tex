@@ -3928,12 +3928,11 @@ DVC \cita{43}                  & \textit{fijada por perfil} & Grafo de dependenc
 
 \paragraph{Carga de boletines: el congelado automático y la carga manual.} \texttt{make freeze} es
 el paso que la tarea programada de días hábiles (Apéndice~A.3) ejecuta para descargar y congelar
-cada boletín nuevo sin intervención. Desde agosto de 2026 el cortafuegos de aplicación del sitio
-del Departamento de Estado responde con un rechazo (HTTP 403) a esa descarga automática, de modo
-que el congelado ya no obtiene la página del mes: la tarea registra la fuente como bloqueada en
-el feed de ingesta (\texttt{reports/governance/ingestion\_state.json}), que declara el estado
-vigente, desde cuándo rige y su causa, y no fabrica ni reutiliza datos. Desde entonces cada
-boletín se \textbf{carga de forma manual} por una de dos órdenes gobernadas:
+cada boletín nuevo. El cortafuegos de aplicación del sitio del Departamento de Estado rechaza esa
+descarga automática, de modo que el congelado ya no obtiene la página del mes: la tarea registra
+la fuente como bloqueada en el feed de ingesta (\texttt{reports/governance/ingestion\_state.json}),
+que declara el estado vigente, desde cuándo rige y su causa, y no fabrica ni reutiliza datos.
+Mientras dure el bloqueo, cada boletín se \textbf{carga de forma manual} por una de dos órdenes gobernadas:
 \texttt{make ingest-manual FILE=\ldots} valida e ingiere la página HTML que una persona
 descargó del sitio oficial, y \texttt{make bulletin MONTH=AAAA-MM} parte del PDF oficial del
 boletín (Sección~2.3, \hyperref[fig:ingesta_pdf_asistida]{Figura~\ref*{fig:ingesta_pdf_asistida}}). Ambas conservan el congelado
