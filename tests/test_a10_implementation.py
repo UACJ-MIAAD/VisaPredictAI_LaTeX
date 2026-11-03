@@ -33,7 +33,7 @@ def test_a10_conserva_los_avances_previos_y_anade_el_cierre() -> None:
     ):
         assert seccion.count(rf"\label{{{etiqueta}}}") == 1
     # Consolidación 1.4.1 (29-oct-2026): la taxonomía de fallos de A10 se conserva en prosa, con
-    # su respuesta segura por clase, y la tabla de avances identifica el aporte de A10.
+    # su respuesta segura por clase, y la tabla de etapas identifica el aporte de la tercera.
     normal = _normalizada()
     for respuesta in ("un entorno divergente del archivo de bloqueo aborta antes de calcular",
                       "un linaje inválido rechaza la etapa de datos",
@@ -43,7 +43,7 @@ def test_a10_conserva_los_avances_previos_y_anade_el_cierre() -> None:
                       "bloquea la promoción final"):
         assert respuesta in normal, respuesta
     avances = normal[normal.index(r"\label{tab:avances_a10}"):]
-    assert r"\textbf{A10} & Cerrar el ciclo de vida del resultado" in avances[: avances.index(r"\end{table}")]
+    assert r"\textbf{3} & Cerrar el ciclo de vida del resultado" in avances[: avances.index(r"\end{table}")]
 
 
 def test_a10_define_estados_y_prohibe_transiciones_por_existencia() -> None:
@@ -79,7 +79,7 @@ def test_a10_consolida_el_protocolo_sin_confundirlo_con_hiperparametros() -> Non
 def test_a10_mantiene_verificacion_y_campana_como_fronteras_explicitas() -> None:
     seccion = _normalizada()
     assert "la campaña prolongada no se había ejecutado" in seccion
-    assert "la publicación quedaba fuera del avance" in seccion
+    assert "la publicación quedaba fuera de ese alcance" in seccion
     assert "se exigió una verificación de sólo lectura" in seccion
     assert "la finalización del software de la obtención de evidencia experimental nueva" in seccion
     # lo ocurrido después se declara con su orden: verificación, validación humana, reconciliación, publicación
