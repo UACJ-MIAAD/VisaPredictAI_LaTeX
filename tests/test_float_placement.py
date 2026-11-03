@@ -39,12 +39,15 @@ def test_flafter_is_loaded() -> None:
     assert any(re.match(r"\\usepackage\{flafter\}", line.strip()) for line in _lines())
 
 
-# The EDA cites several large figures with little text between them; only there is each float pinned
+# The EDA cites several large figures with little text between them; there (and in A.6) each float is pinned
 # ([H]) right after the paragraph that cites it, so the queue cannot push them pages away.
 PINNED = {
     "tab:eda_descriptiva", "fig:eda_panel", "fig:eda_completitud", "fig:backlog_f4", "fig:eda_spaghetti",
     "fig:eda_dist", "fig:eda_violin_c", "fig:eda_violin_cat", "fig:eda_retros", "fig:eda_season",
-    "fig:eda_corr2", "fig:eda_brecha", "fig:eda_stl", "fig:eda_acf", "tab:eda_estacionariedad",
+    "fig:eda_corr2", "fig:eda_brecha", "fig:eda_stl", "fig:eda_acf",
+    # A.6 closes the document with two figures and no text between them: pinned, they share
+    # pages with that text instead of being flushed one per page before the author page.
+    "fig:eda_dv", "fig:grid_dff",
 }
 
 
