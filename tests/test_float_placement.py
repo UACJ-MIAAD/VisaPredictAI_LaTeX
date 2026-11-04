@@ -45,9 +45,10 @@ PINNED = {
     "tab:eda_descriptiva", "fig:eda_panel", "fig:eda_completitud", "fig:backlog_f4", "fig:eda_spaghetti",
     "fig:eda_dist", "fig:eda_violin_c", "fig:eda_violin_cat", "fig:eda_retros", "fig:eda_season",
     "fig:eda_corr2", "fig:eda_brecha", "fig:eda_stl", "fig:eda_acf",
-    # A.6 closes the document with two figures and no text between them: pinned, they share
-    # pages with that text instead of being flushed one per page before the author page.
-    "fig:eda_dv", "fig:grid_dff",
+    # A.6 closes the document: the lottery figure (printed at text width) after the opening text, the
+    # DFF grid on its own page, and the catalogue table after the paragraph that cites it. Floating,
+    # the table was left alone on a page or the grid overflowed the page under it.
+    "fig:eda_dv", "fig:grid_dff", "tab:catalogo",
 }
 
 

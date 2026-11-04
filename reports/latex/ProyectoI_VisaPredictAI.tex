@@ -150,6 +150,12 @@
   \ifx\@tempa\@empty\else
     \typeout{barreraflotantes: flotantes pendientes en la linea \the\inputlineno}\newpage
   \fi\endgroup}
+% \sinhuerfano antes de un encabezado en línea (\paragraph) que caería al pie de la página: si no
+% caben el encabezado y dos líneas más, el párrafo empieza en la siguiente; si caben, no hace nada.
+% El argumento opcional cambia las líneas pedidas (3 por defecto).
+\newcommand{\sinhuerfano}[1][3]{\par\begingroup\dimen@=#1\baselineskip
+  \vskip\z@\@plus\dimen@\penalty-100\vskip\z@\@plus-\dimen@
+  \vskip\dimen@\penalty9999\vskip-\dimen@\vskip\z@skip\endgroup}
 \makeatother
 \begin{document}
 
@@ -350,7 +356,7 @@ muestra el esquema. El sistema consta de cinco módulos:
       2/4.44/{Preprocesa-\\miento}/{\textit{huecos, escala,}\\\textit{calendario}},
       3/7.50/{Catálogo}/{de \textbf{\factNModels{} modelos}},
       4/10.56/{Walk-forward}/{\textit{24 meses}\\\textit{reservados}},
-      5/13.62/{Pronóstico}/{$+$ PI 95\,\%}} {
+      5/13.62/{Pronóstico}/{$+$ intervalo al 95\,\%}} {
     \fill[uacjblue, rounded corners=3pt] (\x-1.38, 0) rectangle (\x+1.38, -0.82);
     \fill[uacjblue] (\x-1.38, -0.45) rectangle (\x+1.38, -0.82);
     \draw[uacjblue, line width=0.8pt, rounded corners=3pt] (\x-1.38, 0) rectangle (\x+1.38, -1.72);
@@ -405,7 +411,8 @@ líneas base de referencia (naïve-1 o paseo aleatorio, deriva y naïve estacion
 familias: estadísticos (ARIMA, SARIMA), suavizamiento y espacio de estados (suavizamiento exponencial con error, tendencia y
 estacionalidad, \textit{Error-Trend-Seasonality}, ETS, amortiguado, Theta, Kalman, tendencia lineal local), aditivo (Prophet), árboles sobre
 deltas (XGBoost, LightGBM, CatBoost), lineales y redes profundas (DLinear, NLinear,
-RLinear, TiDE, LSTM, DeepAR, ARIMA-LSTM, N-BEATS, N-HiTS, TFT) y un \textit{foundation
+RLinear, TiDE, LSTM, DeepAR, ARIMA-LSTM, N-BEATS, N-HiTS y las redes de fusión temporal, TFT por sus
+siglas en inglés) y un \textit{foundation
 model} zero-shot (Chronos).
 \item \textbf{Validación walk-forward.}\cita{2} Validación temporal con ventana
 expansible y paso mensual que evalúa cada modelo sin fuga de información, reservando
@@ -465,6 +472,7 @@ celdas con fecha son objetivo predictivo.}
 \label{fig:tabla_pub}
 \end{figure}
 
+\sinhuerfano
 \paragraph{Fuentes complementarias.} Junto a la fuente primaria se identificaron tres
 fuentes que no aportan la variable a predecir, pero sí el contexto necesario para
 interpretarla y para validar las reglas de negocio del sistema. La primera es el marco
@@ -2310,6 +2318,7 @@ Promoción & Cobertura exacta de claves y autorización & Prohíbe versiones par
 \end{tabular}
 \end{table}
 
+\sinhuerfano
 \paragraph{Integración acreditada.} La segunda etapa unió esos componentes en una ejecución
 gobernada: ya no bastaba que cada estimador produjera un valor, había que demostrar que todos
 los valores obligatorios procedían del mismo panel, código, entorno y campaña. Se incorporaron
@@ -3223,6 +3232,7 @@ y la cobertura empírica del intervalo al $95$\,\% desciende de 0.97 a 0.88.}
 \end{tabular}
 \end{table}
 
+\sinhuerfano
 \paragraph{Evidencia servida en vivo.} En el corte de noviembre de 2026 se habían calificado
 \factLivePairsScored{} pronósticos servidos en vivo, casi todos a uno a tres meses: MAE de 190 días, MASE de 0.57 y
 cobertura del intervalo al $95$\,\% de 0.83 (intervalo de confianza del $95$\,\%
@@ -4582,7 +4592,30 @@ recalcularse al incorporar otro boletín.
 
 Esta sección reúne material complementario: el catálogo de categorías observadas, al que
 remite el Apéndice~A.5, y dos figuras que el cuerpo cita: la serie del sorteo de diversidad y
-las trayectorias de \textit{Dates for Filing}.
+las trayectorias de \textit{Dates for Filing}. La primera muestra que el rango de corte del sorteo
+sigue el ciclo del año fiscal y, por ser un número de sorteo y no una fecha, queda fuera del objetivo
+predictivo; la segunda repite para DFF la validación por categoría que el cuerpo presenta para FAD.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{eda3_g10_dv.pdf}
+\caption[Rangos de corte del sorteo de diversidad]{Rango de corte del sorteo de
+diversidad por región (2001--2026). El patrón de diente de sierra corresponde al
+ciclo del año fiscal; el valor es un número de sorteo, no una fecha, y queda fuera
+del objetivo predictivo del sistema.}
+\label{fig:eda_dv}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{results_backtest_grid_DFF.pdf}
+\caption[Validación por categoría sobre el conjunto reservado (DFF)]{Validación del pronóstico sobre el
+conjunto reservado de 24 meses para las 25 combinaciones país$\times$categoría de la tabla DFF,
+análogo al de la \hyperref[fig:grid_fad]{Figura~\ref*{fig:grid_fad}}. Las series prácticamente constantes (p.\,ej., varias
+de Filipinas) aparecen como líneas planas que el modelo reproduce con error casi nulo; las de
+movimiento rápido muestran bandas de predicción más anchas.}
+\label{fig:grid_dff}
+\end{figure}
 
 El panel cubre cinco áreas de cargabilidad y veintiuna categorías migratorias. La
 \hyperref[tab:catalogo]{Tabla~\ref*{tab:catalogo}} presenta el catálogo con el número de observaciones de cada
@@ -4591,7 +4624,7 @@ equivalen al producto cartesiano de las dimensiones: varias subcategorías nacie
 desaparecieron a lo largo del periodo (por ejemplo, las reservas de EB-5 creadas en 2022 o
 la categoría de traductores), de modo que solo existen en una fracción de los meses.
 
-\begin{table}[htbp]
+\begin{table}[H]
 \centering
 \footnotesize
 \caption[Catálogo de dimensiones observadas]{Categorías migratorias observadas en el panel,
@@ -4617,30 +4650,6 @@ Empleo & EB4\_TRANS & 40      & \multicolumn{2}{l}{\textbf{Total panel}}    & \t
 \bottomrule
 \end{tabular}
 \end{table}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.62\textwidth]{eda3_g10_dv.pdf}
-\caption[Rangos de corte del sorteo de diversidad]{Rango de corte del sorteo de
-diversidad por región (2001--2026). El patrón de diente de sierra corresponde al
-ciclo del año fiscal; el valor es un número de sorteo, no una fecha, y queda fuera
-del objetivo predictivo del sistema.}
-\label{fig:eda_dv}
-\end{figure}
-
-
-
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{results_backtest_grid_DFF.pdf}
-\caption[Validación por categoría sobre el conjunto reservado (DFF)]{Validación del pronóstico sobre el
-conjunto reservado de 24 meses para las 25 combinaciones país$\times$categoría de la tabla DFF,
-análogo al de la \hyperref[fig:grid_fad]{Figura~\ref*{fig:grid_fad}}. Las series prácticamente constantes (p.\,ej., varias
-de Filipinas) aparecen como líneas planas que el modelo reproduce con error casi nulo; las de
-movimiento rápido muestran bandas de predicción más anchas.}
-\label{fig:grid_dff}
-\end{figure}
 
 % ============================================================
 % ACERCA DEL AUTOR Y DEL ASESOR DE TESIS
