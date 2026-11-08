@@ -250,7 +250,8 @@ reservado \textbf{ningún modelo puntual lo supera con significancia estadístic
 se valida, en cambio, sobre el producto completo: pronósticos a horizontes de 1 a 12 meses
 (donde la ventaja de repetir el último valor se diluye), intervalos de predicción calibrados
 por horizonte desde un registro de \factProspNScoredFmt{} predicciones evaluadas fuera de
-muestra (\textit{backfill} sin fuga de información; las añadas servidas en vivo se acumulan
+muestra (\textit{backfill} congelado en junio de 2026, antes del relleno causal de huecos, por lo que se lee como
+orientativo hasta regenerarlo; las añadas servidas en vivo se acumulan
 desde julio de 2026), coherencia transversal entre tablas y áreas de cargabilidad, y una gobernanza
 campeón-retador-sombra que incorpora la propia línea base como retador formal y decidirá su
 promoción con evidencia prospectiva multi-horizonte.
@@ -3197,9 +3198,9 @@ frente al naïve-1 sigue pendiente de contraste (limitación~iv).
 
 \paragraph{La evidencia por horizonte: el registro de evaluación prospectiva.} La
 \hyperref[tab:prospectivo_horizonte]{Tabla~\ref*{tab:prospectivo_horizonte}} resume cómo crece el error con el horizonte en el registro
-(\factProspNScoredFmt{} pronósticos generados solo con la información disponible hasta su origen
-y calificados contra el corte publicado después). Las añadas históricas son un
-\textit{backfill} sin fuga (reproducen lo que el sistema habría pronosticado en cada origen);
+(\factProspNScoredFmt{} pronósticos calificados contra el corte publicado después). Las añadas
+históricas son un \textit{backfill} congelado en junio de 2026, antes del relleno causal de huecos: en los orígenes que caen dentro de un hueco heredó la interpolación bidireccional, cuyo extremo futuro los alcanzaba (§1.2.2),
+por lo que el registro se lee como orientativo hasta regenerarlas con el código actual;
 desde el despliegue de julio de 2026 el flujo automático congela cada añada al emitirla, de modo
 que la evidencia genuinamente prospectiva se acumula con cada corte (mientras la fuente rechace
 la descarga automática, a través de la ingesta semiautomática de la Sección~2.3). A un paso el
@@ -3212,8 +3213,8 @@ registro promedia MASE $\factProspMase$ y MAE $\factProspMaeDays$ días.
 \begin{table}[htbp]
 \centering
 \caption[Desempeño por horizonte del registro de evaluación]{Registro de evaluación del
-sistema (\textit{backfill} sin fuga de información: pronósticos generados con la
-información disponible hasta su origen y calificados contra el corte publicado después;
+sistema (\textit{backfill} congelado en junio de 2026, antes del relleno causal de huecos: en los orígenes que caen dentro de un hueco heredó la interpolación bidireccional, cuyo extremo futuro los alcanzaba;
+pronósticos calificados contra el corte publicado después;
 \factProspNScoredFmt{} evaluaciones). El error crece de forma ordenada con el horizonte
 y la cobertura empírica del intervalo al $95$\,\% desciende de 0.97 a 0.88.}
 \label{tab:prospectivo_horizonte}
@@ -3566,8 +3567,8 @@ tres horizontes (§2.3).
 
 \paragraph{Dónde está el valor del sistema.} El valor del sistema está en lo que un paseo
 aleatorio no ofrece: (a) \textbf{horizontes de 1 a 12 meses}, evaluados con un registro de
-\factProspNScoredFmt{} predicciones con información truncada a su origen (\textit{backfill} sin
-fuga; la evidencia en vivo se acumula desde julio de 2026; MASE $\factProspMase$, MAE
+\factProspNScoredFmt{} predicciones (\textit{backfill} congelado antes del relleno causal de huecos,
+orientativo hasta regenerarlo; la evidencia en vivo se acumula desde julio de 2026; MASE $\factProspMase$, MAE
 $\factProspMaeDays$ días; \hyperref[tab:prospectivo_horizonte]{Tabla~\ref*{tab:prospectivo_horizonte}}); (b) \textbf{intervalos de
 predicción ajustados por horizonte} (cuantiles empíricos e inferencia conforme adaptativa) con
 cobertura medida y declarada, aun bajo el nominal (§2.2); (c)
@@ -3598,8 +3599,9 @@ cortas la calibración base sub-cubre todavía más.
 \item Los resultados profundos son sensibles a la semilla; en GPU (Apéndice~A.4) las
 arquitecturas de frontera no baten el piso a corto y mediano plazo, y la ventaja a horizonte
 largo proviene de un modelo clásico.
-\item El registro por horizonte es aún un \textit{backfill} sin fuga: solo las añadas
-congeladas desde julio de 2026, acumuladas mes con mes, son evidencia en tiempo real.
+\item El registro por horizonte es aún un \textit{backfill} congelado en junio de 2026, antes del relleno causal de huecos: en los orígenes que caen dentro de un hueco heredó la interpolación bidireccional, cuyo extremo futuro los alcanzaba;
+debe regenerarse con el código actual, y solo las añadas congeladas desde julio de 2026,
+acumuladas mes con mes, son evidencia en tiempo real.
 \item La ingesta manual-automatizada depende de la descarga humana del PDF mientras la fuente
 bloquee el acceso automático (Sección~2.3).
 \end{enumerate}
