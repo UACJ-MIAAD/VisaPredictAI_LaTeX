@@ -1592,10 +1592,12 @@ asociaciones que superaran el umbral entre los descriptores evaluados y la dific
 pronóstico.
 \else
 con este protocolo y el control de falso descubrimiento establecido
-\ifnum\feFactSelRelevant=1 solo uno supera el umbral (\texttt{\feFactSelName}).\else solo
-\feFactSelRelevant{} superan el umbral.\fi{}
+\ifnum\feFactSelRelevant=1 solo un descriptor supera el umbral (\texttt{\feFactSelName}).\else solo
+\feFactSelRelevant{} descriptores superan el umbral; su lista queda en el registro reproducible
+(\texttt{reports/fe/fe\_facts.json}).\fi{}
 \fi
-Este resultado no demuestra ausencia de señal ni permite comparar el rendimiento predictivo
+\ifnum\feFactSelRelevant=0 Este resultado no demuestra ausencia de señal ni permite\else La
+asociación es descriptiva: no permite\fi{} comparar el rendimiento predictivo
 de conjuntos de características, porque los modelos no consumen estos descriptores. La
 des-redundancia previa responde a que las bibliotecas de características de series de
 tiempo comparten buena parte de su información \cita{22}.
@@ -1710,7 +1712,7 @@ Tablas no intercambiables: la brecha entre DFF y FAD tiene mediana cercana a un 
 \hyperref[fig:eda_brecha]{Figura~\ref*{fig:eda_brecha}} &
 FAD y DFF se entrenan y se evalúan por separado, y nunca se comparan como si midieran lo mismo \\
 Con este protocolo, de \feFactSelIn{} descriptores candidatos
-\ifnum\feFactSelRelevant=0 ninguno supera\else\ifnum\feFactSelRelevant=1 solo uno supera\else solo \feFactSelRelevant{} superan\fi\fi{}
+\ifnum\feFactSelRelevant=0 ninguno supera\else\ifnum\feFactSelRelevant=1 solo uno supera\else solo \feFactSelRelevant{} descriptores superan\fi\fi{}
 el control de falso descubrimiento como asociación con la dificultad (resultado
 descriptivo, no comparación predictiva) &
 Selección FRESH y mRMR &
@@ -3236,10 +3238,13 @@ y la cobertura empírica del intervalo al $95$\,\% desciende de 0.97 a 0.88.}
 
 \sinhuerfano
 \paragraph{Evidencia servida en vivo.} En el corte de diciembre de 2026 se habían calificado
-\factLivePairsScored{} pronósticos servidos en vivo, la mayoría a uno a tres meses: MAE de 183 días, MASE de 0.55 y
+\factLivePairsScored{} pronósticos servidos en vivo, la mayoría a horizontes de uno a tres meses: MAE de 182 días, MASE de 0.55 y
 cobertura del intervalo al $95$\,\% de 0.85 (intervalo de confianza del $95$\,\%
-$[0.83,\,0.87]$), por debajo del nominal. Por pares contra la sombra naïve-1, el campeón FAD
-obtiene MASE 0.468 frente a 0.506 (552 pares) y el campeón DFF 0.685 frente a 0.758 (359 pares):
+$[0.83,\,0.87]$), por debajo del nominal. Por pares contra la sombra, el campeón FAD
+obtiene MASE 0.468 frente a 0.506 de naïve-1 (552 pares) y el campeón DFF 0.685 frente a 0.758
+(359 pares; en DFF la sombra registrada combina naïve-1 y la mediana de SARIMA, ETS y Theta). A un
+mes la sombra es mejor en ambas tablas, de dos a cinco meses gana el campeón y más allá las
+muestras son todavía mínimas:
 diferencias descriptivas que alimentan la decisión prospectiva de promoción, no una prueba
 confirmatoria.
 
