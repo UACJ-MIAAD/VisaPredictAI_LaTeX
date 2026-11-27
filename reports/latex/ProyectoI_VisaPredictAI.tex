@@ -1592,8 +1592,8 @@ asociaciones que superaran el umbral entre los descriptores evaluados y la dific
 pronóstico.
 \else
 con este protocolo y el control de falso descubrimiento establecido
-\ifnum\feFactSelRelevant=1 solo uno supera\else solo \feFactSelRelevant{} superan\fi{} el umbral
-(\texttt{\feFactSelName}).
+\ifnum\feFactSelRelevant=1 solo uno supera el umbral (\texttt{\feFactSelName}).\else solo
+\feFactSelRelevant{} superan el umbral.\fi{}
 \fi
 Este resultado no demuestra ausencia de señal ni permite comparar el rendimiento predictivo
 de conjuntos de características, porque los modelos no consumen estos descriptores. La
