@@ -1279,7 +1279,7 @@ la prueba ADF pierde potencia precisamente bajo tendencia fuerte y muestras cort
 alcanza la envolvente de potencia óptima; también confirma la no estacionariedad en
 nivel ($p=0.78$), reforzando de forma más robusta la elección $d=1$. La
 \hyperref[fig:eda_acf]{Figura~\ref*{fig:eda_acf}} muestra la autocorrelación de la serie diferenciada, que
-orienta el orden de los modelos ARIMA y SARIMA.
+orienta el orden de ARIMA y SARIMA según el ciclo de Box-Jenkins (identificación, estimación y diagnóstico con Ljung-Box).
 
 \begin{figure}[H]
 \centering
@@ -1951,13 +1951,15 @@ inductivo} distinto, que permite anticipar y luego contrastar cuál encaja con e
 
 \paragraph{Estadísticos lineales: ARIMA y SARIMA \cita{24}.} Modelan la serie como una
 combinación lineal de sus valores y errores pasados (SARIMA añade términos estacionales) y se
-eligen porque las series son fuertemente autorregresivas. Revelan una fragilidad clave: con las
+eligen porque las series son fuertemente autorregresivas. Usan un orden único, ARIMA$(2,1,2)$ y
+SARIMA$(1,1,1)(1,0,1)_{12}$, con $d=1$ por las pruebas de raíz unitaria (control Auto-ARIMA en §2.2). Revelan una fragilidad clave: con las
 series cortas de DFF, SARIMA solo converge en 17 de 25 series y ARIMA en 23 (falla numérica
 \textit{LinAlgError}), un sesgo de supervivencia que desmiente cualquier ventaja aparente.
 
 \paragraph{Suavizamiento parsimonioso y espacio de estados: ETS amortiguado, Theta, Kalman y
 tendencia lineal local.} El suavizamiento exponencial con tendencia
-amortiguada\cita{25}\cita{26}, la descomposición de Theta\cita{27}, el filtro de
+amortiguada\cita{25}\cita{26} (familia ETS, que incluye los métodos de Holt y Holt-Winters; sin
+componente estacional, casi nulo aquí), la descomposición de Theta\cita{27}, el filtro de
 Kalman\cita{28} y el modelo estructural de tendencia lineal local (LLT, nivel más pendiente
 en espacio de estados) comparten una virtud decisiva: \textbf{pocos parámetros}. Theta y ETS
 resultan los mejores modelos \textit{entrenados} en el conjunto reservado de FAD, y el LLT, a
@@ -2645,7 +2647,7 @@ mejoran}, con reversión por serie a los valores por defecto cuando estos ganan 
 §2.2). En las redes globales la búsqueda incorpora la arquitectura (tamaño oculto,
 \textit{dropout}, núcleo) con parada temprana, se ejecuta \textit{una sola vez} y la
 configuración ganadora se reentrena con cinco semillas. Los modelos estadísticos no entran en
-esta búsqueda porque su selección por criterio de información (AICc) ya cumple esa función.
+esta búsqueda: ETS elige su forma por AICc y ARIMA y SARIMA usan un orden fijo (control en §2.2).
 
 Los intervalos de predicción al 95\,\% se generan por tres mecanismos complementarios: el
 probabilístico, en que ARIMA, SARIMA y DeepAR muestrean su distribución predictiva y se leen los
